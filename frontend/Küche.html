@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍳 Küche</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #1a1a2e; color: #eee; }
+        .order-card { background: #16213e; border: none; border-radius: 12px; }
+        .order-card.new { border-left: 5px solid #f39c12; }
+        .badge-pending { background: #f39c12; }
+        h2 { color: #f39c12; }
+        .btn-ready { background: #27ae60; border: none; color: white; }
+        .kitchen-print-btn { background: #2980b9; border: none; color: white; }
+    </style>
+</head>
+<body class="p-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🍳 Küche - Bestellungen</h2>
+    <span class="badge bg-warning text-dark" id="count">0 offen</span>
+</div>
+
+<div id="orders" class="row"></div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+function loadOrders() {
+    fetch(API + "/kitchen")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("count").textContent = data.length + " offen";
+        let html = "";
+
+        if (data.length === 0) {
+            html = '<div class="col"><p class="text-muted">Keine offenen Bestellungen ✅</p></div>';
+        }
+
+        data.forEach(order => {
+            // ✅ FIX: items is already parsed array from API
+            let itemsHtml = "";
+            if (Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    itemsHtml += `<li>${item.name} × ${item.qty} <span class="text-muted">(${(item.price * item.qty).toFixed(2)} €)</span></li>`;
+                });
+            }
+
+            html += `
+                <div class="col-md-4 mb-3">
+                    <div class="card order-card new p-3">
+                        <div class="d-flex justify-content-between">
+                            <h5>🪑 Tisch ${order.table_number}</h5>
+                            <small class="text-muted">#${order.id}</small>
+                        </div>
+                        <small class="text-muted">${order.created_at || ""}</small>
+                        <ul class="mt-2">${itemsHtml}</ul>
+                        <hr style="border-color:#333">
+                        <div class="d-flex gap-2">
+                            <button onclick="markReady(${order.id})" class="btn btn-ready flex-fill">
+                                ✅ Fertig
+                            </button>
+                            <button onclick="printKitchen(${order.id})" class="btn kitchen-print-btn">
+                                🖨️
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById("orders").innerHTML = html;
+    });
+}
+
+function markReady(id) {
+    fetch(API + "/orders/" + id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "ready" })
+    }).then(() => loadOrders());
+}
+
+// ✅ مرحله ۲: چاپ برای آشپزخانه
+function printKitchen(id) {
+    fetch(API + "/orders/" + id)
+    .then(res => res.json())
+    .then(order => {
+        let itemsText = "";
+        order.items.forEach(item => {
+            itemsText += `<tr>
+                <td>${item.name}</td>
+                <td style="text-align:center">${item.qty}</td>
+            </tr>`;
+        });
+
+        const win = window.open("", "_blank", "width=350,height=500");
+        win.document.write(`
+            <html><head>
+            <title>Küche Bon</title>
+            <style>
+                body { font-family: 'Courier New', monospace; padding: 15px; font-size: 16px; }
+                table { width: 100%; border-collapse: collapse; }
+                td { padding: 6px 4px; border-bottom: 1px dashed #ccc; }
+                h2 { text-align: center; }
+            </style>
+            </head><body>
+            <h2>🍳 KÜCHE BON</h2>
+            <p><b>Tisch: ${order.table_number}</b> &nbsp;&nbsp; #${order.id}</p>
+            <p>${order.created_at || ""}</p>
+            <hr>
+            <table>
+                <tr><th style="text-align:left">Artikel</th><th>Menge</th></tr>
+                ${itemsText}
+            </table>
+            </body></html>
+        `);
+        win.document.close();
+        win.print();
+    });
+}
+
+setInterval(loadOrders, 5000);
+loadOrders();
+</script>
+</body>
+</html>

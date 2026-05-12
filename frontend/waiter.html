@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garsone Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-pending  { border-left: 4px solid #f39c12; }
+        .status-ready    { border-left: 4px solid #27ae60; }
+        .status-paid     { border-left: 4px solid #95a5a6; opacity: 0.7; }
+    </style>
+</head>
+<body class="p-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>🧑‍🍳 Garsone Dashboard</h4>
+    <div>
+        <span class="badge bg-warning me-1">🟡 Ausstehend</span>
+        <span class="badge bg-success me-1">🟢 Fertig</span>
+        <span class="badge bg-secondary">⚫ Bezahlt</span>
+    </div>
+</div>
+
+<div id="orders" class="row"></div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+function loadOrders() {
+    fetch(API + "/orders")
+    .then(res => res.json())
+    .then(data => {
+        let html = "";
+
+        // Sort: pending first, then ready, then paid
+        data.sort((a, b) => {
+            const order = { pending: 0, ready: 1, paid: 2 };
+            return (order[a.status] || 0) - (order[b.status] || 0);
+        });
+
+        data.forEach(order => {
+            // ✅ FIX: table_number (not table)
+            let color = "secondary";
+            if (order.status === "pending") color = "warning";
+            if (order.status === "ready")   color = "success";
+
+            let itemsHtml = "";
+            if (Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    itemsHtml += `<span class="badge bg-light text-dark me-1 mb-1">${item.name} ×${item.qty}</span>`;
+                });
+            }
+
+            html += `
+                <div class="col-md-4 mb-3">
+                    <div class="card p-3 status-${order.status}">
+                        <div class="d-flex justify-content-between">
+                            <h5>🪑 Tisch ${order.table_number}</h5>
+                            <span class="badge bg-${color}">${order.status}</span>
+                        </div>
+                        <small class="text-muted">#${order.id} — ${order.created_at || ""}</small>
+                        <div class="mt-2">${itemsHtml}</div>
+                        <div class="fw-bold mt-2">💶 ${order.total ? order.total.toFixed(2) + " €" : "-"}</div>
+                        <div class="d-flex gap-2 mt-2">
+                            ${order.status !== "paid" ? `
+                                <button onclick="markPaid(${order.id})" class="btn btn-sm btn-outline-success flex-fill">
+                                    💳 Bezahlt
+                                </button>` : ""}
+                            <button onclick="printGuestReceipt(${order.id})" class="btn btn-sm btn-outline-primary">
+                                🖨️ Quittung
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById("orders").innerHTML = html || '<p class="text-muted">Keine Bestellungen</p>';
+    });
+}
+
+function markPaid(id) {
+    fetch(API + "/orders/" + id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "paid" })
+    }).then(() => loadOrders());
+}
+
+// ✅ مرحله ۲: رسید برای مهمان
+function printGuestReceipt(id) {
+    fetch(API + "/orders/" + id)
+    .then(res => res.json())
+    .then(order => {
+        const now = new Date().toLocaleString("de-DE");
+        let itemsHtml = "";
+        let total = 0;
+
+        order.items.forEach(item => {
+            const subtotal = item.price * item.qty;
+            total += subtotal;
+            itemsHtml += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td style="text-align:center">${item.qty}</td>
+                    <td style="text-align:right">${subtotal.toFixed(2)} €</td>
+                </tr>`;
+        });
+
+        const win = window.open("", "_blank", "width=380,height=600");
+        win.document.write(`
+            <html><head>
+            <title>Quittung</title>
+            <style>
+                body { font-family: 'Courier New', monospace; padding: 20px; font-size: 13px; }
+                table { width: 100%; border-collapse: collapse; }
+                td, th { padding: 5px 4px; }
+                th { border-bottom: 1px solid #333; }
+                .total-row td { border-top: 2px dashed #333; font-weight: bold; padding-top: 8px; }
+                .center { text-align: center; }
+            </style>
+            </head><body>
+            <div class="center">
+                <h3>🍴 Restaurant</h3>
+                <p>${now}</p>
+                <p>Tisch Nr. <b>${order.table_number}</b></p>
+            </div>
+            <hr style="border-style:dashed">
+            <table>
+                <tr><th>Artikel</th><th style="text-align:center">Menge</th><th style="text-align:right">Preis</th></tr>
+                ${itemsHtml}
+                <tr class="total-row">
+                    <td colspan="2">GESAMT</td>
+                    <td style="text-align:right">${total.toFixed(2)} €</td>
+                </tr>
+            </table>
+            <br>
+            <div class="center">
+                <p>Bestellung #${order.id}</p>
+                <p>MwSt. 19% inklusive</p>
+                <p>Vielen Dank für Ihren Besuch! 🙏</p>
+            </div>
+            </body></html>
+        `);
+        win.document.close();
+        win.print();
+    });
+}
+
+setInterval(loadOrders, 5000);
+loadOrders();
+</script>
+</body>
+</html>

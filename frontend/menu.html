@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parsia Restaurant – Speisekarte</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Taviraj:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold:#c8972a; --gold-light:#e8c060; --dark:#1a1208; --cream:#f5efe0; --warm:#2d1f0a; --text:#3a2a10; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--cream); color:var(--text); font-family:'Taviraj',serif; min-height:100vh; }
+        .header { background:var(--dark); text-align:center; padding:40px 20px 30px; position:relative; overflow:hidden; }
+        .header::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8972a' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+        .header-ornament { color:var(--gold); font-size:1.2rem; letter-spacing:8px; margin-bottom:10px; opacity:0.7; }
+        .header h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.5rem); color:var(--gold-light); font-weight:400; letter-spacing:3px; }
+        .header-farsi { font-size:clamp(1.2rem,4vw,2rem); color:var(--gold); margin-top:6px; opacity:0.85; direction:rtl; }
+        .header-subtitle { color:rgba(255,255,255,0.5); font-size:0.85rem; letter-spacing:4px; text-transform:uppercase; margin-top:12px; }
+        .gold-line { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:16px auto; }
+        .cart-bar { background:var(--warm); color:var(--gold-light); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.3); }
+        .cart-count { background:var(--gold); color:var(--dark); border-radius:50%; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; margin-left:8px; }
+        .btn-order { background:var(--gold); color:var(--dark); border:none; padding:8px 20px; border-radius:2px; font-family:'Taviraj',serif; font-weight:500; cursor:pointer; transition:all 0.2s; font-size:0.85rem; }
+        .btn-order:hover { background:var(--gold-light); }
+        .category-tabs { display:flex; overflow-x:auto; background:var(--dark); padding:0 20px; scrollbar-width:none; }
+        .category-tabs::-webkit-scrollbar { display:none; }
+        .tab { padding:12px 20px; color:rgba(255,255,255,0.5); cursor:pointer; white-space:nowrap; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; border-bottom:2px solid transparent; transition:all 0.2s; }
+        .tab.active,.tab:hover { color:var(--gold-light); border-bottom-color:var(--gold); }
+        .menu-container { padding:20px 16px 100px; max-width:900px; margin:0 auto; }
+        .section { display:none; }
+        .section.active { display:block; }
+        .section-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--warm); text-align:center; padding:24px 0 8px; font-weight:400; }
+        .section-subtitle { text-align:center; color:var(--gold); font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:24px; }
+        .menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+        .menu-card { background:white; border-radius:4px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08); transition:transform 0.2s,box-shadow 0.2s; }
+        .menu-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.15); }
+        .card-img { width:100%; height:200px; object-fit:cover; display:block; }
+        .card-img-placeholder { width:100%; height:200px; background:linear-gradient(135deg,#f5efe0,#e8d9b8); display:none; align-items:center; justify-content:center; font-size:3rem; }
+        .card-body { padding:14px 16px; }
+        .card-name { font-family:'Playfair Display',serif; font-size:1rem; color:var(--warm); margin-bottom:4px; }
+        .card-desc { font-size:0.78rem; color:#888; line-height:1.5; margin-bottom:12px; }
+        .card-footer { display:flex; justify-content:space-between; align-items:center; }
+        .card-price { font-size:1.1rem; font-weight:500; color:var(--gold); font-family:'Playfair Display',serif; }
+        .btn-add { background:var(--dark); color:var(--gold-light); border:none; width:32px; height:32px; border-radius:50%; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+        .btn-add:hover { background:var(--gold); color:var(--dark); }
+        .btn-add.added { background:#27ae60; color:white; }
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; justify-content:flex-end; }
+        .modal-overlay.open { display:flex; }
+        .cart-panel { background:var(--cream); width:min(400px,100vw); height:100vh; overflow-y:auto; display:flex; flex-direction:column; animation:slideIn 0.3s ease; }
+        @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+        .cart-header { background:var(--dark); color:var(--gold-light); padding:20px; display:flex; justify-content:space-between; align-items:center; }
+        .cart-header h3 { font-family:'Playfair Display',serif; font-weight:400; font-size:1.3rem; }
+        .btn-close { background:none; border:none; color:var(--gold); font-size:1.5rem; cursor:pointer; }
+        .cart-items { flex:1; padding:16px; }
+        .cart-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #e8d9b8; gap:8px; }
+        .cart-item-name { font-size:0.85rem; color:var(--warm); flex:1; }
+        .cart-item-controls { display:flex; align-items:center; gap:8px; }
+        .qty-btn { background:var(--dark); color:var(--gold-light); border:none; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .cart-item-price { font-size:0.9rem; color:var(--gold); min-width:55px; text-align:right; }
+        .cart-footer { padding:16px; background:white; border-top:1px solid #e8d9b8; }
+        .cart-total { display:flex; justify-content:space-between; font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--warm); margin-bottom:16px; }
+        .cart-total span:last-child { color:var(--gold); }
+        .table-input { width:100%; padding:10px 14px; border:1px solid #e8d9b8; border-radius:2px; font-family:'Taviraj',serif; font-size:0.9rem; margin-bottom:12px; background:var(--cream); color:var(--text); }
+        .btn-confirm { width:100%; background:var(--dark); color:var(--gold-light); border:none; padding:14px; font-family:'Playfair Display',serif; font-size:1rem; letter-spacing:2px; cursor:pointer; }
+        .btn-confirm:hover { background:var(--warm); }
+        .empty-cart { text-align:center; color:#aaa; padding:40px 20px; font-size:0.9rem; }
+        .receipt-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:300; align-items:center; justify-content:center; padding:20px; }
+        .receipt-overlay.open { display:flex; }
+        .receipt-box { background:white; max-width:360px; width:100%; padding:24px; font-family:'Courier New',monospace; border-radius:4px; max-height:90vh; overflow-y:auto; }
+        .receipt-title { text-align:center; font-size:1.2rem; font-weight:bold; margin-bottom:4px; }
+        .receipt-sub { text-align:center; font-size:0.8rem; color:#666; margin-bottom:12px; }
+        .receipt-line { display:flex; justify-content:space-between; font-size:0.85rem; padding:3px 0; }
+        .receipt-divider { border:none; border-top:1px dashed #ccc; margin:10px 0; }
+        .receipt-total { display:flex; justify-content:space-between; font-weight:bold; font-size:1rem; }
+        .receipt-thanks { text-align:center; margin-top:12px; font-size:0.8rem; color:#666; }
+        .btn-print { width:100%; background:#27ae60; color:white; border:none; padding:12px; margin-top:16px; cursor:pointer; font-size:0.95rem; border-radius:2px; }
+        .btn-close-receipt { width:100%; background:#eee; border:none; padding:10px; margin-top:8px; cursor:pointer; border-radius:2px; }
+        .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--dark); color:var(--gold-light); padding:10px 24px; border-radius:2px; font-size:0.85rem; opacity:0; transition:all 0.3s; z-index:400; pointer-events:none; white-space:nowrap; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-ornament">✦ ✦ ✦</div>
+    <h1>Parsia Restaurant</h1>
+    <div class="header-farsi">رستوران پارسیا</div>
+    <div class="gold-line"></div>
+    <div class="header-subtitle">Neunkirchen · Persische Küche</div>
+</div>
+
+<div class="cart-bar">
+    <span>🛒 Warenkorb <span class="cart-count" id="cart-count">0</span></span>
+    <button class="btn-order" onclick="openCart()">Bestellen →</button>
+</div>
+
+<div class="category-tabs">
+    <div class="tab active" onclick="showSection('vorspeisen',this)">Vorspeisen</div>
+    <div class="tab" onclick="showSection('eintoepfe',this)">Eintöpfe</div>
+    <div class="tab" onclick="showSection('grill',this)">Gegrilltes</div>
+    <div class="tab" onclick="showSection('desserts',this)">Desserts</div>
+    <div class="tab" onclick="showSection('getraenke',this)">Getränke</div>
+    <div class="tab" onclick="showSection('heisse',this)">Heiße Getränke</div>
+</div>
+
+<div class="menu-container">
+    <div class="section active" id="vorspeisen">
+        <div class="section-title">Vorspeisen</div>
+        <div class="section-subtitle">پیش غذاها</div>
+        <div class="menu-grid" id="grid-vorspeisen"></div>
+    </div>
+    <div class="section" id="eintoepfe">
+        <div class="section-title">Eintöpfe & Hauptgerichte</div>
+        <div class="section-subtitle">خورش‌ها · Wird mit Basmatireis serviert</div>
+        <div class="menu-grid" id="grid-eintoepfe"></div>
+    </div>
+    <div class="section" id="grill">
+        <div class="section-title">Vom Grill</div>
+        <div class="section-subtitle">کباب‌ها · Wird mit Basmatireis serviert</div>
+        <div class="menu-grid" id="grid-grill"></div>
+    </div>
+    <div class="section" id="desserts">
+        <div class="section-title">Desserts & Süßes</div>
+        <div class="section-subtitle">دسرها</div>
+        <div class="menu-grid" id="grid-desserts"></div>
+    </div>
+    <div class="section" id="getraenke">
+        <div class="section-title">Getränke</div>
+        <div class="section-subtitle">نوشیدنی‌ها</div>
+        <div class="menu-grid" id="grid-getraenke"></div>
+    </div>
+    <div class="section" id="heisse">
+        <div class="section-title">Heiße Getränke</div>
+        <div class="section-subtitle">نوشیدنی‌های گرم</div>
+        <div class="menu-grid" id="grid-heisse"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="cart-modal" onclick="handleOverlayClick(event)">
+    <div class="cart-panel">
+        <div class="cart-header">
+            <h3>Ihre Bestellung</h3>
+            <button class="btn-close" onclick="closeCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cart-items-list"></div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Gesamt</span><span id="cart-total-price">0.00 €</span></div>
+            <input class="table-input" id="table-input" type="number" placeholder="Tischnummer" min="1">
+            <button class="btn-confirm" onclick="sendOrder()">✓ JETZT BESTELLEN</button>
+        </div>
+    </div>
+</div>
+
+<div class="receipt-overlay" id="receipt-modal">
+    <div class="receipt-box">
+        <div id="receipt-content"></div>
+        <button class="btn-print" onclick="printReceipt()">🖨️ Quittung drucken</button>
+        <button class="btn-close-receipt" onclick="closeReceipt()">Schließen</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+const menuData = {
+    vorspeisen: [
+        { id:101, img:"images/Vorspeisen/Mirza_Ghasemi.jpeg",    name:"Mirza Ghasemi",    farsi:"میرزا قاسمی",   desc:"Rauchige, gegrillte Auberginen mit Tomaten, Knoblauch und Ei · بادمجان کبابی با گوجه، سیر و تخم‌مرغ", price:7.90 },
+        { id:102, img:"images/Vorspeisen/Kashke_Bademjoon.jpeg", name:"Kashke Bademjoon", farsi:"کشک بادمجان",   desc:"Auberginen mit Röstzwiebeln, Walnüssen, Minze und Kashk · بادمجان با کشک، پیاز داغ و گردو", price:7.50 },
+        { id:103, img:"images/Vorspeisen/Mast-o_Khiar.jpeg",     name:"Mast-o Khiar",     farsi:"ماست و خیار",   desc:"Joghurt-Dip mit Gurke und Minze · ماست با خیار و نعنا خشک", price:5.50 },
+        { id:104, img:"images/Vorspeisen/Mast-o_Moosir.jpeg",    name:"Mast-o Moosir",    farsi:"ماست و موسیر",  desc:"Joghurt-Dip mit Wildknoblauch · ماست با موسیر کوهی", price:5.50 },
+        { id:105, img:"images/Vorspeisen/Felafel.jpeg",           name:"Felafel",          farsi:"فلافل",         desc:"Knusprige Kichererbsen-Bällchen mit Kräutern · فلافل ترد با سبزیجات و ادویه", price:5.50 },
+        { id:106, img:"images/Vorspeisen/Zeytoon_Parvarde.jpeg", name:"Zeytoon Parvarde", farsi:"زیتون پرورده",  desc:"Oliven in Walnuss-Granatapfel-Paste · زیتون با گردو، رب انار و سبزی", price:5.50 },
+    ],
+    eintoepfe: [
+        { id:201, img:"images/Eintöpfe/Chelo_Ghorme_Sabzi.jpeg", name:"Chelo Ghorme Sabzi",                   farsi:"چلو قورمه سبزی",         desc:"Kräutereintopf mit Lammfleisch, Kidneybohnen und Limetten · خورش سبزی با گوشت بره و لیمو عمانی", price:14.90 },
+        { id:202, img:"images/Eintöpfe/Chelo_Ghormeh_Sabzi_vegetarisch.jpeg",  name:"Chelo Ghormeh Sabzi (vegetarisch)",    farsi:"چلو قورمه سبزی گیاهی",   desc:"Vegetarisch: Kräutereintopf mit Champignons · خورش سبزی گیاهی با قارچ و لیمو عمانی", price:14.90 },
+        { id:203, img:"images/Eintöpfe/Chelo_Khoresh_Fesenjan.jpeg",  name:"Chelo Khoresh Fesenjan",               farsi:"چلو خورش فسنجان",         desc:"Süß-saurer Eintopf mit Rinderhackfleisch, Walnüssen, Granatapfel · خورش فسنجان با گوشت چرخ‌کرده", price:18.90 },
+        { id:204, img:"images/Eintöpfe/Chelo_Khoresh_Fesenjan_vegetarisch.jpeg",  name:"Chelo Khoresh Fesenjan (vegetarisch)", farsi:"چلو خورش فسنجان گیاهی",  desc:"Vegetarisch: Süß-saurer Eintopf mit Walnüssen, Granatapfel · فسنجان گیاهی با گردو و رب انار", price:18.90 },
+        { id:205, img:"images/Eintöpfe/Baghali_Polo_Ba_Mahiche.jpeg", name:"Baghali Polo Ba Mahiche",              farsi:"باقالی پلو با ماهیچه",   desc:"Lammhaxe mit Dill-Safranreis und grünen Bohnen · ماهیچه با باقالی پلو و زعفران", price:22.90 },
+        { id:206, img:"images/Eintöpfe/Zereshk_Polo_Ba_Morgh.jpeg", name:"Zereshk Polo Ba Morgh",                farsi:"زرشک پلو با مرغ",        desc:"Hähnchenschenkel mit Berberitzen-Safranreis · مرغ با زرشک پلو و زعفران", price:19.90 },
+        { id:207, img:"images/Eintöpfe/Chelo_Mahi.jpeg", name:"Chelo Mahi",                           farsi:"چلو ماهی",               desc:"Gebratenes Fischfilet mit Safranreis oder grünen Bohnen · ماهی سرخ‌شده با برنج زعفرانی", price:22.90 },
+    ],
+    grill: [
+        { id:301, img:"images/Gegrilltes/Chelo_Kabab_Koobideh.jpeg", name:"Chelo Kabab Koobideh", farsi:"چلو کباب کوبیده", desc:"Zwei Spieße Lamm- und Rinderhackfleisch, gegrillt · دو سیخ کباب کوبیده با برنج زعفرانی", price:18.50 },
+        { id:302, img:"images/Gegrilltes/Chelo_Kabab_Barg.jpeg",  name:"Chelo Kabab Barg",     farsi:"چلو کباب برگ",    desc:"Zartes mariniertes Lammfilet in Streifen · فیله بره مرینیت‌شده با برنج زعفرانی", price:24.50 },
+        { id:303, img:"images/Gegrilltes/Chelo_Joojeh_Kabab.jpeg",  name:"Chelo Joojeh Kabab",   farsi:"چلو جوجه کباب",  desc:"Mariniertes Hähnchenfleisch in Safran · جوجه کباب زعفرانی با برنج", price:19.50 },
+        { id:304, img:"images/Gegrilltes/Chelo_Kabab_Soltani.jpeg", name:"Chelo Kabab Soltani",  farsi:"چلو کباب سلطانی", desc:"Königsplatte: Koobideh und Barg Spieß · ترکیب کباب کوبیده و برگ با برنج زعفرانی", price:29.50 },
+    ],
+    desserts: [
+        { id:401, img:"images/Desserts/Bastani_Sonati.jpeg", name:"Bastani Sonati", farsi:"بستنی سنتی", desc:"Traditionelles iranisches Safraneis mit Pistazie · بستنی زعفرانی سنتی ایرانی با پسته", price:5.00 },
+        { id:402, img:"images/Desserts/Tiramisu.jpeg",  name:"Tiramisu",       farsi:"تیرامیسو",   desc:"Klassisches italienisches Tiramisu · تیرامیسوی کلاسیک ایتالیایی", price:5.00 },
+        { id:403, img:"images/Desserts/Baklava.jpeg",  name:"Baklava",        farsi:"باقلوا",     desc:"Zwei frische Pistazien-Baklava mit Chai · دو تکه باقلوای تازه پسته‌ای با چای", price:6.00 },
+    ],
+    getraenke: [
+        { id:501, img:"images/Getränke/Doogh_0.2L.jpg",      name:"Doogh 0.2L",      farsi:"دوغ ۰.۲ لیتر",   desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:3.00 },
+        { id:502, img:"images/Getränke/Doogh_0.4L.jpg",      name:"Doogh 0.4L",      farsi:"دوغ ۰.۴ لیتر",   desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:4.00 },
+        { id:503, img:"images/Getränke/Softdrinks_0.2L.jpg",  name:"Softdrinks 0.2L", farsi:"نوشابه ۰.۲ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:2.40 },
+        { id:504, img:"images/Getränke/Softdrinks_0.4L.jpg",  name:"Softdrinks 0.4L", farsi:"نوشابه ۰.۴ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:4.00 },
+        { id:505, img:"images/Getränke/Wasser_0.25L.jpg",     name:"Wasser 0.25L",    farsi:"آب ۰.۲۵ لیتر",   desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:2.50 },
+        { id:506, img:"images/Getränke/Wasser 0.75L.jpg",     name:"Wasser 0.75L",    farsi:"آب ۰.۷۵ لیتر",   desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:6.50 },
+    ],
+    heisse: [
+        { id:601, img:"images/HeißeGetränke/Kaffee.jpg",                      name:"Kaffee",                       farsi:"قهوه",   desc:"Frisch gebrühter Kaffee · قهوه تازه‌دم", price:2.50 },
+        { id:602, img:"images/HeißeGetränke/Espresso.jpg",                    name:"Espresso",                     farsi:"اسپرسو", desc:"Klassischer Espresso · اسپرسوی کلاسیک", price:2.50 },
+        { id:603, img:"images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg",  name:"Chai – Persischer Schwarztee", farsi:"چای",    desc:"Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", price:2.00 },
+    ]
+};
+
+let cart = [];
+const urlParams = new URLSearchParams(window.location.search);
+const tableFromQR = urlParams.get("table");
+if (tableFromQR) document.getElementById("table-input").value = tableFromQR;
+
+function renderMenus() {
+    const icons = { getraenke:'🥤', heisse:'☕' };
+    for (const [section, items] of Object.entries(menuData)) {
+        const icon = icons[section] || '🍽️';
+        document.getElementById("grid-"+section).innerHTML = items.map(item => `
+            <div class="menu-card">
+                ${item.img
+                    ? `<img class="card-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                       <div class="card-img-placeholder" style="display:none">${icon}</div>`
+                    : `<div class="card-img-placeholder" style="display:flex">${icon}</div>`
+                }
+                <div class="card-body">
+                    <div class="card-name">${item.name} ${item.farsi ? `<span style="font-size:0.85rem;color:var(--gold);direction:rtl;display:inline-block;margin-right:4px">· ${item.farsi}</span>` : ''}</div>
+                    <div class="card-desc">${item.desc}</div>
+                    <div class="card-footer">
+                        <div class="card-price">${item.price.toFixed(2)} €</div>
+                        <button class="btn-add" id="btn-${item.id}" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price})">+</button>
+                    </div>
+                </div>
+            </div>`).join('');
+    }
+}
+
+function addItem(id, name, price) {
+    const ex = cart.find(i => i.id === id);
+    if (ex) { ex.qty++; } else { cart.push({id,name,price,qty:1}); }
+    updateCartCount();
+    showToast(name + " hinzugefügt ✓");
+    const btn = document.getElementById("btn-"+id);
+    if (btn) { btn.textContent="✓"; btn.classList.add("added"); setTimeout(()=>{btn.textContent="+";btn.classList.remove("added");},1000); }
+}
+
+function updateCartCount() { document.getElementById("cart-count").textContent = cart.reduce((s,i)=>s+i.qty,0); }
+
+function renderCartItems() {
+    const list = document.getElementById("cart-items-list");
+    if (!cart.length) { list.innerHTML='<div class="empty-cart">Ihr Warenkorb ist leer</div>'; document.getElementById("cart-total-price").textContent="0.00 €"; return; }
+    let total=0;
+    list.innerHTML = cart.map((item,i)=>{
+        total += item.price*item.qty;
+        return `<div class="cart-item">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-controls">
+                <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+                <span>${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+            </div>
+            <div class="cart-item-price">${(item.price*item.qty).toFixed(2)} €</div>
+        </div>`;
+    }).join('');
+    document.getElementById("cart-total-price").textContent = total.toFixed(2)+" €";
+}
+
+function changeQty(i,d) { cart[i].qty+=d; if(cart[i].qty<=0) cart.splice(i,1); updateCartCount(); renderCartItems(); }
+function openCart() { renderCartItems(); document.getElementById("cart-modal").classList.add("open"); }
+function closeCart() { document.getElementById("cart-modal").classList.remove("open"); }
+function handleOverlayClick(e) { if(e.target===e.currentTarget) closeCart(); }
+
+function sendOrder() {
+    if (!cart.length) { showToast("Bitte Artikel auswählen!"); return; }
+    const table = document.getElementById("table-input").value;
+    if (!table) { showToast("Bitte Tischnummer eingeben!"); return; }
+    const savedCart = [...cart];
+    fetch(API+"/orders", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({table,items:savedCart}) })
+    .then(r=>r.json()).then(data=>{ closeCart(); showReceiptModal(data,table,savedCart); cart=[]; updateCartCount(); })
+    .catch(()=>showToast("Verbindungsfehler!"));
+}
+
+function showReceiptModal(order, table, savedCart) {
+    const now = new Date().toLocaleString("de-DE");
+    let lines="", total=0;
+    savedCart.forEach(item=>{ const s=item.price*item.qty; total+=s; lines+=`<div class="receipt-line"><span>${item.name} ×${item.qty}</span><span>${s.toFixed(2)} €</span></div>`; });
+    document.getElementById("receipt-content").innerHTML = `
+        <div class="receipt-title">🍴 Parsia Restaurant</div>
+        <div class="receipt-sub">${now}<br>Tisch Nr. ${table}</div>
+        <hr class="receipt-divider">${lines}<hr class="receipt-divider">
+        <div class="receipt-total"><span>GESAMT</span><span>${total.toFixed(2)} €</span></div>
+        <div class="receipt-sub" style="margin-top:8px">MwSt. 19% inklusive · Bestellung #${order.order_id||''}</div>
+        <div class="receipt-thanks">Vielen Dank für Ihren Besuch! 🙏</div>`;
+    document.getElementById("receipt-modal").classList.add("open");
+}
+
+function closeReceipt() { document.getElementById("receipt-modal").classList.remove("open"); }
+function printReceipt() {
+    const c = document.getElementById("receipt-content").innerHTML;
+    const w = window.open("","_blank","width=380,height=600");
+    w.document.write(`<html><head><title>Quittung</title><style>body{font-family:'Courier New',monospace;padding:20px;font-size:13px}.receipt-line,.receipt-total{display:flex;justify-content:space-between;padding:3px 0}.receipt-total{font-weight:bold;border-top:2px dashed #333;padding-top:8px;margin-top:8px}.receipt-title{text-align:center;font-size:1.2rem;font-weight:bold}.receipt-sub,.receipt-thanks{text-align:center;font-size:0.8rem;color:#666}hr{border:none;border-top:1px dashed #ccc;margin:8px 0}</style></head><body>${c}</body></html>`);
+    w.document.close(); w.print();
+}
+
+function showSection(id, tab) {
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    tab.classList.add('active');
+}
+
+function showToast(msg) {
+    const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+renderMenus();
+</script>
+</body>
+</html>

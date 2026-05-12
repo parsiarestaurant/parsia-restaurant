@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellung</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; }
+        .menu-card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .cart-box { position: sticky; top: 10px; }
+        .badge-qty { font-size: 0.9rem; }
+        #receipt-modal .modal-body { font-family: 'Courier New', monospace; }
+        .receipt-line { display: flex; justify-content: space-between; }
+        .receipt-total { border-top: 2px dashed #333; margin-top: 8px; padding-top: 8px; font-weight: bold; }
+    </style>
+</head>
+<body class="p-3">
+
+<div class="row">
+    <!-- MENU -->
+    <div class="col-md-7">
+        <h4>🍽️ Speisekarte</h4>
+        <div id="menu"></div>
+    </div>
+
+    <!-- CART -->
+    <div class="col-md-5">
+        <div class="cart-box card p-3">
+            <h5>🛒 Warenkorb</h5>
+            <p class="text-muted small">Tisch: <strong id="table-display">-</strong></p>
+            <div id="cart-items"></div>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold">
+                <span>Gesamt:</span>
+                <span id="cart-total">0.00 €</span>
+            </div>
+            <button onclick="sendOrder()" class="btn btn-primary mt-3 w-100">✅ Bestellen</button>
+        </div>
+    </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal fade" id="receipt-modal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">🧾 Ihre Quittung</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="receipt-content"></div>
+      <div class="modal-footer">
+        <button onclick="printReceipt()" class="btn btn-success w-100">🖨️ Drucken</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = "http://127.0.0.1:8000";
+
+// ----------------------
+// TABLE FROM QR
+// ----------------------
+const urlParams = new URLSearchParams(window.location.search);
+let tableNumber = urlParams.get("table") || "1";
+document.getElementById("table-display").textContent = tableNumber;
+
+// ----------------------
+// CART
+// ----------------------
+let cart = [];
+
+function renderCart() {
+    let html = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        total += item.price * item.qty;
+        html += `
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>${item.name} x${item.qty}</span>
+                <div>
+                    <span class="me-2">${(item.price * item.qty).toFixed(2)} €</span>
+                    <button onclick="removeItem(${index})" class="btn btn-sm btn-outline-danger">✕</button>
+                </div>
+            </div>`;
+    });
+
+    document.getElementById("cart-items").innerHTML = html || '<p class="text-muted small">Leer</p>';
+    document.getElementById("cart-total").textContent = total.toFixed(2) + " €";
+}
+
+function addItem(id, name, price) {
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+        existing.qty++;
+    } else {
+        cart.push({ id, name, price, qty: 1 });
+    }
+    renderCart();
+}
+
+function removeItem(index) {
+    if (cart[index].qty > 1) {
+        cart[index].qty--;
+    } else {
+        cart.splice(index, 1);
+    }
+    renderCart();
+}
+
+// ----------------------
+// LOAD MENU
+// ----------------------
+fetch(API + "/menu")
+.then(res => res.json())
+.then(data => {
+    // Group by category
+    const categories = {};
+    data.forEach(item => {
+        if (!categories[item.category]) categories[item.category] = [];
+        categories[item.category].push(item);
+    });
+
+    let html = "";
+    for (const [cat, items] of Object.entries(categories)) {
+        html += `<h6 class="text-muted mt-3">${cat}</h6>`;
+        items.forEach(item => {
+            html += `
+                <div class="card menu-card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <b>${item.name}</b><br>
+                            <small class="text-muted">${item.description}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-success">${item.price.toFixed(2)} €</div>
+                            <button onclick="addItem(${item.id}, '${item.name}', ${item.price})"
+                                    class="btn btn-sm btn-outline-success mt-1">
+                                + Hinzufügen
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+    document.getElementById("menu").innerHTML = html;
+});
+
+// ----------------------
+// SEND ORDER
+// ----------------------
+function sendOrder() {
+    if (cart.length === 0) {
+        alert("Bitte wählen Sie Artikel aus!");
+        return;
+    }
+
+    fetch(API + "/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ table: tableNumber, items: cart })
+    })
+    .then(res => res.json())
+    .then(data => {
+        showReceipt(data);
+        cart = [];
+        renderCart();
+    });
+}
+
+// ----------------------
+// SHOW RECEIPT (مرحله ۲)
+// ----------------------
+function showReceipt(order) {
+    const now = new Date().toLocaleString("de-DE");
+    let lines = "";
+    let total = 0;
+
+    order.items && order.items.forEach ? "" : "";
+
+    // Build from cart (before clear)
+    const savedCart = [...cart];
+    let t = 0;
+    savedCart.forEach(item => {
+        t += item.price * item.qty;
+        lines += `<div class="receipt-line">
+            <span>${item.name} x${item.qty}</span>
+            <span>${(item.price * item.qty).toFixed(2)} €</span>
+        </div>`;
+    });
+
+    const html = `
+        <div style="text-align:center; margin-bottom:10px;">
+            <b>🍴 Restaurant</b><br>
+            <small>${now}</small><br>
+            <small>Tisch Nr. ${tableNumber}</small>
+        </div>
+        <hr style="border-style:dashed">
+        ${lines}
+        <div class="receipt-total receipt-line">
+            <span>GESAMT</span>
+            <span>${t.toFixed(2)} €</span>
+        </div>
+        <div style="text-align:center; margin-top:10px;">
+            <small>Bestellung #${order.order_id}</small><br>
+            <small>Vielen Dank! 🙏</small>
+        </div>
+    `;
+
+    document.getElementById("receipt-content").innerHTML = html;
+    // Store for print
+    document.getElementById("receipt-content").dataset.cart = JSON.stringify(savedCart);
+    document.getElementById("receipt-content").dataset.orderid = order.order_id;
+
+    new bootstrap.Modal(document.getElementById("receipt-modal")).show();
+}
+
+// ----------------------
+// PRINT RECEIPT
+// ----------------------
+function printReceipt() {
+    const content = document.getElementById("receipt-content").innerHTML;
+    const win = window.open("", "_blank", "width=400,height=600");
+    win.document.write(`
+        <html><head>
+        <title>Quittung</title>
+        <style>
+            body { font-family: 'Courier New', monospace; padding: 20px; font-size: 14px; }
+            .receipt-line { display: flex; justify-content: space-between; }
+            .receipt-total { border-top: 2px dashed #333; margin-top: 8px; padding-top: 8px; font-weight: bold; }
+            hr { border-style: dashed; }
+        </style>
+        </head><body>${content}</body></html>
+    `);
+    win.document.close();
+    win.print();
+}
+</script>
+</body>
+</html>
