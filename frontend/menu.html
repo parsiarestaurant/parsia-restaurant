@@ -152,8 +152,7 @@
 <div class="receipt-overlay" id="receipt-modal">
     <div class="receipt-box">
         <div id="receipt-content"></div>
-        <button class="btn-print" onclick="printReceipt()">🖨️ Quittung drucken</button>
-        <button class="btn-close-receipt" onclick="closeReceipt()">Schließen</button>
+        <button class="btn-close-receipt" onclick="closeReceipt()" style="background:var(--gold);color:var(--dark);font-weight:bold">✓ OK</button>
     </div>
 </div>
 
@@ -275,8 +274,20 @@ function sendOrder() {
     if (!table) { showToast("Bitte Tischnummer eingeben!"); return; }
     const savedCart = [...cart];
     fetch(API+"/orders", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({table,items:savedCart}) })
-    .then(r=>r.json()).then(data=>{ closeCart(); showReceiptModal(data,table,savedCart); cart=[]; updateCartCount(); })
+    .then(r=>r.json()).then(data=>{ closeCart(); showThankYou(table); cart=[]; updateCartCount(); })
     .catch(()=>showToast("Verbindungsfehler!"));
+}
+
+function showThankYou(table) {
+    document.getElementById("receipt-content").innerHTML = `
+        <div style="text-align:center;padding:20px">
+            <div style="font-size:3rem">🙏</div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#2d1f0a;margin:16px 0">Vielen Dank!</div>
+            <div style="font-size:0.9rem;color:#666;margin-bottom:8px">Ihre Bestellung wurde aufgenommen.</div>
+            <div style="font-size:0.9rem;color:#666;margin-bottom:8px">Tisch Nr. <b>${table}</b></div>
+            <div style="font-size:0.85rem;color:#c8972a;margin-top:16px">سفارش شما ثبت شد 🍽️</div>
+        </div>`;
+    document.getElementById("receipt-modal").classList.add("open");
 }
 
 function showReceiptModal(order, table, savedCart) {
