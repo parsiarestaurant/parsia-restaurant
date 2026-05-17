@@ -11,6 +11,8 @@
         .status-paid     { border-left: 4px solid #95a5a6; opacity: 0.7; }
         .filter-btn { cursor: pointer; padding: 8px 16px; border-radius: 20px; border: 2px solid transparent; font-weight: bold; }
         .filter-btn.active { border-color: #333; }
+        .btn-kitchen-print { background: #8e44ad; color: white; border: none; font-size: 0.8rem; }
+        .btn-kitchen-print:hover { background: #7d3c98; color: white; }
     </style>
 </head>
 <body class="p-4">
@@ -56,8 +58,8 @@ function loadOrders() {
 }
 
 function renderOrders() {
-    const filtered = currentFilter === "all" 
-        ? allOrders 
+    const filtered = currentFilter === "all"
+        ? allOrders
         : allOrders.filter(o => o.status === currentFilter);
 
     document.getElementById("total-count").textContent = filtered.length + " Bestellungen";
@@ -85,13 +87,16 @@ function renderOrders() {
                     <small class="text-muted">#${order.id} - ${order.created_at || ""}</small>
                     <div class="mt-2">${itemsHtml}</div>
                     <div class="fw-bold mt-2">EUR ${order.total ? order.total.toFixed(2) : "-"}</div>
-                    <div class="d-flex gap-2 mt-2">
+                    <div class="d-flex gap-2 mt-2 flex-wrap">
                         ${order.status !== "paid" ? `
                             <button onclick="markPaid(${order.id})" class="btn btn-sm btn-outline-success flex-fill">
                                 Bezahlt
                             </button>` : ""}
                         <button onclick="printGuestReceipt(${order.id})" class="btn btn-sm btn-outline-primary">
-                            Quittung
+                            🧾 Quittung
+                        </button>
+                        <button onclick="printKitchenTicket(${order.id})" class="btn btn-sm btn-kitchen-print">
+                            🍳 Küche
                         </button>
                     </div>
                 </div>
@@ -122,7 +127,35 @@ function printGuestReceipt(id) {
             itemsHtml += `<tr><td>${item.name}</td><td style="text-align:center">${item.qty}</td><td style="text-align:right">${subtotal.toFixed(2)} EUR</td></tr>`;
         });
         const win = window.open("", "_blank", "width=380,height=600");
-        win.document.write(`<html><head><title>Quittung</title><style>body{font-family:'Courier New',monospace;padding:20px;font-size:13px}table{width:100%;border-collapse:collapse}td,th{padding:5px 4px}th{border-bottom:1px solid #333}.total-row td{border-top:2px dashed #333;font-weight:bold;padding-top:8px}.center{text-align:center}</style></head><body><div class="center"><h3>Parsia Restaurant</h3><p>${now}</p><p>Tisch Nr. <b>${order.table_number}</b></p></div><hr style="border-style:dashed"><table><tr><th>Artikel</th><th style="text-align:center">Menge</th><th style="text-align:right">Preis</th></tr>${itemsHtml}<tr class="total-row"><td colspan="2">GESAMT</td><td style="text-align:right">${total.toFixed(2)} EUR</td></tr></table><br><div class="center"><p>Bestellung #${order.id}</p><p>MwSt. 19% inklusive</p><p>Vielen Dank fuer Ihren Besuch!</p></div></body></html>`);
+        win.document.write(`<html><head><title>Quittung</title><style>body{font-family:'Courier New',monospace;padding:20px;font-size:13px}table{width:100%;border-collapse:collapse}td,th{padding:5px 4px}th{border-bottom:1px solid #333}.total-row td{border-top:2px dashed #333;font-weight:bold;padding-top:8px}.center{text-align:center}</style></head><body><div class="center"><h3>🍴 Parsia Restaurant</h3><p>${now}</p><p>Tisch Nr. <b>${order.table_number}</b></p></div><hr style="border-style:dashed"><table><tr><th>Artikel</th><th style="text-align:center">Menge</th><th style="text-align:right">Preis</th></tr>${itemsHtml}<tr class="total-row"><td colspan="2">GESAMT</td><td style="text-align:right">${total.toFixed(2)} EUR</td></tr></table><br><div class="center"><p>Bestellung #${order.id}</p><p>MwSt. 19% inklusive</p><p>Vielen Dank fuer Ihren Besuch!</p></div></body></html>`);
+        win.document.close();
+        win.print();
+    });
+}
+
+function printKitchenTicket(id) {
+    fetch(API + "/orders/" + id)
+    .then(res => res.json())
+    .then(order => {
+        const now = new Date().toLocaleString("de-DE");
+        let rows = "";
+        order.items.forEach(item => {
+            rows += `<tr>
+                <td style="font-size:1.25rem;font-weight:bold;padding:8px 4px">${item.name}</td>
+                <td style="text-align:center;font-size:1.5rem;font-weight:bold;padding:8px 4px">${item.qty}</td>
+            </tr>`;
+        });
+        const win = window.open("", "_blank", "width=350,height=480");
+        win.document.write(`<html><head><title>Küche Bon</title>
+        <style>body{font-family:'Courier New',monospace;padding:16px;font-size:14px}
+        table{width:100%;border-collapse:collapse}td{border-bottom:1px dashed #ccc}
+        h2{text-align:center}.center{text-align:center}</style></head><body>
+        <div class="center"><h2>🍳 KÜCHE BON</h2>
+        <p><b>Tisch: ${order.table_number}</b> &nbsp;&nbsp; #${order.id}</p>
+        <p>${now}</p></div>
+        <hr style="border-style:dashed">
+        <table><tr><th style="text-align:left">Artikel</th><th>Menge</th></tr>${rows}</table>
+        </body></html>`);
         win.document.close();
         win.print();
     });
