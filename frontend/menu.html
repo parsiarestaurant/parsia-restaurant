@@ -7,140 +7,717 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:wght@300;400;500;600&family=Taviraj:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold:#c8972a; --gold-light:#e8c060; --dark:#1a1208; --cream:#f5efe0;
-            --warm:#2d1f0a; --text:#3a2a10; --card-shadow:0 4px 20px rgba(0,0,0,0.1);
+            --bg:        #0f0a06;
+            --gold:      #d4a843;
+            --gold-light:#f0c96a;
+            --gold-dim:  #8a6820;
+            --card-bg:   #1a1008;
+            --card-bg2:  #150d05;
+            --warm-dark: #2a1a06;
+            --text-main: #f0c96a;
+            --text-soft: rgba(240,201,106,0.55);
+            --text-body: #c8a86a;
+            --border:    rgba(212,168,67,0.3);
+            --border-bright: rgba(212,168,67,0.7);
+            --shadow:    0 8px 40px rgba(0,0,0,0.7);
+            --glow:      0 0 20px rgba(212,168,67,0.15);
         }
+
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:var(--cream); color:var(--text); font-family:'Cormorant Garamond',serif; min-height:100vh; }
 
-        /* ─── HEADER ─── */
-        .header { background:var(--dark); text-align:center; padding:44px 20px 32px; position:relative; overflow:hidden; }
-        .header::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8972a' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
-        .header-ornament { color:var(--gold); font-size:1.1rem; letter-spacing:10px; margin-bottom:12px; opacity:0.7; }
-        .header h1 { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,6vw,3.8rem); color:var(--gold-light); font-weight:400; letter-spacing:4px; }
-        .header-farsi { font-size:clamp(1.3rem,4vw,2.1rem); color:var(--gold); margin-top:8px; opacity:0.85; direction:rtl; font-family:'Cormorant Garamond',serif; }
-        .header-subtitle { color:rgba(255,255,255,0.5); font-size:0.9rem; letter-spacing:5px; text-transform:uppercase; margin-top:14px; font-family:'Taviraj',serif; }
-        .gold-line { width:90px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:18px auto; }
+        body {
+            background: var(--bg);
+            color: var(--text-body);
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            /* Subtle noise texture */
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(42,26,6,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(26,16,8,0.5) 0%, transparent 50%);
+        }
 
-        /* ─── CART BAR ─── */
-        .cart-bar { background:var(--warm); color:var(--gold-light); padding:13px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.3); }
-        .cart-bar-label { font-size:1rem; font-family:'Cormorant Garamond',serif; letter-spacing:1px; }
-        .cart-count { background:var(--gold); color:var(--dark); border-radius:50%; width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; margin-left:8px; }
-        .btn-order { background:var(--gold); color:var(--dark); border:none; padding:9px 22px; border-radius:2px; font-family:'Cormorant Garamond',serif; font-weight:600; cursor:pointer; transition:all 0.2s; font-size:1rem; letter-spacing:1px; }
-        .btn-order:hover { background:var(--gold-light); }
+        /* ═══ ARABESQE PATTERN SVG ═══ */
+        .arabesqe-bg {
+            position: fixed;
+            inset: 0;
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a843' fill-rule='evenodd'%3E%3Cpath d='M40 0 C20 0 0 20 0 40 C0 60 20 80 40 80 C60 80 80 60 80 40 C80 20 60 0 40 0 Z M40 8 C55 8 72 25 72 40 C72 55 55 72 40 72 C25 72 8 55 8 40 C8 25 25 8 40 8 Z'/%3E%3Cpath d='M40 16 C28 16 16 28 16 40 C16 52 28 64 40 64 C52 64 64 52 64 40 C64 28 52 16 40 16 Z M40 22 C49 22 58 31 58 40 C58 49 49 58 40 58 C31 58 22 49 22 40 C22 31 31 22 40 22 Z'/%3E%3Cpath d='M40 2 L42 38 L78 40 L42 42 L40 78 L38 42 L2 40 L38 38 Z' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 80px 80px;
+        }
 
-        /* ─── TABS ─── */
-        .category-tabs { display:flex; overflow-x:auto; background:var(--dark); padding:0 16px; scrollbar-width:none; border-top:1px solid rgba(200,151,42,0.2); }
-        .category-tabs::-webkit-scrollbar { display:none; }
-        .tab { padding:13px 22px; color:rgba(255,255,255,0.5); cursor:pointer; white-space:nowrap; font-size:0.82rem; letter-spacing:2.5px; text-transform:uppercase; border-bottom:2px solid transparent; transition:all 0.2s; font-family:'Taviraj',serif; }
-        .tab.active,.tab:hover { color:var(--gold-light); border-bottom-color:var(--gold); }
+        /* ═══ HEADER ═══ */
+        .header {
+            position: relative;
+            text-align: center;
+            padding: 52px 20px 40px;
+            overflow: hidden;
+            z-index: 1;
+        }
 
-        /* ─── MENU GRID ─── */
-        .menu-container { padding:24px 16px 110px; max-width:960px; margin:0 auto; }
-        .section { display:none; }
-        .section.active { display:block; }
-        .section-title { font-family:'Playfair Display',serif; font-size:2rem; color:var(--warm); text-align:center; padding:28px 0 6px; font-weight:400; letter-spacing:1px; }
-        .section-subtitle { text-align:center; color:var(--gold); font-size:0.8rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:28px; font-family:'Taviraj',serif; }
-        .menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+        .header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(212,168,67,0.05) 0%, transparent 100%),
+                url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a843' fill-opacity='0.06'%3E%3Cpath d='M60 10 L70 50 L110 60 L70 70 L60 110 L50 70 L10 60 L50 50 Z'/%3E%3Cpath d='M60 30 L66 54 L90 60 L66 66 L60 90 L54 66 L30 60 L54 54 Z'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: auto, 120px 120px;
+        }
 
-        /* ─── MENU CARD ─── */
+        .header-ornament {
+            color: var(--gold);
+            font-size: 0.85rem;
+            letter-spacing: 16px;
+            margin-bottom: 18px;
+            opacity: 0.65;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 7vw, 4.2rem);
+            color: var(--gold-light);
+            font-weight: 400;
+            letter-spacing: 6px;
+            text-shadow: 0 0 60px rgba(212,168,67,0.3), 0 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .header-farsi {
+            font-size: clamp(1.4rem, 4vw, 2.3rem);
+            color: var(--gold);
+            margin-top: 10px;
+            opacity: 0.85;
+            direction: rtl;
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 2px;
+        }
+
+        .header-subtitle {
+            color: var(--text-soft);
+            font-size: 0.78rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-top: 16px;
+            font-family: 'Taviraj', serif;
+        }
+
+        /* Arabesqe border top/bottom */
+        .gold-ornament-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 500px;
+        }
+        .gold-ornament-line .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .gold-ornament-line .diamond {
+            color: var(--gold);
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* ═══ CART BAR ═══ */
+        .cart-bar {
+            background: var(--warm-dark);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 13px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .cart-bar-label {
+            font-size: 1rem;
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 2px;
+            color: var(--text-soft);
+        }
+
+        .cart-count {
+            background: var(--gold);
+            color: var(--bg);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        .btn-order {
+            background: transparent;
+            color: var(--gold-light);
+            border: 1px solid var(--border-bright);
+            padding: 9px 24px;
+            border-radius: 1px;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+        }
+        .btn-order:hover {
+            background: var(--gold);
+            color: var(--bg);
+            box-shadow: 0 0 20px rgba(212,168,67,0.3);
+        }
+
+        /* ═══ TABS ═══ */
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            background: var(--card-bg2);
+            padding: 0 12px;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 50px;
+            z-index: 99;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+
+        .tab {
+            padding: 14px 20px;
+            color: var(--text-soft);
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-family: 'Taviraj', serif;
+            position: relative;
+        }
+
+        /* ✦ decorative separator */
+        .tab:not(:last-child)::after {
+            content: '✦';
+            position: absolute;
+            right: -2px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-dim);
+            font-size: 0.5rem;
+            opacity: 0.4;
+        }
+
+        .tab.active, .tab:hover {
+            color: var(--gold-light);
+            border-bottom-color: var(--gold);
+        }
+
+        /* ═══ SECTION ═══ */
+        .menu-container {
+            padding: 32px 16px 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            color: var(--gold-light);
+            text-align: center;
+            padding: 36px 0 8px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 0 40px rgba(212,168,67,0.2);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-soft);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 36px;
+            font-family: 'Taviraj', serif;
+            direction: rtl;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 auto 32px;
+            max-width: 300px;
+        }
+        .section-divider .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+        }
+        .section-divider .sym {
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 22px;
+        }
+
+        /* ═══ MENU CARD ═══ */
         .menu-card {
-            background:white; border-radius:6px; overflow:hidden;
-            box-shadow:var(--card-shadow); transition:transform 0.22s, box-shadow 0.22s;
-            cursor:pointer; position:relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.28s cubic-bezier(.2,.8,.3,1), box-shadow 0.28s, border-color 0.28s;
+            animation: fadeInUp 0.5s ease both;
+            box-shadow: var(--shadow);
         }
-        .menu-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.16); }
-        .menu-card:active { transform:scale(0.98); }
 
-        /* Click-to-order overlay flash */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 20px rgba(212,168,67,0.12);
+        }
+
+        /* gold flash on click */
         .menu-card::after {
-            content:''; position:absolute; inset:0;
-            background:rgba(200,151,42,0.18); opacity:0;
-            transition:opacity 0.15s; pointer-events:none; border-radius:6px;
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(212,168,67,0.12);
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: none;
         }
-        .menu-card.flash::after { opacity:1; }
+        .menu-card.flash::after { opacity: 1; }
 
-        .card-img-wrap { position:relative; width:100%; height:210px; overflow:hidden; }
-        .card-img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.35s; }
-        .menu-card:hover .card-img { transform:scale(1.04); }
-        .card-img-placeholder { width:100%; height:210px; background:linear-gradient(135deg,#f5efe0,#e8d9b8); display:none; align-items:center; justify-content:center; font-size:3.5rem; }
+        /* Corner ornaments */
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 20px; height: 20px;
+            border-top: 1px solid var(--gold);
+            border-left: 1px solid var(--gold);
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: 2;
+        }
+        .menu-card:hover::before { opacity: 0.6; }
 
-        /* Add-to-cart badge on image */
+        .card-corner-br {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 20px; height: 20px;
+            border-bottom: 1px solid var(--gold);
+            border-right: 1px solid var(--gold);
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: 2;
+        }
+        .menu-card:hover .card-corner-br { opacity: 0.6; }
+
+        .card-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+            filter: brightness(0.88) saturate(0.9);
+        }
+        .menu-card:hover .card-img {
+            transform: scale(1.06);
+            filter: brightness(0.95) saturate(1.0);
+        }
+
+        /* Gold gradient overlay on image bottom */
+        .card-img-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(transparent, var(--card-bg));
+            pointer-events: none;
+        }
+
+        .card-img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a1008, #0f0a06);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        /* Add badge */
         .card-add-badge {
-            position:absolute; bottom:10px; right:10px;
-            background:var(--dark); color:var(--gold-light);
-            width:36px; height:36px; border-radius:50%;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.4rem; font-weight:300; box-shadow:0 2px 8px rgba(0,0,0,0.35);
-            transition:background 0.2s, transform 0.2s;
-            pointer-events:none;
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(15,10,6,0.85);
+            border: 1px solid var(--gold-dim);
+            color: var(--gold-light);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 300;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            transition: all 0.2s;
+            pointer-events: none;
+            z-index: 3;
         }
-        .menu-card:hover .card-add-badge { background:var(--gold); color:var(--dark); }
-        .card-add-badge.added { background:#27ae60 !important; color:white; transform:scale(1.15); }
+        .menu-card:hover .card-add-badge {
+            background: var(--gold);
+            color: var(--bg);
+            border-color: var(--gold);
+            box-shadow: 0 0 16px rgba(212,168,67,0.4);
+        }
+        .card-add-badge.added {
+            background: #2a7a4a !important;
+            color: #90ffb8 !important;
+            border-color: #2a7a4a !important;
+            transform: scale(1.15);
+        }
 
-        .card-body { padding:16px 18px 18px; }
+        .card-body {
+            padding: 16px 18px 18px;
+        }
+
         .card-name {
-            font-family:'Playfair Display',serif;
-            font-size:1.2rem; color:var(--warm); margin-bottom:4px; font-weight:600; line-height:1.3;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.18rem;
+            color: #f5e8c8;
+            margin-bottom: 4px;
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: 0.3px;
         }
-        .card-farsi { font-size:1rem; color:var(--gold); direction:rtl; display:block; margin-bottom:8px; font-family:'Cormorant Garamond',serif; }
-        .card-desc { font-size:0.92rem; color:#7a6040; line-height:1.65; margin-bottom:14px; font-family:'Cormorant Garamond',serif; }
-        .card-footer { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f0e8d4; padding-top:12px; }
-        .card-price { font-size:1.3rem; font-weight:600; color:var(--gold); font-family:'Playfair Display',serif; letter-spacing:0.5px; }
-        .card-tap-hint { font-size:0.75rem; color:#bbb; font-family:'Taviraj',serif; letter-spacing:1px; }
 
-        /* ─── CART PANEL ─── */
-        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:200; justify-content:flex-end; }
-        .modal-overlay.open { display:flex; }
-        .cart-panel { background:var(--cream); width:min(420px,100vw); height:100vh; overflow-y:hidden; display:flex; flex-direction:column; animation:slideIn 0.3s ease; }
-        @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
-        .cart-header { background:var(--dark); color:var(--gold-light); padding:22px 20px; display:flex; justify-content:space-between; align-items:center; }
-        .cart-header h3 { font-family:'Playfair Display',serif; font-weight:400; font-size:1.4rem; }
-        .btn-close { background:none; border:none; color:var(--gold); font-size:1.6rem; cursor:pointer; }
-        .cart-items { flex:1; padding:16px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-        .cart-item { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #e8d9b8; gap:8px; }
-        .cart-item-name { font-size:1rem; color:var(--warm); flex:1; font-family:'Cormorant Garamond',serif; }
-        .cart-item-controls { display:flex; align-items:center; gap:8px; }
-        .qty-btn { background:var(--dark); color:var(--gold-light); border:none; width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; }
-        .qty-label { font-size:1rem; min-width:20px; text-align:center; font-family:'Playfair Display',serif; }
-        .cart-item-price { font-size:1rem; color:var(--gold); min-width:60px; text-align:right; font-family:'Playfair Display',serif; }
-        .cart-footer { padding:16px 18px; background:white; border-top:1px solid #e8d9b8; flex-shrink:0; }
-        .cart-total { display:flex; justify-content:space-between; font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--warm); margin-bottom:16px; }
-        .cart-total span:last-child { color:var(--gold); }
-        .table-input { width:100%; padding:11px 14px; border:1px solid #e8d9b8; border-radius:2px; font-family:'Cormorant Garamond',serif; font-size:1rem; margin-bottom:12px; background:var(--cream); color:var(--text); }
-        .btn-confirm { width:100%; background:var(--dark); color:var(--gold-light); border:none; padding:15px; font-family:'Playfair Display',serif; font-size:1.05rem; letter-spacing:2px; cursor:pointer; transition:background 0.2s; }
-        .btn-confirm:hover { background:var(--warm); }
-        .empty-cart { text-align:center; color:#aaa; padding:50px 20px; font-size:1rem; font-family:'Cormorant Garamond',serif; }
+        .card-farsi {
+            font-size: 1rem;
+            color: var(--gold);
+            direction: rtl;
+            display: block;
+            margin-bottom: 9px;
+            font-family: 'Cormorant Garamond', serif;
+            opacity: 0.75;
+            font-weight: 300;
+        }
 
-        /* ─── RECEIPT ─── */
-        .receipt-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:300; align-items:center; justify-content:center; padding:20px; }
-        .receipt-overlay.open { display:flex; }
-        .receipt-box { background:white; max-width:370px; width:100%; padding:26px; font-family:'Courier New',monospace; border-radius:4px; max-height:90vh; overflow-y:auto; }
-        .receipt-title { text-align:center; font-size:1.2rem; font-weight:bold; margin-bottom:4px; }
-        .receipt-sub { text-align:center; font-size:0.82rem; color:#666; margin-bottom:12px; }
-        .receipt-line { display:flex; justify-content:space-between; font-size:0.88rem; padding:3px 0; }
-        .receipt-divider { border:none; border-top:1px dashed #ccc; margin:10px 0; }
-        .receipt-total { display:flex; justify-content:space-between; font-weight:bold; font-size:1rem; }
-        .receipt-thanks { text-align:center; margin-top:12px; font-size:0.8rem; color:#666; }
-        .btn-print { width:100%; background:#27ae60; color:white; border:none; padding:12px; margin-top:16px; cursor:pointer; font-size:0.95rem; border-radius:2px; }
-        .btn-close-receipt { width:100%; background:var(--gold); color:var(--dark); border:none; padding:11px; margin-top:8px; cursor:pointer; border-radius:2px; font-weight:bold; font-size:0.95rem; }
+        .card-desc {
+            font-size: 0.88rem;
+            color: rgba(200,168,106,0.6);
+            line-height: 1.65;
+            margin-bottom: 14px;
+            font-family: 'Cormorant Garamond', serif;
+        }
 
-        /* ─── TOAST ─── */
-        .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--dark); color:var(--gold-light); padding:11px 26px; border-radius:2px; font-size:0.9rem; opacity:0; transition:all 0.3s; z-index:400; pointer-events:none; white-space:nowrap; font-family:'Cormorant Garamond',serif; }
-        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
 
-        /* ─── TABLE DISPLAY ─── */
-        #table-display { display:none; background:var(--gold); color:var(--dark); padding:9px 14px; border-radius:2px; margin-bottom:12px; font-weight:bold; text-align:center; font-family:'Playfair Display',serif; font-size:1rem; }
+        /* Price badge */
+        .card-price-badge {
+            background: var(--gold);
+            color: var(--bg);
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 1px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-tap-hint {
+            font-size: 0.7rem;
+            color: var(--text-soft);
+            font-family: 'Taviraj', serif;
+            letter-spacing: 1px;
+        }
+
+        /* ═══ CART PANEL ═══ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 200;
+            justify-content: flex-end;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.open { display: flex; }
+
+        .cart-panel {
+            background: var(--card-bg);
+            border-left: 1px solid var(--border);
+            width: min(420px, 100vw);
+            height: 100vh;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .cart-header {
+            background: var(--warm-dark);
+            border-bottom: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 22px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+        .btn-close {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 1px;
+        }
+        .btn-close:hover { background: var(--gold); color: var(--bg); }
+
+        .cart-items {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+        .cart-item-name { font-size: 1rem; color: var(--text-main); flex: 1; font-family: 'Cormorant Garamond', serif; }
+        .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            background: var(--warm-dark);
+            color: var(--gold-light);
+            border: 1px solid var(--border);
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .qty-btn:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+        .qty-label { font-size: 1rem; min-width: 20px; text-align: center; font-family: 'Playfair Display', serif; color: var(--gold-light); }
+        .cart-item-price { font-size: 1rem; color: var(--gold); min-width: 60px; text-align: right; font-family: 'Playfair Display', serif; }
+
+        .cart-footer {
+            padding: 16px 18px;
+            background: var(--card-bg2);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #f5e8c8;
+            margin-bottom: 16px;
+        }
+        .cart-total span:last-child { color: var(--gold); }
+
+        .table-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 1px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            background: var(--warm-dark);
+            color: var(--gold-light);
+        }
+        .table-input::placeholder { color: var(--text-soft); }
+        .table-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 10px rgba(212,168,67,0.2); }
+
+        .btn-confirm {
+            width: 100%;
+            background: var(--gold);
+            color: var(--bg);
+            border: none;
+            padding: 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn-confirm:hover { background: var(--gold-light); box-shadow: 0 0 20px rgba(212,168,67,0.3); }
+
+        .empty-cart {
+            text-align: center;
+            color: var(--text-soft);
+            padding: 50px 20px;
+            font-size: 1rem;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* ═══ RECEIPT ═══ */
+        .receipt-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .receipt-overlay.open { display: flex; }
+
+        .receipt-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-bright);
+            max-width: 370px;
+            width: 100%;
+            padding: 28px;
+            font-family: 'Courier New', monospace;
+            border-radius: 3px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 60px rgba(212,168,67,0.1);
+        }
+        .receipt-title { text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; color: var(--gold-light); }
+        .receipt-sub { text-align: center; font-size: 0.82rem; color: var(--text-soft); margin-bottom: 12px; }
+        .receipt-line { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 3px 0; color: var(--text-body); }
+        .receipt-divider { border: none; border-top: 1px dashed var(--border); margin: 10px 0; }
+        .receipt-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem; color: var(--gold); }
+        .receipt-thanks { text-align: center; margin-top: 12px; font-size: 0.8rem; color: var(--text-soft); }
+        .btn-print { width: 100%; background: #27ae60; color: white; border: none; padding: 12px; margin-top: 16px; cursor: pointer; font-size: 0.95rem; border-radius: 2px; }
+        .btn-close-receipt { width: 100%; background: var(--gold); color: var(--bg); border: none; padding: 11px; margin-top: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+
+        /* ═══ TOAST ═══ */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--warm-dark);
+            border: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 11px 26px;
+            border-radius: 2px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 400;
+            pointer-events: none;
+            white-space: nowrap;
+            font-family: 'Cormorant Garamond', serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ═══ TABLE DISPLAY ═══ */
+        #table-display {
+            display: none;
+            background: var(--gold);
+            color: var(--bg);
+            padding: 9px 14px;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+        }
+
+        /* Staggered animation for cards */
+        .menu-card:nth-child(1) { animation-delay: 0.05s; }
+        .menu-card:nth-child(2) { animation-delay: 0.1s; }
+        .menu-card:nth-child(3) { animation-delay: 0.15s; }
+        .menu-card:nth-child(4) { animation-delay: 0.2s; }
+        .menu-card:nth-child(5) { animation-delay: 0.25s; }
+        .menu-card:nth-child(6) { animation-delay: 0.3s; }
+        .menu-card:nth-child(7) { animation-delay: 0.35s; }
     </style>
 </head>
 <body>
 
+<div class="arabesqe-bg"></div>
+
 <div class="header">
-    <div class="header-ornament">✦ ✦ ✦</div>
+    <div class="header-ornament">✦ ✦ ✦ ✦ ✦</div>
     <h1>Parsia Restaurant</h1>
     <div class="header-farsi">رستوران پارسیا</div>
-    <div class="gold-line"></div>
-    <div class="header-subtitle">Neunkirchen · Persische Küche</div>
+    <div class="gold-ornament-line">
+        <div class="line"></div>
+        <div class="diamond">✦</div>
+        <div class="diamond">◆</div>
+        <div class="diamond">✦</div>
+        <div class="line"></div>
+    </div>
+    <div class="header-subtitle">Neunkirchen · Persische Küche · آشپزی ایرانی</div>
 </div>
 
 <div class="cart-bar">
@@ -160,32 +737,38 @@
 <div class="menu-container">
     <div class="section active" id="vorspeisen">
         <div class="section-title">Vorspeisen</div>
-        <div class="section-subtitle">پیش غذاها</div>
+        <div class="section-subtitle">✦ پیش غذاها ✦</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-vorspeisen"></div>
     </div>
     <div class="section" id="eintoepfe">
         <div class="section-title">Eintöpfe & Hauptgerichte</div>
-        <div class="section-subtitle">خورش‌ها · Wird mit Basmatireis serviert</div>
+        <div class="section-subtitle">✦ خورش‌ها · Wird mit Basmatireis serviert ✦</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-eintoepfe"></div>
     </div>
     <div class="section" id="grill">
         <div class="section-title">Vom Grill</div>
-        <div class="section-subtitle">کباب‌ها · Wird mit Basmatireis serviert</div>
+        <div class="section-subtitle">✦ کباب‌ها · Wird mit Basmatireis serviert ✦</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-grill"></div>
     </div>
     <div class="section" id="desserts">
         <div class="section-title">Desserts & Süßes</div>
-        <div class="section-subtitle">دسرها</div>
+        <div class="section-subtitle">✦ دسرها ✦</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-desserts"></div>
     </div>
     <div class="section" id="getraenke">
         <div class="section-title">Getränke</div>
-        <div class="section-subtitle">نوشیدنی‌ها</div>
+        <div class="section-subtitle">✦ نوشیدنی‌ها ✦</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-getraenke"></div>
     </div>
     <div class="section" id="heisse">
         <div class="section-title">Heiße Getränke</div>
-        <div class="section-subtitle">نوشیدنی‌های گرم</div>
+        <div class="section-subtitle">✦ نوشیدنی‌های گرم ✦</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-heisse"></div>
     </div>
 </div>
@@ -202,7 +785,7 @@
             <div id="table-display"></div>
             <input class="table-input" id="table-input" type="number" placeholder="Tischnummer eingeben" min="1" inputmode="numeric">
             <div class="cart-total"><span>Gesamt</span><span id="cart-total-price">0.00 €</span></div>
-            <button class="btn-confirm" onclick="sendOrder()">✓ JETZT BESTELLEN</button>
+            <button class="btn-confirm" onclick="sendOrder()">✦ JETZT BESTELLEN ✦</button>
         </div>
     </div>
 </div>
@@ -287,6 +870,7 @@ function renderMenus() {
         const icon = icons[section] || '🍽️';
         document.getElementById("grid-"+section).innerHTML = items.map(item => `
             <div class="menu-card" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)" id="card-${item.id}">
+                <div class="card-corner-br"></div>
                 <div class="card-img-wrap">
                     ${item.img
                         ? `<img class="card-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -300,7 +884,7 @@ function renderMenus() {
                     ${item.farsi ? `<span class="card-farsi">${item.farsi}</span>` : ''}
                     <div class="card-desc">${item.desc}</div>
                     <div class="card-footer">
-                        <div class="card-price">${item.price.toFixed(2)} €</div>
+                        <div class="card-price-badge">${item.price.toFixed(2)} €</div>
                         <div class="card-tap-hint">Tippen zum Bestellen</div>
                     </div>
                 </div>
@@ -308,20 +892,18 @@ function renderMenus() {
     }
 }
 
-// ─── ADD ITEM (click on card) ───
+// ─── ADD ITEM ───
 function addItem(id, name, price, cardEl) {
     const ex = cart.find(i => i.id === id);
     if (ex) { ex.qty++; } else { cart.push({id, name, price, qty:1}); }
     updateCartCount();
     showToast(name + " hinzugefügt ✓");
 
-    // Flash animation on card
     if (cardEl) {
         cardEl.classList.add("flash");
         setTimeout(() => cardEl.classList.remove("flash"), 300);
     }
 
-    // Badge animation
     const badge = document.getElementById("badge-"+id);
     if (badge) {
         const count = cart.find(i=>i.id===id)?.qty || 1;
@@ -374,7 +956,6 @@ function closeCart() { document.getElementById("cart-modal").classList.remove("o
 function handleOverlayClick(e) { if (e.target === e.currentTarget) closeCart(); }
 
 // ─── SEND ORDER ───
-// Merge with existing open order for the same table, or create new
 function sendOrder() {
     if (!cart.length) { showToast("Bitte Artikel auswählen!"); return; }
     const table = getTable();
@@ -382,18 +963,15 @@ function sendOrder() {
 
     const savedCart = [...cart];
 
-    // Check if there's an existing pending/ready order for this table
     fetch(API + "/orders?table=" + table)
     .then(r => r.json())
     .then(orders => {
-        // Find most recent non-paid order for this table
         const existing = Array.isArray(orders)
             ? orders.filter(o => o.table_number == table && o.status !== "paid")
                     .sort((a,b) => b.id - a.id)[0]
             : null;
 
         if (existing) {
-            // Merge items into the existing order
             const merged = [...existing.items];
             savedCart.forEach(newItem => {
                 const found = merged.find(m => m.id === newItem.id);
@@ -408,7 +986,6 @@ function sendOrder() {
                 body: JSON.stringify({ items: merged, total: newTotal })
             }).then(r => r.json()).then(data => ({ merged: true, orderId: existing.id, table, savedCart }));
         } else {
-            // Create new order
             return fetch(API + "/orders", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -420,12 +997,10 @@ function sendOrder() {
         closeCart();
         cart = [];
         updateCartCount();
-        // Auto-print two receipts: guest + kitchen
         autoPrint(result.orderId, result.table, result.savedCart);
         showThankYou(result.table, result.merged);
     })
     .catch(() => {
-        // Fallback: just create new order if query fails
         fetch(API + "/orders", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -443,7 +1018,7 @@ function sendOrder() {
     });
 }
 
-// ─── AUTO PRINT: GUEST + KITCHEN ───
+// ─── AUTO PRINT ───
 function autoPrint(orderId, table, items) {
     const now = new Date().toLocaleString("de-DE");
     let guestRows = "", kitchenRows = "", total = 0;
@@ -468,7 +1043,6 @@ function autoPrint(orderId, table, items) {
         th{font-size:0.9rem;border-bottom:2px solid #333}
         .center{text-align:center}.total{font-weight:bold;font-size:1.05rem;border-top:2px dashed #333}`;
 
-    // Guest receipt
     const guestWin = window.open("", "_blank", "width=380,height=600");
     if (guestWin) {
         guestWin.document.write(`<html><head><title>Quittung</title><style>${baseStyle}</style></head><body>
@@ -489,7 +1063,6 @@ function autoPrint(orderId, table, items) {
         guestWin.print();
     }
 
-    // Kitchen ticket (slightly delayed so browser handles both)
     setTimeout(() => {
         const kitchenWin = window.open("", "_blank", "width=350,height=480");
         if (kitchenWin) {
@@ -508,17 +1081,17 @@ function autoPrint(orderId, table, items) {
     }, 600);
 }
 
-// ─── THANK YOU SCREEN ───
+// ─── THANK YOU ───
 function showThankYou(table, merged) {
     document.getElementById("receipt-content").innerHTML = `
-        <div style="text-align:center;padding:24px 10px">
-            <div style="font-size:3.2rem">🙏</div>
-            <div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#2d1f0a;margin:16px 0">Vielen Dank!</div>
-            <div style="font-size:1rem;color:#666;margin-bottom:8px">
+        <div style="text-align:center;padding:28px 10px">
+            <div style="font-size:3rem;margin-bottom:16px">🙏</div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:#f0c96a;margin-bottom:14px;letter-spacing:1px">Vielen Dank!</div>
+            <div style="font-size:1rem;color:rgba(240,201,106,0.6);margin-bottom:8px">
                 ${merged ? "Ihre Artikel wurden zur laufenden Bestellung hinzugefügt." : "Ihre Bestellung wurde aufgenommen."}
             </div>
-            <div style="font-size:1rem;color:#666;margin-bottom:8px">Tisch Nr. <b>${table}</b></div>
-            <div style="font-size:0.95rem;color:#c8972a;margin-top:18px">سفارش شما ثبت شد 🍽️</div>
+            <div style="font-size:1rem;color:rgba(240,201,106,0.6);margin-bottom:8px">Tisch Nr. <b style="color:#f0c96a">${table}</b></div>
+            <div style="font-size:1.1rem;color:#d4a843;margin-top:20px;direction:rtl">سفارش شما ثبت شد ✦</div>
         </div>`;
     document.getElementById("receipt-modal").classList.add("open");
 }
