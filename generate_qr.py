@@ -5,7 +5,7 @@ import os
 # ----------------------
 # تنظیمات
 # ----------------------
-base_url = "http://192.168.0.102:8000/frontend/menu.html?table="
+base_url = "https://parsia-restaurant.onrender.com/frontend/menu.html?table="
 tables = 10
 output_folder = "qrcodes"
 
