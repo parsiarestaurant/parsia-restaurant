@@ -1070,7 +1070,7 @@ function noSubmitOrder() {
         fetch(API + "/orders", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ table_number: noSelectedTable, items, total, status: "pending" })
+            body: JSON.stringify({ table: noSelectedTable, items, total, status: "pending" })
         })
         .then(res => {
             if (!res.ok) throw new Error("HTTP " + res.status);
