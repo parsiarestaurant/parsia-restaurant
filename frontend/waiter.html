@@ -563,7 +563,7 @@ function buildReceiptHtml(order, forPrint = false) {
     const totalMwst = foodMwst + drinkMwst;
     const totalNetto = totalBrutto - totalMwst;
 
-    const logoLine = `<div style="text-align:center;font-size:1.8rem;font-weight:bold;letter-spacing:6px;margin-bottom:4px">✦ PARSIA RESTAURANT ✦</div>`;
+    const logoLine = `<div style="text-align:center;font-size:1.1rem;font-weight:bold;letter-spacing:3px;margin-bottom:4px;white-space:nowrap">✦ PARSIA RESTAURANT ✦</div>`;
 
     let mwstRows = '';
     if (foodNetto > 0) {
