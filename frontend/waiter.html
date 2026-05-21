@@ -563,9 +563,7 @@ function buildReceiptHtml(order, forPrint = false) {
     const totalMwst = foodMwst + drinkMwst;
     const totalNetto = totalBrutto - totalMwst;
 
-    const logoLine = forPrint
-        ? `<div style="text-align:center;margin-bottom:4px"><img src="logo.jpeg" style="max-width:150px;max-height:70px;object-fit:contain;filter:sepia(1) saturate(0.5) brightness(0.5)" onerror="this.style.display='none'"></div>`
-        : `<div style="text-align:center;font-size:1.4rem;font-weight:bold;letter-spacing:4px;margin-bottom:2px">✦ RESTAURANT ✦</div>`;
+    const logoLine = `<div style="text-align:center;font-size:1.8rem;font-weight:bold;letter-spacing:6px;margin-bottom:4px">✦ PARSIA RESTAURANT ✦</div>`;
 
     let mwstRows = '';
     if (foodNetto > 0) {
@@ -581,7 +579,6 @@ function buildReceiptHtml(order, forPrint = false) {
 <div style="font-family:'Courier New',monospace;font-size:13px;line-height:1.7;max-width:340px;margin:0 auto">
   ${logoLine}
   <div style="text-align:center">
-    <div style="font-weight:bold">Restaurant</div>
     <div>Max-Braun-Straße 4, 66538 Neunkirchen</div>
     <div>Tel: 06821 6364421</div>
     <div>${now}</div>
@@ -713,16 +710,7 @@ function printKitchenTicket(id) {
     });
 }
 
-function isAnyModalOpen() {
-    return document.getElementById("edit-modal").classList.contains("open") ||
-           document.getElementById("payment-modal").classList.contains("open") ||
-           document.getElementById("receipt-preview-modal").classList.contains("open") ||
-           document.getElementById("menu-modal").classList.contains("open");
-}
-
-setInterval(() => {
-    if (!isAnyModalOpen()) loadOrders();
-}, 5000);
+setInterval(loadOrders, 5000);
 loadOrders();
 </script>
 </body>
