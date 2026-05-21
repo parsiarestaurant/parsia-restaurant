@@ -513,26 +513,13 @@ function addMenuItemToOrder(itemId) {
 function saveEditedOrder() {
     if (!editingOrder) return;
     const newTotal = editItems.reduce((s, i) => s + (i.price || 0) * i.qty, 0);
-
-    const saveBtn = document.querySelector('#edit-modal .btn-success');
-    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Wird gespeichert...'; }
-
     fetch(API + "/orders/" + editingOrder.id, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items: editItems, total: newTotal })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-    })
-    .then(() => {
+    }).then(() => {
         closeEditModal();
         loadOrders();
-    })
-    .catch(err => {
-        alert('❌ Fehler beim Speichern: ' + err.message + '\n\nBitte prüfen Sie die Verbindung zum Server.');
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '💾 Speichern'; }
     });
 }
 
@@ -726,7 +713,16 @@ function printKitchenTicket(id) {
     });
 }
 
-setInterval(loadOrders, 5000);
+function isAnyModalOpen() {
+    return document.getElementById("edit-modal").classList.contains("open") ||
+           document.getElementById("payment-modal").classList.contains("open") ||
+           document.getElementById("receipt-preview-modal").classList.contains("open") ||
+           document.getElementById("menu-modal").classList.contains("open");
+}
+
+setInterval(() => {
+    if (!isAnyModalOpen()) loadOrders();
+}, 5000);
 loadOrders();
 </script>
 </body>
