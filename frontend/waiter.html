@@ -1068,21 +1068,25 @@ function noSubmitOrder() {
     fetch(API + "/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ table_number: noSelectedTable, items, total, status: "pending", source: "waiter" })
+        body: JSON.stringify({ table_number: noSelectedTable, items, total, status: "pending" })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(() => {
         noShowStep('no-step-3');
         document.getElementById('no-header-title').textContent = '✅ Bestellt!';
         document.getElementById('no-success-msg').textContent = `Tisch ${noSelectedTable} – Bestellung aufgegeben!`;
         document.getElementById('no-success-sub').textContent =
-            `${items.length} Artikel · ${total.toFixed(2)} € · Bon geht sofort in die Küche`;
+            `${items.length} Artikel · ${total.toFixed(2)} €`;
         loadOrders();
     })
-    .catch(() => {
+    .catch(err => {
         btn.disabled = false;
         btn.textContent = '✅ Bestellung absenden';
-        alert('Fehler beim Senden. Bitte nochmal versuchen.');
+        console.error('Order error:', err);
+        alert('Fehler: ' + err.message + '\n\nBitte prüfen Sie die Verbindung und versuchen Sie es erneut.');
     });
 }
 
