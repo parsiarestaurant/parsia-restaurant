@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kellner Dashboard</title>
+    <title>Kellner Dashboard – Parsia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --gold: #c8972a;
+            --gold-light: #e8b84b;
+            --bg-dark: #1a1008;
+        }
+        body { background: #f5f2ee; }
         .status-pending  { border-left: 4px solid #f39c12; }
         .status-ready    { border-left: 4px solid #27ae60; }
         .status-paid     { border-left: 4px solid #95a5a6; opacity: 0.7; }
@@ -13,15 +19,101 @@
         .filter-btn.active { border-color: #333; }
         .btn-kitchen-print { background: #8e44ad; color: white; border: none; font-size: 0.8rem; }
         .btn-kitchen-print:hover { background: #7d3c98; color: white; }
+        .btn-edit-table { background: #2c6fad; color: white; border: none; font-size: 0.8rem; }
+        .btn-edit-table:hover { background: #245a8e; color: white; }
+
+        /* ── Modal overlay ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 12px;
+            padding: 28px; max-width: 520px; width: 95%;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        /* ── Payment modal ── */
+        .pay-btn {
+            display: flex; align-items: center; gap: 12px;
+            border: 2px solid #dee2e6; border-radius: 10px;
+            padding: 18px 20px; cursor: pointer;
+            background: #fff; width: 100%;
+            font-size: 1.1rem; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .pay-btn:hover { border-color: var(--gold); background: #fffbf2; }
+        .pay-btn .pay-icon { font-size: 2rem; }
+        .pay-btn.selected { border-color: var(--gold); background: #fffbf2; }
+
+        /* ── Edit table modal ── */
+        .edit-item-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 0; border-bottom: 1px solid #eee;
+        }
+        .edit-item-row:last-child { border-bottom: none; }
+        .edit-qty-btn {
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid #ccc; background: #fff;
+            font-size: 1rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .edit-qty-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .edit-qty-label { min-width: 28px; text-align: center; font-weight: 700; }
+
+        /* ── Receipt styling ── */
+        .receipt-paper {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .receipt-logo-area {
+            text-align: center;
+            padding: 10px 0 6px;
+            border-bottom: 1px dashed #333;
+            margin-bottom: 10px;
+        }
+        .receipt-logo-area img {
+            max-width: 160px;
+            max-height: 80px;
+            object-fit: contain;
+            filter: sepia(1) saturate(0.6) brightness(0.4);
+        }
+
+        /* Note input for items */
+        .item-note-input {
+            font-size: 0.78rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 2px 6px;
+            width: 100%;
+            margin-top: 4px;
+            color: #555;
+        }
+
+        .header-bar {
+            background: #1a1008;
+            color: #e8b84b;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            border-radius: 0 0 10px 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-bar h4 { color: #e8b84b; margin: 0; }
     </style>
 </head>
-<body class="p-4">
+<body>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>🧑‍🍳 Kellner Dashboard</h4>
-    <span class="badge bg-secondary" id="total-count">0 Bestellungen</span>
+<div class="header-bar">
+    <h4>🧑‍🍳 Kellner Dashboard – Parsia</h4>
+    <span class="badge bg-warning text-dark" id="total-count">0 Bestellungen</span>
 </div>
 
+<div class="px-3">
 <!-- Filter Buttons -->
 <div class="d-flex gap-2 mb-4 flex-wrap">
     <button class="filter-btn btn btn-warning active" onclick="setFilter('all', this)">📋 Alle</button>
@@ -31,11 +123,113 @@
 </div>
 
 <div id="orders" class="row"></div>
+</div>
+
+<!-- ══════════ PAYMENT MODAL ══════════ -->
+<div class="modal-overlay" id="payment-modal">
+    <div class="modal-box" style="max-width:400px">
+        <h5 class="mb-1">💳 Zahlungsart wählen</h5>
+        <p class="text-muted mb-3" id="payment-table-label" style="font-size:0.9rem"></p>
+        <div class="d-flex flex-column gap-3 mb-4">
+            <button class="pay-btn" id="btn-bar" onclick="selectPayment('bar')">
+                <span class="pay-icon">💵</span>
+                <div>
+                    <div>Barzahlung</div>
+                    <small class="text-muted fw-normal">Kunde zahlt mit Bargeld</small>
+                </div>
+            </button>
+            <button class="pay-btn" id="btn-karte" onclick="selectPayment('karte')">
+                <span class="pay-icon">💳</span>
+                <div>
+                    <div>Kartenzahlung</div>
+                    <small class="text-muted fw-normal">EC- oder Kreditkarte</small>
+                </div>
+            </button>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-success flex-fill fw-bold" onclick="confirmPayment()" id="confirm-pay-btn" disabled>
+                ✅ Bezahlt bestätigen
+            </button>
+            <button class="btn btn-outline-secondary" onclick="closePaymentModal()">Abbrechen</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ EDIT TABLE MODAL ══════════ -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal-box">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">✏️ Bestellung bearbeiten</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="closeEditModal()">✕ Schließen</button>
+        </div>
+        <p class="text-muted" id="edit-table-label" style="font-size:0.9rem"></p>
+
+        <div id="edit-items-list" class="mb-3"></div>
+
+        <!-- Open inline menu -->
+        <div class="border rounded p-3 bg-light mb-3">
+            <div class="fw-bold mb-2">➕ Artikel aus Menü hinzufügen</div>
+            <button class="btn btn-primary w-100" onclick="openInlineMenu()">🍽️ Speisekarte öffnen</button>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-success flex-fill fw-bold" onclick="saveEditedOrder()">💾 Speichern</button>
+            <button class="btn btn-outline-danger" onclick="deleteOrder()">🗑️ Bestellung löschen</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ INLINE MENU MODAL ══════════ -->
+<div class="modal-overlay" id="menu-modal" style="z-index:1100">
+    <div class="modal-box" style="max-width:680px;padding:0;overflow:hidden">
+        <!-- Header -->
+        <div style="background:#1a1008;color:#e8b84b;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:bold;font-size:1.05rem">🍽️ Speisekarte — Artikel auswählen</span>
+            <button class="btn btn-sm btn-outline-warning" onclick="closeInlineMenu()">✕ Schließen</button>
+        </div>
+        <!-- Category tabs -->
+        <div id="menu-tabs" style="display:flex;overflow-x:auto;background:#2a1a06;padding:8px 12px;gap:8px;scrollbar-width:none;border-bottom:1px solid rgba(200,151,42,0.3)"></div>
+        <!-- Items grid -->
+        <div id="menu-items-panel" style="padding:16px;max-height:60vh;overflow-y:auto;background:#f5f2ee">
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ RECEIPT PREVIEW MODAL ══════════ -->
+<div class="modal-overlay" id="receipt-preview-modal">
+    <div class="modal-box" style="max-width:420px">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">🧾 Quittung Vorschau</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="closeReceiptPreview()">✕</button>
+        </div>
+        <div id="receipt-preview-content" class="receipt-paper border rounded p-3 bg-white mb-3"></div>
+        <button class="btn btn-primary w-100" onclick="doPrintReceipt()">🖨️ Drucken</button>
+    </div>
+</div>
 
 <script>
 const API = "https://parsia-restaurant.onrender.com";
 let currentFilter = "all";
 let allOrders = [];
+let paymentOrderId = null;
+let selectedPaymentMethod = null;
+let editingOrder = null;
+let editItems = [];
+
+// ── Categories known to be drinks (19% MwSt) ──
+// Items fetched from API don't have category; we use name heuristics or a flag
+// The menu has getraenke + heisse as drinks. We tag items by category when possible.
+// For receipt: we split by item.category if set, else default food=7%
+
+function isGetrank(item) {
+    // Items added manually with type='drink' will have item.itemType='drink'
+    if (item.itemType === 'drink') return true;
+    if (item.itemType === 'food') return false;
+    // Heuristic: common drink names
+    const drinkKeywords = ['cola','fanta','wasser','saft','bier','tee','kaffee','espresso','latte','juice','ayran','doogh','limonade','cappuccino','mokka','chai','mineralwasser','apfelschorle','orangensaft'];
+    const name = (item.name || '').toLowerCase();
+    return drinkKeywords.some(k => name.includes(k));
+}
 
 function setFilter(filter, btn) {
     currentFilter = filter;
@@ -77,26 +271,34 @@ function renderOrders() {
             });
         }
 
+        const payLabel = order.paymentMethod === 'bar' ? '💵 Bar' : order.paymentMethod === 'karte' ? '💳 Karte' : '';
+
         html += `
             <div class="col-md-4 mb-3">
                 <div class="card p-3 status-${order.status}">
                     <div class="d-flex justify-content-between">
                         <h5>Tisch ${order.table_number}</h5>
-                        <span class="badge bg-${color}">${order.status}</span>
+                        <div class="d-flex gap-1 align-items-center">
+                            ${payLabel ? `<span class="badge bg-light text-dark" style="font-size:0.7rem">${payLabel}</span>` : ''}
+                            <span class="badge bg-${color}">${order.status}</span>
+                        </div>
                     </div>
-                    <small class="text-muted">#${order.id} - ${order.created_at || ""}</small>
+                    <small class="text-muted">${order.created_at || ""}</small>
                     <div class="mt-2">${itemsHtml}</div>
                     <div class="fw-bold mt-2">EUR ${order.total ? order.total.toFixed(2) : "-"}</div>
                     <div class="d-flex gap-2 mt-2 flex-wrap">
                         ${order.status !== "paid" ? `
-                            <button onclick="markPaid(${order.id})" class="btn btn-sm btn-outline-success flex-fill">
-                                Bezahlt
+                            <button onclick="openPaymentModal(${order.id})" class="btn btn-sm btn-outline-success flex-fill">
+                                💰 Bezahlen
                             </button>` : ""}
-                        <button onclick="printGuestReceipt(${order.id})" class="btn btn-sm btn-outline-primary">
+                        <button onclick="showReceiptPreview(${order.id})" class="btn btn-sm btn-outline-primary">
                             🧾 Quittung
                         </button>
                         <button onclick="printKitchenTicket(${order.id})" class="btn btn-sm btn-kitchen-print">
                             🍳 Küche
+                        </button>
+                        <button onclick="openEditModal(${order.id})" class="btn btn-sm btn-edit-table" title="Bestellung bearbeiten">
+                            ✏️ Bearbeiten
                         </button>
                     </div>
                 </div>
@@ -106,33 +308,383 @@ function renderOrders() {
     document.getElementById("orders").innerHTML = html || '<p class="text-muted">Keine Bestellungen</p>';
 }
 
-function markPaid(id) {
-    fetch(API + "/orders/" + id, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "paid" })
-    }).then(() => loadOrders());
+// ══════════ PAYMENT MODAL ══════════
+function openPaymentModal(id) {
+    paymentOrderId = id;
+    selectedPaymentMethod = null;
+    document.getElementById('confirm-pay-btn').disabled = true;
+    document.getElementById('btn-bar').classList.remove('selected');
+    document.getElementById('btn-karte').classList.remove('selected');
+    const order = allOrders.find(o => o.id === id);
+    document.getElementById('payment-table-label').textContent =
+        order ? `Tisch ${order.table_number} · EUR ${order.total ? order.total.toFixed(2) : '-'}` : '';
+    document.getElementById('payment-modal').classList.add('open');
 }
 
-function printGuestReceipt(id) {
-    fetch(API + "/orders/" + id)
-    .then(res => res.json())
-    .then(order => {
-        const now = new Date().toLocaleString("de-DE");
-        let itemsHtml = "";
-        let total = 0;
-        order.items.forEach(item => {
-            const subtotal = item.price * item.qty;
-            total += subtotal;
-            itemsHtml += `<tr><td>${item.name}</td><td style="text-align:center">${item.qty}</td><td style="text-align:right">${subtotal.toFixed(2)} EUR</td></tr>`;
-        });
-        const win = window.open("", "_blank", "width=380,height=600");
-        win.document.write(`<html><head><title>Quittung</title><style>body{font-family:'Courier New',monospace;padding:20px;font-size:13px}table{width:100%;border-collapse:collapse}td,th{padding:5px 4px}th{border-bottom:1px solid #333}.total-row td{border-top:2px dashed #333;font-weight:bold;padding-top:8px}.center{text-align:center}</style></head><body><div class="center"><h3>🍴 Parsia Restaurant</h3><p>${now}</p><p>Tisch Nr. <b>${order.table_number}</b></p></div><hr style="border-style:dashed"><table><tr><th>Artikel</th><th style="text-align:center">Menge</th><th style="text-align:right">Preis</th></tr>${itemsHtml}<tr class="total-row"><td colspan="2">GESAMT</td><td style="text-align:right">${total.toFixed(2)} EUR</td></tr></table><br><div class="center"><p>Bestellung #${order.id}</p><p>MwSt. 19% inklusive</p><p>Vielen Dank fuer Ihren Besuch!</p></div></body></html>`);
-        win.document.close();
-        win.print();
+function closePaymentModal() {
+    document.getElementById('payment-modal').classList.remove('open');
+    paymentOrderId = null;
+}
+
+function selectPayment(method) {
+    selectedPaymentMethod = method;
+    document.getElementById('btn-bar').classList.toggle('selected', method === 'bar');
+    document.getElementById('btn-karte').classList.toggle('selected', method === 'karte');
+    document.getElementById('confirm-pay-btn').disabled = false;
+}
+
+function confirmPayment() {
+    if (!paymentOrderId || !selectedPaymentMethod) return;
+    fetch(API + "/orders/" + paymentOrderId, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "paid", paymentMethod: selectedPaymentMethod })
+    }).then(() => {
+        closePaymentModal();
+        loadOrders();
     });
 }
 
+// ══════════ EDIT MODAL ══════════
+function openEditModal(id) {
+    const order = allOrders.find(o => o.id === id);
+    if (!order) return;
+    editingOrder = order;
+    editItems = JSON.parse(JSON.stringify(order.items || []));
+    document.getElementById('edit-table-label').textContent =
+        `Tisch ${order.table_number} · Bestellung vom ${order.created_at || ''}`;
+    renderEditItems();
+    document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('open');
+    editingOrder = null;
+}
+
+function renderEditItems() {
+    const list = document.getElementById('edit-items-list');
+    if (!editItems.length) {
+        list.innerHTML = '<p class="text-muted">Keine Artikel</p>';
+        return;
+    }
+    list.innerHTML = editItems.map((item, i) => `
+        <div class="edit-item-row">
+            <button class="edit-qty-btn" onclick="editQty(${i}, -1)">−</button>
+            <span class="edit-qty-label">${item.qty}</span>
+            <button class="edit-qty-btn" onclick="editQty(${i}, 1)">+</button>
+            <div class="flex-fill">
+                <div class="fw-semibold">${item.name}</div>
+                <small class="text-muted">${item.price ? item.price.toFixed(2) + ' €' : ''} · ${isGetrank(item) ? '🥤 Getränk 19%' : '🍽️ Essen 7%'}</small>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeEditItem(${i})">✕</button>
+        </div>
+    `).join('');
+}
+
+function editQty(i, d) {
+    editItems[i].qty += d;
+    if (editItems[i].qty <= 0) editItems.splice(i, 1);
+    renderEditItems();
+}
+
+function removeEditItem(i) {
+    editItems.splice(i, 1);
+    renderEditItems();
+}
+
+// ══════════ INLINE MENU DATA ══════════
+const menuData = {
+    vorspeisen: { label:'Vorspeisen', items:[
+        { id:101, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mirza_Ghasemi.jpeg", name:"Mirza Ghasemi", price:7.90, type:'food' },
+        { id:102, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Kashke_Bademjoon.jpeg", name:"Kashke Bademjoon", price:7.50, type:'food' },
+        { id:103, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mast-o_Khiar.jpeg", name:"Mast-o Khiar", price:5.50, type:'food' },
+        { id:104, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mast-o_Moosir.jpeg", name:"Mast-o Moosir", price:5.50, type:'food' },
+        { id:105, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Felafel.jpeg", name:"Felafel", price:5.50, type:'food' },
+        { id:106, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Zeytoon_Parvarde.jpeg", name:"Zeytoon Parvarde", price:5.50, type:'food' },
+    ]},
+    eintoepfe: { label:'Eintöpfe', items:[
+        { id:201, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Ghorme_Sabzi.jpeg", name:"Chelo Ghorme Sabzi", price:14.90, type:'food' },
+        { id:202, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Ghormeh_Sabzi_vegetarisch.jpeg", name:"Chelo Ghormeh Sabzi (vegetarisch)", price:14.90, type:'food' },
+        { id:203, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Khoresh_Fesenjan.jpeg", name:"Chelo Khoresh Fesenjan", price:18.90, type:'food' },
+        { id:204, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Khoresh_Fesenjan_vegetarisch.jpeg", name:"Chelo Khoresh Fesenjan (vegetarisch)", price:18.90, type:'food' },
+        { id:205, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Baghali_Polo_Ba_Mahiche.jpeg", name:"Baghali Polo Ba Mahiche", price:22.90, type:'food' },
+        { id:206, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Zereshk_Polo_Ba_Morgh.jpeg", name:"Zereshk Polo Ba Morgh", price:19.90, type:'food' },
+        { id:207, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Mahi.jpeg", name:"Chelo Mahi", price:22.90, type:'food' },
+    ]},
+    grill: { label:'Gegrilltes', items:[
+        { id:301, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Koobideh.jpeg", name:"Chelo Kabab Koobideh", price:18.50, type:'food' },
+        { id:302, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Barg.jpeg", name:"Chelo Kabab Barg", price:24.50, type:'food' },
+        { id:303, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Joojeh_Kabab.jpeg", name:"Chelo Joojeh Kabab", price:19.50, type:'food' },
+        { id:304, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Soltani.jpeg", name:"Chelo Kabab Soltani", price:29.50, type:'food' },
+    ]},
+    desserts: { label:'Desserts', items:[
+        { id:401, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Bastani_Sonati.jpeg", name:"Bastani Sonati", price:5.00, type:'food' },
+        { id:402, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Tiramisu.jpeg", name:"Tiramisu", price:5.00, type:'food' },
+        { id:403, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Baklava.jpeg", name:"Baklava", price:6.00, type:'food' },
+    ]},
+    getraenke: { label:'Getränke', items:[
+        { id:501, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Doogh_0.2L.jpg", name:"Doogh 0.2L", price:3.00, type:'drink' },
+        { id:502, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Doogh_0.4L.jpg", name:"Doogh 0.4L", price:4.00, type:'drink' },
+        { id:503, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Softdrinks_0.2L.jpg", name:"Softdrinks 0.2L", price:2.40, type:'drink' },
+        { id:504, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Softdrinks_0.4L.jpg", name:"Softdrinks 0.4L", price:4.00, type:'drink' },
+        { id:505, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Wasser_0.25L.jpg", name:"Wasser 0.25L", price:2.50, type:'drink' },
+        { id:506, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Wasser 0.75L.jpg", name:"Wasser 0.75L", price:6.50, type:'drink' },
+    ]},
+    heisse: { label:'Heiße Getränke', items:[
+        { id:601, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Kaffee.jpg", name:"Kaffee", price:2.50, type:'drink' },
+        { id:602, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Espresso.jpg", name:"Espresso", price:2.50, type:'drink' },
+        { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", price:2.00, type:'drink' },
+    ]},
+};
+
+let activeMenuCategory = 'vorspeisen';
+
+function openInlineMenu() {
+    // Build tabs
+    const tabs = document.getElementById('menu-tabs');
+    tabs.innerHTML = Object.entries(menuData).map(([key, cat]) => `
+        <button onclick="showMenuCategory('${key}')" id="mtab-${key}"
+            style="background:${key===activeMenuCategory?'#c8972a':'transparent'};
+                   color:${key===activeMenuCategory?'#1a1008':'#e8b84b'};
+                   border:1px solid rgba(200,151,42,0.5);border-radius:20px;
+                   padding:5px 14px;cursor:pointer;white-space:nowrap;font-weight:600;font-size:0.85rem">
+            ${cat.label}
+        </button>`).join('');
+    showMenuCategory(activeMenuCategory);
+    document.getElementById('menu-modal').classList.add('open');
+}
+
+function closeInlineMenu() {
+    document.getElementById('menu-modal').classList.remove('open');
+}
+
+function showMenuCategory(key) {
+    activeMenuCategory = key;
+    // Update tab styles
+    Object.keys(menuData).forEach(k => {
+        const btn = document.getElementById('mtab-' + k);
+        if (!btn) return;
+        btn.style.background = k === key ? '#c8972a' : 'transparent';
+        btn.style.color = k === key ? '#1a1008' : '#e8b84b';
+    });
+    const cat = menuData[key];
+    const panel = document.getElementById('menu-items-panel');
+    panel.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">` +
+        cat.items.map(item => `
+        <div style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer"
+             onclick="addMenuItemToOrder(${item.id})">
+            <img src="${item.img}" alt="${item.name}"
+                 style="width:100%;height:110px;object-fit:cover"
+                 onerror="this.style.display='none'">
+            <div style="padding:8px 10px">
+                <div style="font-weight:600;font-size:0.85rem;line-height:1.3">${item.name}</div>
+                <div style="color:#c8972a;font-weight:700;margin-top:4px">${item.price.toFixed(2)} €</div>
+                <button style="margin-top:6px;width:100%;background:#1a1008;color:#e8b84b;border:none;border-radius:6px;padding:4px;font-size:0.8rem;cursor:pointer">
+                    ➕ Hinzufügen
+                </button>
+            </div>
+        </div>`).join('') +
+    `</div>`;
+}
+
+function addMenuItemToOrder(itemId) {
+    // Find item in menuData
+    let found = null;
+    for (const cat of Object.values(menuData)) {
+        found = cat.items.find(i => i.id === itemId);
+        if (found) break;
+    }
+    if (!found) return;
+    // Add to editItems or increment qty
+    const existing = editItems.find(i => i.id === found.id);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        editItems.push({ id: found.id, name: found.name, price: found.price, qty: 1, itemType: found.type });
+    }
+    // Flash feedback
+    const btn = event.currentTarget.querySelector('button');
+    if (btn) { btn.textContent = '✅ Hinzugefügt'; setTimeout(() => btn.textContent = '➕ Hinzufügen', 800); }
+    renderEditItems();
+    closeInlineMenu();
+}
+
+function saveEditedOrder() {
+    if (!editingOrder) return;
+    const newTotal = editItems.reduce((s, i) => s + (i.price || 0) * i.qty, 0);
+    fetch(API + "/orders/" + editingOrder.id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: editItems, total: newTotal })
+    }).then(() => {
+        closeEditModal();
+        loadOrders();
+    });
+}
+
+function deleteOrder() {
+    if (!editingOrder) return;
+    if (!confirm(`Bestellung für Tisch ${editingOrder.table_number} wirklich löschen?`)) return;
+    fetch(API + "/orders/" + editingOrder.id, { method: "DELETE" })
+    .then(() => { closeEditModal(); loadOrders(); })
+    .catch(() => {
+        // If no DELETE endpoint, mark as paid
+        fetch(API + "/orders/" + editingOrder.id, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "paid" })
+        }).then(() => { closeEditModal(); loadOrders(); });
+    });
+}
+
+// ══════════ RECEIPT LOGIC ══════════
+function buildReceiptHtml(order, forPrint = false) {
+    const now = new Date().toLocaleString("de-DE");
+    let foodNetto = 0, drinkNetto = 0;
+
+    let rows = '';
+    order.items.forEach(item => {
+        const subtotal = item.price * item.qty;
+        if (isGetrank(item)) drinkNetto += subtotal;
+        else foodNetto += subtotal;
+        rows += `<tr>
+            <td>${item.name}</td>
+            <td style="text-align:center">${item.qty}</td>
+            <td style="text-align:right">${subtotal.toFixed(2)} €</td>
+        </tr>`;
+    });
+
+    // Tax calc: items already include tax (inkl. MwSt)
+    // Netto = Brutto / (1 + rate)
+    const foodMwst = foodNetto - (foodNetto / 1.07);
+    const drinkMwst = drinkNetto - (drinkNetto / 1.19);
+    const totalBrutto = foodNetto + drinkNetto;
+    const totalMwst = foodMwst + drinkMwst;
+    const totalNetto = totalBrutto - totalMwst;
+
+    const logoLine = forPrint
+        ? `<div style="text-align:center;margin-bottom:4px"><img src="logo.jpeg" style="max-width:150px;max-height:70px;object-fit:contain;filter:sepia(1) saturate(0.5) brightness(0.5)" onerror="this.style.display='none'"></div>`
+        : `<div style="text-align:center;font-size:1.4rem;font-weight:bold;letter-spacing:4px;margin-bottom:2px">✦ RESTAURANT ✦</div>`;
+
+    let mwstRows = '';
+    if (foodNetto > 0) {
+        mwstRows += `<tr><td>MwSt. 7% (Speisen)</td><td style="text-align:right">${foodMwst.toFixed(2)} €</td></tr>`;
+    }
+    if (drinkNetto > 0) {
+        mwstRows += `<tr><td>MwSt. 19% (Getränke)</td><td style="text-align:right">${drinkMwst.toFixed(2)} €</td></tr>`;
+    }
+
+    const noteHtml = order.note ? `<tr><td colspan="3" style="font-style:italic;color:#666;font-size:0.85em">Notiz: ${order.note}</td></tr>` : '';
+
+    return `
+<div style="font-family:'Courier New',monospace;font-size:13px;line-height:1.7;max-width:340px;margin:0 auto">
+  ${logoLine}
+  <div style="text-align:center">
+    <div style="font-weight:bold">Restaurant</div>
+    <div>Max-Braun-Straße 4, 66538 Neunkirchen</div>
+    <div>Tel: 06821 6364421</div>
+    <div>${now}</div>
+    <div>Tisch Nr. <b>${order.table_number}</b></div>
+  </div>
+  <hr style="border-style:dashed;margin:8px 0">
+  <table style="width:100%;border-collapse:collapse">
+    <tr><th style="text-align:left">Artikel</th><th style="text-align:center">Menge</th><th style="text-align:right">Preis</th></tr>
+    ${rows}
+    ${noteHtml}
+  </table>
+  <hr style="border-style:dashed;margin:8px 0">
+  <table style="width:100%;border-collapse:collapse">
+    <tr><td>Netto</td><td style="text-align:right">${totalNetto.toFixed(2)} €</td></tr>
+    ${mwstRows}
+    <tr style="font-weight:bold;font-size:1.1em;border-top:2px dashed #333">
+        <td style="padding-top:6px">GESAMT (Brutto)</td>
+        <td style="text-align:right;padding-top:6px">${totalBrutto.toFixed(2)} €</td>
+    </tr>
+  </table>
+  <hr style="border-style:dashed;margin:8px 0">
+  <div style="text-align:center">
+    <div>Alle Preise inkl. MwSt.</div>
+    <div style="margin-top:8px">Vielen Dank für Ihren Besuch!</div>
+    <div style="direction:rtl;margin-top:4px">ممنون از بازدید شما ✦</div>
+  </div>
+</div>`;
+}
+
+function showReceiptPreview(id) {
+    fetch(API + "/orders/" + id)
+    .then(res => res.json())
+    .then(order => {
+        document.getElementById('receipt-preview-content').innerHTML = buildReceiptHtml(order, false);
+        document.getElementById('receipt-preview-modal')._orderId = id;
+        document.getElementById('receipt-preview-modal').classList.add('open');
+    });
+}
+
+function closeReceiptPreview() {
+    document.getElementById('receipt-preview-modal').classList.remove('open');
+}
+
+function doPrintReceipt() {
+    const id = document.getElementById('receipt-preview-modal')._orderId;
+    fetch(API + "/orders/" + id)
+    .then(res => res.json())
+    .then(order => {
+        const receiptContent = buildReceiptHtml(order, true);
+        const now = new Date().toLocaleString("de-DE");
+
+        // Build kitchen ticket HTML (inline)
+        let kitchenRows = "";
+        order.items.forEach(item => {
+            kitchenRows += `<tr>
+                <td style="font-size:1.2rem;font-weight:bold;padding:8px 4px">${item.name}</td>
+                <td style="text-align:center;font-size:1.4rem;font-weight:bold;padding:8px 4px">${item.qty}</td>
+            </tr>`;
+        });
+        const kitchenContent = `
+<div style="font-family:'Courier New',monospace;padding:16px;font-size:14px;max-width:340px;margin:0 auto">
+  <div style="text-align:center"><h2 style="margin:0 0 8px">🍳 KÜCHE BON</h2>
+  <p><b>Tisch: ${order.table_number}</b></p>
+  <p>${now}</p></div>
+  <hr style="border-style:dashed">
+  <table style="width:100%;border-collapse:collapse">
+    <tr><th style="text-align:left">Artikel</th><th>Menge</th></tr>
+    ${kitchenRows}
+  </table>
+</div>`;
+
+        // Print window with 2x Quittung (page break between) + 1x Küche
+        const win = window.open("", "_blank", "width=420,height=700");
+        win.document.write(`<html><head><title>Drucken</title>
+        <style>
+          body { margin: 0; }
+          .print-section { page-break-after: always; padding: 20px; }
+          .print-section:last-child { page-break-after: avoid; }
+          .copy-label { font-family: 'Courier New', monospace; font-size: 11px;
+            text-align: center; border: 1px dashed #aaa; padding: 2px 8px;
+            margin-bottom: 8px; display: inline-block; }
+          @media print { body { margin: 0; } }
+        </style>
+        </head><body>
+          <div class="print-section">
+            <div style="text-align:center"><span class="copy-label">📋 KUNDE – Quittung</span></div>
+            ${receiptContent}
+          </div>
+          <div class="print-section">
+            <div style="text-align:center"><span class="copy-label">📁 ARCHIV – Quittung</span></div>
+            ${receiptContent}
+          </div>
+          <div class="print-section">
+            <div style="text-align:center"><span class="copy-label">🍳 KÜCHE – Bon</span></div>
+            ${kitchenContent}
+          </div>
+        </body></html>`);
+        win.document.close();
+        setTimeout(() => win.print(), 400);
+    });
+}
+
+// ══════════ KITCHEN TICKET ══════════
 function printKitchenTicket(id) {
     fetch(API + "/orders/" + id)
     .then(res => res.json())
@@ -151,7 +703,7 @@ function printKitchenTicket(id) {
         table{width:100%;border-collapse:collapse}td{border-bottom:1px dashed #ccc}
         h2{text-align:center}.center{text-align:center}</style></head><body>
         <div class="center"><h2>🍳 KÜCHE BON</h2>
-        <p><b>Tisch: ${order.table_number}</b> &nbsp;&nbsp; #${order.id}</p>
+        <p><b>Tisch: ${order.table_number}</b></p>
         <p>${now}</p></div>
         <hr style="border-style:dashed">
         <table><tr><th style="text-align:left">Artikel</th><th>Menge</th></tr>${rows}</table>
