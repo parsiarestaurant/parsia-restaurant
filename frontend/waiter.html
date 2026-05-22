@@ -839,36 +839,23 @@ function doPrintReceipt() {
   </table>
 </div>`;
 
-        // Print window with 2x Quittung (page break between) + 1x Küche
+        // Print window with 1x Quittung only
         const win = window.open("", "_blank", "width=420,height=700");
         win.document.write(`<html><head><title>Drucken</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
           body { margin: 0; padding: 0; }
           .print-section { padding: 8px; }
-          .copy-label { font-family: 'Courier New', monospace; font-size: 10px;
-            text-align: center; border: 1px dashed #aaa; padding: 2px 6px;
-            margin-bottom: 6px; display: inline-block; }
           @media print {
             * { margin: 0; padding: 0; }
             body { margin: 0; padding: 0; }
-            .print-section { padding: 4px; page-break-after: always; }
-            .print-section:last-child { page-break-after: avoid; }
+            .print-section { padding: 4px; }
             @page { margin: 0; size: 80mm auto; }
           }
         </style>
         </head><body>
           <div class="print-section">
-            <div style="text-align:center"><span class="copy-label">KUNDE – Quittung</span></div>
             ${receiptContent}
-          </div>
-          <div class="print-section">
-            <div style="text-align:center"><span class="copy-label">ARCHIV – Quittung</span></div>
-            ${receiptContent}
-          </div>
-          <div class="print-section">
-            <div style="text-align:center"><span class="copy-label">KÜCHE – Bon</span></div>
-            ${kitchenContent}
           </div>
         </body></html>`);
         win.document.close();
