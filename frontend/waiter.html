@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kellner Dashboard – Parsia</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Parsia">
+    <meta name="theme-color" content="#c8972a">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
@@ -226,6 +233,9 @@
             📝 Neue Bestellung
         </button>
         <span class="badge bg-warning text-dark" id="total-count">0 Bestellungen</span>
+        <button id="install-btn" onclick="installApp()" style="display:none;background:#e8b84b;color:#1a1008;border:none;border-radius:8px;padding:8px 14px;font-weight:800;font-size:0.85rem;cursor:pointer;align-items:center;gap:6px;">
+            📲 App installieren
+        </button>
     </div>
 </div>
 
@@ -1122,6 +1132,36 @@ function noShowStep(activeId) {
 
 setInterval(loadOrders, 5000);
 loadOrders();
+
+// ── PWA Service Worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// ── PWA Install Prompt ──
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install button
+  const btn = document.getElementById('install-btn');
+  if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('install-btn');
+  if (btn) btn.style.display = 'none';
+  deferredPrompt = null;
+});
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  }
+}
 </script>
 </body>
 </html>
