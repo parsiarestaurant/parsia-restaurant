@@ -889,8 +889,14 @@ function printKitchenTicket(id) {
     .then(order => {
         const now = new Date().toLocaleString("de-DE");
 
-        // Filter out drinks
-        const foodItems = order.items.filter(item => !isGetrank(item));
+        // Filter out drinks — check itemType, id range (501-699 = drinks), and name keywords
+        const foodItems = order.items.filter(item => {
+            if (item.itemType === 'drink') return false;
+            if (item.itemType === 'food') return true;
+            const id = item.id || 0;
+            if (id >= 501 && id <= 699) return false; // drink id ranges
+            return !isGetrank(item); // fallback: name keyword check
+        });
 
         if (!foodItems.length) {
             alert('Keine Speisen in dieser Bestellung – nur Getränke.');
@@ -905,69 +911,65 @@ function printKitchenTicket(id) {
             groups[cat].push(item);
         });
 
-        // Build HTML sections per category
-        let sectionsHtml = '';
-        KITCHEN_CATEGORY_ORDER.forEach(({ key, label }) => {
-            if (!groups[key] || !groups[key].length) return;
-            let rows = '';
-            groups[key].forEach(item => {
-                rows += `<tr>
-                    <td class="item-name">${item.name}</td>
-                    <td class="item-qty">${item.qty}</td>
-                </tr>`;
-            });
-            sectionsHtml += `
-            <div class="cat-section">
-                <div class="cat-label">${label}</div>
-                <table><tbody>${rows}</tbody></table>
-            </div>`;
-        });
-
-        // Handle items that didn't match any known category (catch-all)
+        // Build HTML sections per category — clean block style
         const knownKeys = KITCHEN_CATEGORY_ORDER.map(c => c.key);
         const otherItems = foodItems.filter(item => !knownKeys.includes(getKitchenCategory(item)));
-        if (otherItems.length) {
-            let rows = otherItems.map(item =>
-                `<tr><td class="item-name">${item.name}</td><td class="item-qty">${item.qty}</td></tr>`
+        const allCats = [...KITCHEN_CATEGORY_ORDER];
+        if (otherItems.length) { allCats.push({ key: '_other', label: 'Sonstiges' }); groups['_other'] = otherItems; }
+
+        let sectionsHtml = '';
+        allCats.forEach(({ key, label }) => {
+            if (!groups[key] || !groups[key].length) return;
+            const lines = groups[key].map(item =>
+                `<div class="item-row"><span class="item-name">${item.name}</span><span class="item-qty">x${item.qty}</span></div>`
             ).join('');
-            sectionsHtml += `<div class="cat-section"><div class="cat-label">Sonstiges</div><table><tbody>${rows}</tbody></table></div>`;
-        }
+            sectionsHtml += `<div class="cat-section"><div class="cat-label">┌─ ${label}</div><div class="cat-items">${lines}</div><div class="cat-bottom"></div></div>`;
+        });
 
         const win = window.open("", "_blank", "width=400,height=600");
         win.document.write(`<html><head><title>Küche Bon</title>
         <style>
           * { margin:0; padding:0; box-sizing:border-box; }
           body { font-family:'Courier New',monospace; padding:10px; font-size:16px; }
-          .center { text-align:center; }
-          h2 { text-align:center; font-size:1.8rem; margin-bottom:6px; }
-          .meta { text-align:center; font-size:1.1rem; margin-bottom:4px; }
-          .cat-section { margin-top:14px; }
+          h2 { text-align:center; font-size:1.8rem; margin-bottom:4px; }
+          .meta { text-align:center; font-size:1.1rem; margin-bottom:3px; }
+          .cat-section { margin-top:14px; font-family:'Courier New',monospace; }
+          .cat-items { padding:4px 10px; border-left:1px solid #000; border-right:1px solid #000; }
           .cat-label {
-            font-size:1.2rem;
+            font-size:1.1rem;
             font-weight:900;
-            text-transform:uppercase;
             letter-spacing:1px;
-            border-top:2px solid #000;
-            border-bottom:2px solid #000;
-            padding:4px 0;
-            margin-bottom:6px;
-          }
-          table { width:100%; border-collapse:collapse; }
-          .item-name {
-            font-size:1.35rem;
-            font-weight:bold;
-            padding:7px 4px;
-            border-bottom:1px dashed #999;
-            word-break:break-word;
-          }
-          .item-qty {
-            text-align:center;
-            font-size:1.6rem;
-            font-weight:900;
-            padding:7px 4px;
-            border-bottom:1px dashed #999;
             white-space:nowrap;
-            width:40px;
+            border-top:1px solid #000;
+            border-left:1px solid #000;
+            border-right:1px solid #000;
+            padding:4px 10px 2px;
+            text-transform:uppercase;
+          }
+          .cat-bottom {
+            border-bottom:1px solid #000;
+            border-left:1px solid #000;
+            border-right:1px solid #000;
+            height:6px;
+          }
+          .item-row {
+            display:flex;
+            justify-content:space-between;
+            align-items:baseline;
+            padding:5px 0;
+            border-bottom:1px dotted #bbb;
+          }
+          .item-row:last-child { border-bottom:none; }
+          .item-qty {
+            font-size:1.5rem;
+            font-weight:900;
+            white-space:nowrap;
+            margin-left:12px;
+          }
+          .item-name {
+            font-size:1.3rem;
+            font-weight:bold;
+            word-break:break-word;
           }
           @media print {
             @page { margin:0; size:80mm auto; }
