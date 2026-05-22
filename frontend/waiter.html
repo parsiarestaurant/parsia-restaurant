@@ -738,9 +738,9 @@ function buildReceiptHtml(order, forPrint = false) {
         if (isGetrank(item)) drinkNetto += subtotal;
         else foodNetto += subtotal;
         rows += `<tr>
-            <td>${item.name}</td>
-            <td style="text-align:center">${item.qty}</td>
-            <td style="text-align:right">${subtotal.toFixed(2)} €</td>
+            <td style="word-break:break-word;max-width:45mm">${item.name}</td>
+            <td style="text-align:center;white-space:nowrap;padding:0 4px">${item.qty}</td>
+            <td style="text-align:right;white-space:nowrap">${subtotal.toFixed(2)}</td>
         </tr>`;
     });
 
@@ -756,43 +756,43 @@ function buildReceiptHtml(order, forPrint = false) {
 
     let mwstRows = '';
     if (foodNetto > 0) {
-        mwstRows += `<tr><td>MwSt. 7% (Speisen)</td><td style="text-align:right">${foodMwst.toFixed(2)} €</td></tr>`;
+        mwstRows += `<tr><td>MwSt. 7% (Speisen)</td><td style="text-align:right;white-space:nowrap">${foodMwst.toFixed(2)} EUR</td></tr>`;
     }
     if (drinkNetto > 0) {
-        mwstRows += `<tr><td>MwSt. 19% (Getränke)</td><td style="text-align:right">${drinkMwst.toFixed(2)} €</td></tr>`;
+        mwstRows += `<tr><td>MwSt. 19% (Getr.)</td><td style="text-align:right;white-space:nowrap">${drinkMwst.toFixed(2)} EUR</td></tr>`;
     }
 
     const noteHtml = order.note ? `<tr><td colspan="3" style="font-style:italic;color:#666;font-size:0.85em">Notiz: ${order.note}</td></tr>` : '';
 
     return `
-<div style="font-family:'Courier New',monospace;font-size:13px;line-height:1.7;max-width:340px;margin:0 auto">
+<div style="font-family:'Courier New',Courier,monospace;font-size:12pt;line-height:1.5;width:72mm;margin:0;padding:0">
   ${logoLine}
-  <div style="text-align:center">
-    <div>Max-Braun-Straße 4, 66538 Neunkirchen</div>
+  <div style="text-align:center;font-size:10pt">
+    <div>Max-Braun-Str. 4, 66538 Neunkirchen</div>
     <div>Tel: 06821 6364421</div>
     <div>${now}</div>
-    <div>Tisch Nr. <b>${order.table_number}</b></div>
+    <div style="font-size:11pt">Tisch Nr. <b>${order.table_number}</b></div>
   </div>
-  <hr style="border-style:dashed;margin:8px 0">
-  <table style="width:100%;border-collapse:collapse">
-    <tr><th style="text-align:left">Artikel</th><th style="text-align:center">Menge</th><th style="text-align:right">Preis</th></tr>
+  <hr style="border:none;border-top:1px dashed #333;margin:6px 0">
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><th style="text-align:left">Artikel</th><th style="text-align:center;width:1.5em">x</th><th style="text-align:right;white-space:nowrap">Preis</th></tr>
     ${rows}
     ${noteHtml}
   </table>
-  <hr style="border-style:dashed;margin:8px 0">
-  <table style="width:100%;border-collapse:collapse">
-    <tr><td>Netto</td><td style="text-align:right">${totalNetto.toFixed(2)} €</td></tr>
+  <hr style="border:none;border-top:1px dashed #333;margin:6px 0">
+  <table style="width:100%;border-collapse:collapse;font-size:10pt">
+    <tr><td>Netto</td><td style="text-align:right;white-space:nowrap">${totalNetto.toFixed(2)} EUR</td></tr>
     ${mwstRows}
-    <tr style="font-weight:bold;font-size:1.1em;border-top:2px dashed #333">
-        <td style="padding-top:6px">GESAMT (Brutto)</td>
-        <td style="text-align:right;padding-top:6px">${totalBrutto.toFixed(2)} €</td>
+    <tr style="font-weight:bold;font-size:11pt">
+        <td style="padding-top:4px;border-top:1px dashed #333">GESAMT</td>
+        <td style="text-align:right;padding-top:4px;border-top:1px dashed #333;white-space:nowrap">${totalBrutto.toFixed(2)} EUR</td>
     </tr>
   </table>
-  <hr style="border-style:dashed;margin:8px 0">
-  <div style="text-align:center">
+  <hr style="border:none;border-top:1px dashed #333;margin:6px 0">
+  <div style="text-align:center;font-size:9pt">
     <div>Alle Preise inkl. MwSt.</div>
-    <div style="margin-top:8px">Vielen Dank für Ihren Besuch!</div>
-    <div style="direction:rtl;margin-top:4px">ممنون از بازدید شما ✦</div>
+    <div style="margin-top:6px">Vielen Dank fuer Ihren Besuch!</div>
+    <div style="direction:rtl;margin-top:4px;font-size:10pt">ممنون از بازدید شما</div>
   </div>
 </div>`;
 }
@@ -844,19 +844,15 @@ function doPrintReceipt() {
         win.document.write(`<html><head><title>Drucken</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { margin: 0; padding: 0; }
-          .print-section { padding: 8px; }
+          body { margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
           @media print {
-            * { margin: 0; padding: 0; }
-            body { margin: 0; padding: 0; }
-            .print-section { padding: 4px; }
+            * { margin: 0 !important; padding: 0 !important; }
+            body { margin: 0; padding: 0; width: 80mm; }
             @page { margin: 0; size: 80mm auto; }
           }
         </style>
         </head><body>
-          <div class="print-section">
-            ${receiptContent}
-          </div>
+          ${receiptContent}
         </body></html>`);
         win.document.close();
         setTimeout(() => win.print(), 400);
