@@ -104,12 +104,10 @@ def update_order(order_id: int, data: dict, db: Session = Depends(get_db)):
         order.total = round(data["total"], 2)
 
     if "paymentMethod" in data:
-        # Store paymentMethod inside items JSON as a metadata field
         try:
             items = json.loads(order.items)
         except:
             items = []
-        # Save as special metadata entry
         items_clean = [i for i in items if not i.get("_meta")]
         items_clean.append({"_meta": True, "paymentMethod": data["paymentMethod"]})
         order.items = json.dumps(items_clean, ensure_ascii=False)
@@ -130,12 +128,20 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Deleted ✅"}
 
+# ----------------------
+# DELETE ALL ORDERS
+# ----------------------
+@app.delete("/orders")
+def delete_all_orders(db: Session = Depends(get_db)):
+    count = db.query(database.Order).delete()
+    db.commit()
+    return {"message": f"Alle {count} Bestellungen gelöscht ✅"}
+
 def parse_order(order):
     try:
         raw = json.loads(order.items)
     except:
         raw = []
-    # Separate real items from metadata
     items = [i for i in raw if not i.get("_meta")]
     meta = next((i for i in raw if i.get("_meta")), {})
     return {
