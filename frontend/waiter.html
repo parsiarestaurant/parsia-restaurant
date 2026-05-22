@@ -859,34 +859,126 @@ function doPrintReceipt() {
 }
 
 // ══════════ KITCHEN TICKET ══════════
+
+// Map item id ranges / types to category labels for kitchen grouping
+const KITCHEN_CATEGORY_ORDER = [
+    { key: 'vorspeisen',  label: 'Vorspeisen' },
+    { key: 'eintoepfe',   label: 'Eintöpfe & Hauptgerichte' },
+    { key: 'grill',       label: 'Vom Grill' },
+    { key: 'desserts',    label: 'Desserts & Süßes' },
+];
+
+function getKitchenCategory(item) {
+    // Use itemType or id ranges to determine category
+    // IDs: 101-199 Vorspeisen, 201-299 Eintöpfe, 301-399 Grill, 401-499 Desserts
+    // Falls back to itemType checks
+    const id = item.id || 0;
+    if (id >= 101 && id <= 199) return 'vorspeisen';
+    if (id >= 201 && id <= 299) return 'eintoepfe';
+    if (id >= 301 && id <= 399) return 'grill';
+    if (id >= 401 && id <= 499) return 'desserts';
+    // Fallback: check name/type
+    const type = (item.itemType || item.type || '').toLowerCase();
+    if (type === 'drink' || type === 'getränk') return 'getraenke';
+    return 'eintoepfe'; // default food category
+}
+
 function printKitchenTicket(id) {
     fetch(API + "/orders/" + id)
     .then(res => res.json())
     .then(order => {
         const now = new Date().toLocaleString("de-DE");
-        let rows = "";
-        order.items.forEach(item => {
-            rows += `<tr>
-                <td style="font-size:1.25rem;font-weight:bold;padding:8px 4px">${item.name}</td>
-                <td style="text-align:center;font-size:1.5rem;font-weight:bold;padding:8px 4px">${item.qty}</td>
-            </tr>`;
+
+        // Filter out drinks
+        const foodItems = order.items.filter(item => !isGetrank(item));
+
+        if (!foodItems.length) {
+            alert('Keine Speisen in dieser Bestellung – nur Getränke.');
+            return;
+        }
+
+        // Group by kitchen category
+        const groups = {};
+        foodItems.forEach(item => {
+            const cat = getKitchenCategory(item);
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push(item);
         });
-        const win = window.open("", "_blank", "width=350,height=480");
+
+        // Build HTML sections per category
+        let sectionsHtml = '';
+        KITCHEN_CATEGORY_ORDER.forEach(({ key, label }) => {
+            if (!groups[key] || !groups[key].length) return;
+            let rows = '';
+            groups[key].forEach(item => {
+                rows += `<tr>
+                    <td class="item-name">${item.name}</td>
+                    <td class="item-qty">${item.qty}</td>
+                </tr>`;
+            });
+            sectionsHtml += `
+            <div class="cat-section">
+                <div class="cat-label">${label}</div>
+                <table><tbody>${rows}</tbody></table>
+            </div>`;
+        });
+
+        // Handle items that didn't match any known category (catch-all)
+        const knownKeys = KITCHEN_CATEGORY_ORDER.map(c => c.key);
+        const otherItems = foodItems.filter(item => !knownKeys.includes(getKitchenCategory(item)));
+        if (otherItems.length) {
+            let rows = otherItems.map(item =>
+                `<tr><td class="item-name">${item.name}</td><td class="item-qty">${item.qty}</td></tr>`
+            ).join('');
+            sectionsHtml += `<div class="cat-section"><div class="cat-label">Sonstiges</div><table><tbody>${rows}</tbody></table></div>`;
+        }
+
+        const win = window.open("", "_blank", "width=400,height=600");
         win.document.write(`<html><head><title>Küche Bon</title>
         <style>
-          *{margin:0;padding:0;box-sizing:border-box}
-          body{font-family:'Courier New',monospace;padding:8px;font-size:14px}
-          table{width:100%;border-collapse:collapse}
-          td{border-bottom:1px dashed #ccc}
-          h2{text-align:center}
-          .center{text-align:center}
-          @media print{@page{margin:0;size:80mm auto}body{padding:4px}}
+          * { margin:0; padding:0; box-sizing:border-box; }
+          body { font-family:'Courier New',monospace; padding:10px; font-size:16px; }
+          .center { text-align:center; }
+          h2 { text-align:center; font-size:1.8rem; margin-bottom:6px; }
+          .meta { text-align:center; font-size:1.1rem; margin-bottom:4px; }
+          .cat-section { margin-top:14px; }
+          .cat-label {
+            font-size:1.2rem;
+            font-weight:900;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            border-top:2px solid #000;
+            border-bottom:2px solid #000;
+            padding:4px 0;
+            margin-bottom:6px;
+          }
+          table { width:100%; border-collapse:collapse; }
+          .item-name {
+            font-size:1.35rem;
+            font-weight:bold;
+            padding:7px 4px;
+            border-bottom:1px dashed #999;
+            word-break:break-word;
+          }
+          .item-qty {
+            text-align:center;
+            font-size:1.6rem;
+            font-weight:900;
+            padding:7px 4px;
+            border-bottom:1px dashed #999;
+            white-space:nowrap;
+            width:40px;
+          }
+          @media print {
+            @page { margin:0; size:80mm auto; }
+            body { padding:4px; font-size:15px; }
+          }
         </style></head><body>
-        <div class="center"><h2>🍳 KÜCHE BON</h2>
-        <p><b>Tisch: ${order.table_number}</b></p>
-        <p>${now}</p></div>
-        <hr style="border-style:dashed">
-        <table><tr><th style="text-align:left">Artikel</th><th>Menge</th></tr>${rows}</table>
+        <h2>🍳 KÜCHE BON</h2>
+        <p class="meta"><b>Tisch: ${order.table_number}</b></p>
+        <p class="meta">${now}</p>
+        <hr style="border-style:dashed;margin:8px 0">
+        ${sectionsHtml}
         </body></html>`);
         win.document.close();
         win.print();
