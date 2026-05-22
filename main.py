@@ -104,14 +104,15 @@ def update_order(order_id: int, data: dict, db: Session = Depends(get_db)):
         order.total = round(data["total"], 2)
 
     if "paymentMethod" in data:
-        # Store paymentMethod in items field as metadata if no dedicated column
+        # Store paymentMethod inside items JSON as a metadata field
         try:
             items = json.loads(order.items)
         except:
             items = []
-        order.items = json.dumps(items, ensure_ascii=False)
-        # Save paymentMethod in a note or ignore if no column
-        pass
+        # Save as special metadata entry
+        items_clean = [i for i in items if not i.get("_meta")]
+        items_clean.append({"_meta": True, "paymentMethod": data["paymentMethod"]})
+        order.items = json.dumps(items_clean, ensure_ascii=False)
 
     db.commit()
     db.refresh(order)
@@ -131,14 +132,18 @@ def delete_order(order_id: int, db: Session = Depends(get_db)):
 
 def parse_order(order):
     try:
-        items = json.loads(order.items)
+        raw = json.loads(order.items)
     except:
-        items = []
+        raw = []
+    # Separate real items from metadata
+    items = [i for i in raw if not i.get("_meta")]
+    meta = next((i for i in raw if i.get("_meta")), {})
     return {
         "id": order.id,
         "table_number": order.table_number,
         "items": items,
         "status": order.status,
         "total": order.total,
-        "created_at": order.created_at
+        "created_at": order.created_at,
+        "paymentMethod": meta.get("paymentMethod", None)
     }
