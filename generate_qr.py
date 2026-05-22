@@ -5,8 +5,8 @@ import os
 # ----------------------
 # تنظیمات
 # ----------------------
-base_url = "https://parsia-restaurant.onrender.com/frontend/menu.html?table="
-tables = 10
+base_url = "https://parsiarestaurant.github.io/parsia-restaurant/frontend/menu.html?table="
+tables = 16
 output_folder = "qrcodes"
 
 os.makedirs(output_folder, exist_ok=True)
