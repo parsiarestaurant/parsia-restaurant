@@ -8,42 +8,18 @@ import os
 base_url = "https://parsiarestaurant.github.io/parsia-restaurant/frontend/menu.html?table="
 tables = 16
 output_folder = "qrcodes"
-
-# مسیرهای ممکن لوگو
-logo_candidates = [
-    "frontend/images/logo.jpg",
-    "frontend/images/logo.png",
-    "logo.jpg",
-    "logo.png",
-    r"C:\Users\ssada\Documents\GitHub\parsia-restaurant\frontend\images\logo.jpg",
-]
-
-logo_path = None
-for path in logo_candidates:
-    if os.path.exists(path):
-        logo_path = path
-        print(f"✅ Logo gefunden: {path}")
-        break
-
-if not logo_path:
-    print("⚠️ Logo nicht gefunden! Bitte Pfad prüfen.")
-    print("Vorhandene Dateien in frontend/images/:")
-    try:
-        for f in os.listdir("frontend/images"):
-            print("  -", f)
-    except:
-        pass
+logo_path = "frontend/images/logo/logo.jpg"
 
 os.makedirs(output_folder, exist_ok=True)
 
 # بارگذاری لوگو
 has_logo = False
-if logo_path:
-    try:
-        logo = Image.open(logo_path).convert("RGBA")
-        has_logo = True
-    except Exception as e:
-        print(f"⚠️ Logo konnte nicht geladen werden: {e}")
+try:
+    logo = Image.open(logo_path).convert("RGBA")
+    has_logo = True
+    print(f"✅ Logo geladen: {logo_path}")
+except Exception as e:
+    print(f"⚠️ Logo Fehler: {e}")
 
 for i in range(1, tables + 1):
     url = base_url + str(i)
