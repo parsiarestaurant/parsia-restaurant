@@ -475,8 +475,26 @@
                     </select>
                 </div>
                 <div class="mb-2">
-                    <label style="font-size:0.82rem;font-weight:700;color:#555">Bild-URL</label>
-                    <input id="admin-item-img" type="text" class="form-control form-control-sm mt-1" placeholder="https://... (Link zum Bild)">
+                    <label style="font-size:0.82rem;font-weight:700;color:#555">Bild</label>
+                    <div class="mt-1" style="display:flex;flex-direction:column;gap:8px">
+                        <!-- Upload Button -->
+                        <label id="cloudinary-upload-label" style="display:flex;align-items:center;gap:10px;background:#f8f9fa;border:2px dashed #c8972a;border-radius:8px;padding:12px 14px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='#fffbf2'" onmouseout="this.style.background='#f8f9fa'">
+                            <input type="file" id="cloudinary-file-input" accept="image/*" style="display:none" onchange="uploadToCloudinary(this)">
+                            <span style="font-size:1.5rem">📷</span>
+                            <div>
+                                <div style="font-weight:700;font-size:0.85rem;color:#1a1008">Bild hochladen</div>
+                                <div style="font-size:0.75rem;color:#888">Von Handy oder Computer auswählen</div>
+                            </div>
+                        </label>
+                        <!-- Upload Progress -->
+                        <div id="cloudinary-upload-status" style="display:none;font-size:0.8rem;font-weight:600;padding:8px 12px;border-radius:6px"></div>
+                        <!-- Preview -->
+                        <div id="cloudinary-preview" style="display:none">
+                            <img id="cloudinary-preview-img" src="" alt="Vorschau" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px;border:1px solid #eee">
+                        </div>
+                        <!-- URL field (readonly, auto-filled) -->
+                        <input id="admin-item-img" type="text" class="form-control form-control-sm" placeholder="Wird automatisch nach Upload ausgefüllt..." readonly style="background:#f0f0f0;font-size:0.75rem;color:#666">
+                    </div>
                 </div>
                 <div class="mb-3 d-flex align-items-center gap-2">
                     <input id="admin-item-active" type="checkbox" class="form-check-input" checked style="width:18px;height:18px;cursor:pointer">
@@ -565,6 +583,54 @@
 <script>
 const API = "https://parsia-restaurant.onrender.com";
 const ADMIN_PASSWORD = "parsia2024"; // 🔑 رمز مالک رستوران — اینجا تغییر دهید
+// ══════════ CLOUDINARY UPLOAD ══════════
+const CLOUDINARY_CLOUD_NAME = "dmcgszod1";
+const CLOUDINARY_UPLOAD_PRESET = "restaurant_upload";
+
+async function uploadToCloudinary(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const status = document.getElementById("cloudinary-upload-status");
+    const preview = document.getElementById("cloudinary-preview");
+    const previewImg = document.getElementById("cloudinary-preview-img");
+    const urlInput = document.getElementById("admin-item-img");
+    const label = document.getElementById("cloudinary-upload-label");
+    status.style.display = "block";
+    status.style.background = "#fff3cd";
+    status.style.color = "#856404";
+    status.textContent = "⏳ Bild wird hochgeladen...";
+    preview.style.display = "none";
+    label.style.pointerEvents = "none";
+    label.style.opacity = "0.6";
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    try {
+        const res = await fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/image/upload", {
+            method: "POST", body: formData
+        });
+        if (!res.ok) throw new Error("Upload fehlgeschlagen");
+        const data = await res.json();
+        const url = data.secure_url;
+        urlInput.value = url;
+        previewImg.src = url;
+        preview.style.display = "block";
+        status.style.background = "#d4edda";
+        status.style.color = "#155724";
+        status.textContent = "✅ Bild erfolgreich hochgeladen!";
+        setTimeout(() => { status.style.display = "none"; }, 3000);
+    } catch (err) {
+        status.style.background = "#f8d7da";
+        status.style.color = "#721c24";
+        status.textContent = "❌ Fehler beim Hochladen. Bitte nochmal versuchen.";
+        console.error("Cloudinary upload error:", err);
+    } finally {
+        label.style.pointerEvents = "";
+        label.style.opacity = "";
+        input.value = "";
+    }
+}
+
 let currentFilter = "all";
 let allOrders = [];
 let paymentOrderId = null;
@@ -665,6 +731,7 @@ function openAddItem() {
     document.getElementById('admin-item-category').value = 'vorspeisen';
     document.getElementById('admin-item-type').value = 'food';
     document.getElementById('admin-item-img').value = '';
+    document.getElementById('cloudinary-preview').style.display = 'none';
     document.getElementById('admin-item-active').checked = true;
     document.getElementById('admin-form-section').style.display = 'block';
     document.getElementById('admin-form-section').scrollIntoView({behavior:'smooth'});
@@ -682,6 +749,9 @@ function openEditItem(id) {
     document.getElementById('admin-item-category').value = item.category;
     document.getElementById('admin-item-type').value = item.item_type;
     document.getElementById('admin-item-img').value = item.img_url || '';
+    const _prevImg = document.getElementById('cloudinary-preview-img');
+    const _prev = document.getElementById('cloudinary-preview');
+    if (item.img_url) { _prevImg.src = item.img_url; _prev.style.display = 'block'; } else { _prev.style.display = 'none'; }
     document.getElementById('admin-item-active').checked = item.active;
     document.getElementById('admin-form-section').style.display = 'block';
     document.getElementById('admin-form-section').scrollIntoView({behavior:'smooth'});
