@@ -18,16 +18,95 @@
             --gold-light: #e8b84b;
             --bg-dark: #1a1008;
         }
-        body { background: #f5f2ee; }
-        .status-pending  { border-left: 4px solid #f39c12; }
-        .status-ready    { border-left: 4px solid #27ae60; }
-        .status-paid     { border-left: 4px solid #95a5a6; opacity: 0.7; }
-        .filter-btn { cursor: pointer; padding: 8px 16px; border-radius: 20px; border: 2px solid transparent; font-weight: bold; }
-        .filter-btn.active { border-color: #333; }
-        .btn-kitchen-print { background: #8e44ad; color: white; border: none; font-size: 0.8rem; }
-        .btn-kitchen-print:hover { background: #7d3c98; color: white; }
-        .btn-edit-table { background: #2c6fad; color: white; border: none; font-size: 0.8rem; }
-        .btn-edit-table:hover { background: #245a8e; color: white; }
+        body { background: #f0ece6; }
+        .filter-btn { cursor: pointer; padding: 8px 18px; border-radius: 22px; border: 2px solid transparent; font-weight: 800; transition: all 0.15s; }
+        .filter-btn.active { border-color: #333 !important; }
+
+        /* ── NEW: Order Cards ── */
+        .order-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+            border-left: 5px solid #ddd;
+        }
+        .order-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.13); transform: translateY(-2px); }
+        .order-card.status-pending { border-left-color: #f39c12; }
+        .order-card.status-paid    { border-left-color: #95a5a6; opacity: 0.72; }
+
+        .order-card-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 14px 16px 8px;
+        }
+        .order-table-num {
+            font-size: 1.4rem; font-weight: 900; color: #1a1008;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .order-status-pill {
+            font-size: 0.7rem; font-weight: 800; padding: 4px 10px;
+            border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .pill-pending { background: #fff3cd; color: #856404; }
+        .pill-paid    { background: #e9ecef; color: #6c757d; }
+
+        .order-timer {
+            font-size: 0.72rem; font-weight: 700;
+            padding: 3px 9px; border-radius: 10px;
+            display: inline-flex; align-items: center; gap: 3px; margin-top: 4px;
+        }
+        .timer-fresh  { background: #d4edda; color: #155724; }
+        .timer-medium { background: #fff3cd; color: #856404; }
+        .timer-old    { background: #f8d7da; color: #721c24; }
+
+        .order-items-area {
+            padding: 4px 16px 10px;
+            display: flex; flex-wrap: wrap; gap: 5px;
+        }
+        .item-chip {
+            background: #f5f2ee; border-radius: 20px;
+            padding: 4px 10px; font-size: 0.78rem; font-weight: 600;
+            color: #333; border: 1px solid #e0dbd3;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .item-chip .qty-badge {
+            background: #c8972a; color: #fff; border-radius: 50%;
+            width: 19px; height: 19px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; font-weight: 900; flex-shrink: 0;
+        }
+
+        .order-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 16px 12px;
+            border-top: 1px solid #f0ebe3;
+            background: #fffbf5;
+        }
+        .order-total-display { font-size: 1.15rem; font-weight: 900; color: #1a1008; }
+        .order-time-small { font-size: 0.7rem; color: #aaa; margin-top: 2px; }
+
+        .order-actions {
+            display: flex; gap: 6px; padding: 0 14px 14px; flex-wrap: wrap;
+        }
+        .action-btn {
+            flex: 1; min-width: 60px; padding: 8px 6px;
+            border-radius: 9px; border: none; cursor: pointer;
+            font-size: 0.78rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 3px;
+            transition: all 0.15s;
+        }
+        .action-btn:hover { filter: brightness(0.88); transform: scale(1.04); }
+        .action-pay     { background: #27ae60; color: #fff; }
+        .action-edit    { background: #2c6fad; color: #fff; }
+        .action-receipt { background: #6c757d; color: #fff; }
+        .action-kitchen { background: #8e44ad; color: #fff; }
+
+        @keyframes newOrderPulse {
+            0%   { box-shadow: 0 0 0 0 rgba(243,156,18,0.55); }
+            70%  { box-shadow: 0 0 0 12px rgba(243,156,18,0); }
+            100% { box-shadow: 0 0 0 0 rgba(243,156,18,0); }
+        }
+        .order-card.brand-new { animation: newOrderPulse 1.8s ease-in-out 3; }
 
         /* ── Modal overlay ── */
         .modal-overlay {
@@ -232,6 +311,9 @@
         <button class="new-order-btn-header" onclick="openNewOrderModal()">
             📝 Neue Bestellung
         </button>
+        <button onclick="openAdminPanel()" style="background:#2c6fad;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:0.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(44,111,173,0.4);transition:all 0.2s" onmouseover="this.style.background='#245a8e'" onmouseout="this.style.background='#2c6fad'">
+            ⚙️ Menü verwalten
+        </button>
         <span class="badge bg-warning text-dark" id="total-count">0 Bestellungen</span>
         <button id="install-btn" onclick="installApp()" style="display:none;background:#e8b84b;color:#1a1008;border:none;border-radius:8px;padding:8px 14px;font-weight:800;font-size:0.85rem;cursor:pointer;align-items:center;gap:6px;">
             📲 App installieren
@@ -240,12 +322,16 @@
 </div>
 
 <div class="px-3">
+
+<!-- Stats bar -->
+<div id="stats-bar" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"></div>
+
 <!-- Filter Buttons -->
-<div class="d-flex gap-2 mb-4 flex-wrap">
-    <button class="filter-btn btn btn-warning active" onclick="setFilter('all', this)">📋 Alle</button>
-    <button class="filter-btn btn btn-warning" onclick="setFilter('pending', this)">🟡 Ausstehend</button>
-    <button class="filter-btn btn btn-success" onclick="setFilter('ready', this)">🟢 Fertig</button>
-    <button class="filter-btn btn btn-secondary" onclick="setFilter('paid', this)">⚫ Bezahlt</button>
+<div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
+    <button class="filter-btn active" id="fb-all" onclick="setFilter('all',this)" style="background:#1a1008;color:#e8b84b;border-color:#1a1008">📋 Alle</button>
+    <button class="filter-btn" id="fb-pending" onclick="setFilter('pending',this)" style="background:#fff3cd;color:#856404;border-color:#f39c12">🟡 Ausstehend</button>
+    <button class="filter-btn" id="fb-paid" onclick="setFilter('paid',this)" style="background:#f0f0f0;color:#555;border-color:#95a5a6">⚫ Bezahlt</button>
+    <span id="total-count-inline" style="margin-left:auto;font-size:0.8rem;color:#999;font-weight:600"></span>
 </div>
 
 <div id="orders" class="row"></div>
@@ -333,6 +419,86 @@
     </div>
 </div>
 
+<!-- ══════════ ADMIN PANEL MODAL ══════════ -->
+<div class="modal-overlay" id="admin-modal" style="z-index:1300">
+    <div class="modal-box" style="max-width:680px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:96vh">
+
+        <!-- Header -->
+        <div style="background:#1a1008;color:#e8b84b;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span style="font-weight:bold;font-size:1.05rem">⚙️ Menü verwalten – Parsia</span>
+            <button class="btn btn-sm btn-outline-warning" onclick="closeAdminPanel()">✕ Schließen</button>
+        </div>
+
+        <!-- Content -->
+        <div style="padding:16px;overflow-y:auto;flex:1;background:#f5f2ee">
+
+            <!-- Add button -->
+            <button onclick="openAddItem()" style="width:100%;background:#c8972a;color:#1a1008;border:none;border-radius:10px;padding:12px;font-size:1rem;font-weight:800;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px">
+                ➕ Neuen Artikel hinzufügen
+            </button>
+
+            <!-- Form section (hidden by default) -->
+            <div id="admin-form-section" style="display:none;background:#fff;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
+                <div id="admin-form-title" style="font-weight:800;font-size:1rem;margin-bottom:14px;color:#1a1008">➕ Neuen Artikel hinzufügen</div>
+                <input type="hidden" id="admin-item-id">
+
+                <div class="mb-2">
+                    <label style="font-size:0.82rem;font-weight:700;color:#555">Name *</label>
+                    <input id="admin-item-name" type="text" class="form-control form-control-sm mt-1" placeholder="z.B. Chelo Kebab">
+                </div>
+                <div class="mb-2">
+                    <label style="font-size:0.82rem;font-weight:700;color:#555">Beschreibung</label>
+                    <input id="admin-item-desc" type="text" class="form-control form-control-sm mt-1" placeholder="kurze Beschreibung (optional)">
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label style="font-size:0.82rem;font-weight:700;color:#555">Preis (€) *</label>
+                        <input id="admin-item-price" type="number" step="0.10" min="0" class="form-control form-control-sm mt-1" placeholder="0.00">
+                    </div>
+                    <div class="col-6">
+                        <label style="font-size:0.82rem;font-weight:700;color:#555">Typ</label>
+                        <select id="admin-item-type" class="form-select form-select-sm mt-1">
+                            <option value="food">🍽️ Essen (7% MwSt)</option>
+                            <option value="drink">🥤 Getränk (19% MwSt)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label style="font-size:0.82rem;font-weight:700;color:#555">Kategorie *</label>
+                    <select id="admin-item-category" class="form-select form-select-sm mt-1">
+                        <option value="vorspeisen">🥗 Vorspeisen</option>
+                        <option value="eintoepfe">🍲 Eintöpfe</option>
+                        <option value="grill">🔥 Gegrilltes</option>
+                        <option value="desserts">🍮 Desserts</option>
+                        <option value="getraenke">🥤 Getränke</option>
+                        <option value="heisse">☕ Heiße Getränke</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label style="font-size:0.82rem;font-weight:700;color:#555">Bild-URL</label>
+                    <input id="admin-item-img" type="text" class="form-control form-control-sm mt-1" placeholder="https://... (Link zum Bild)">
+                </div>
+                <div class="mb-3 d-flex align-items-center gap-2">
+                    <input id="admin-item-active" type="checkbox" class="form-check-input" checked style="width:18px;height:18px;cursor:pointer">
+                    <label style="font-size:0.85rem;font-weight:700;cursor:pointer" onclick="document.getElementById('admin-item-active').click()">Im Menü anzeigen (Aktiv)</label>
+                </div>
+                <div class="d-flex gap-2">
+                    <button id="admin-save-btn" onclick="saveMenuItem()" style="background:#27ae60;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:800;cursor:pointer;flex:1">💾 Speichern</button>
+                    <button onclick="cancelAdminForm()" style="background:#95a5a6;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Abbrechen</button>
+                </div>
+            </div>
+
+            <!-- Menu list -->
+            <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
+                <div style="font-weight:800;font-size:0.9rem;color:#1a1008;margin-bottom:12px">📋 Aktuelle Speisekarte</div>
+                <div id="admin-menu-list">
+                    <p class="text-muted text-center py-3">Wird geladen...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ══════════ NEW ORDER MODAL ══════════ -->
 <div class="modal-overlay" id="new-order-modal" style="z-index:1200">
     <div class="modal-box" style="max-width:680px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:96vh">
@@ -398,12 +564,183 @@
 
 <script>
 const API = "https://parsia-restaurant.onrender.com";
+const ADMIN_PASSWORD = "parsia2024"; // 🔑 رمز مالک رستوران — اینجا تغییر دهید
 let currentFilter = "all";
 let allOrders = [];
 let paymentOrderId = null;
 let selectedPaymentMethod = null;
 let editingOrder = null;
 let editItems = [];
+let adminMenuItems = [];
+let editingMenuItem = null;
+
+// ══════════ ADMIN PANEL ══════════
+function openAdminPanel() {
+    const pw = prompt("🔐 Bitte Passwort eingeben:");
+    if (pw !== ADMIN_PASSWORD) {
+        if (pw !== null) alert("❌ Falsches Passwort!");
+        return;
+    }
+    document.getElementById('admin-modal').classList.add('open');
+    loadAdminMenu();
+}
+
+function closeAdminPanel() {
+    document.getElementById('admin-modal').classList.remove('open');
+    editingMenuItem = null;
+}
+
+function loadAdminMenu() {
+    fetch(API + "/admin/menu")
+    .then(r => r.json())
+    .then(data => {
+        adminMenuItems = data;
+        renderAdminMenu();
+    })
+    .catch(() => {
+        // اگر دیتابیس خالی است
+        adminMenuItems = [];
+        renderAdminMenu();
+    });
+}
+
+const CATEGORIES = {
+    vorspeisen: "🥗 Vorspeisen",
+    eintoepfe:  "🍲 Eintöpfe",
+    grill:      "🔥 Gegrilltes",
+    desserts:   "🍮 Desserts",
+    getraenke:  "🥤 Getränke",
+    heisse:     "☕ Heiße Getränke",
+};
+
+function renderAdminMenu() {
+    const list = document.getElementById('admin-menu-list');
+    if (!adminMenuItems.length) {
+        list.innerHTML = '<p class="text-muted text-center py-4">Noch keine Artikel. Ersten Artikel hinzufügen ➕</p>';
+        return;
+    }
+    // Group by category
+    const grouped = {};
+    adminMenuItems.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+    });
+    let html = '';
+    Object.entries(grouped).forEach(([cat, items]) => {
+        html += `<div class="mb-3">
+            <div style="font-weight:800;font-size:0.85rem;color:#c8972a;text-transform:uppercase;letter-spacing:1px;padding:6px 0;border-bottom:1px solid #eee;margin-bottom:8px">
+                ${CATEGORIES[cat] || cat}
+            </div>`;
+        items.forEach(item => {
+            html += `
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                ${item.img_url
+                    ? `<img src="${item.img_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">`
+                    : `<div style="width:48px;height:48px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">${item.item_type==='drink'?'🥤':'🍽️'}</div>`
+                }
+                <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:0.9rem">${item.name}</div>
+                    <div style="font-size:0.8rem;color:#c8972a;font-weight:700">${item.price.toFixed(2)} €
+                        <span style="color:${item.active?'#27ae60':'#e74c3c'};font-size:0.75rem;margin-left:6px">${item.active?'✅ Aktiv':'⛔ Inaktiv'}</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:6px;flex-shrink:0">
+                    <button onclick="openEditItem(${item.id})" style="background:#2c6fad;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;cursor:pointer">✏️</button>
+                    <button onclick="deleteMenuItem(${item.id})" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;cursor:pointer">🗑️</button>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+    list.innerHTML = html;
+}
+
+function openAddItem() {
+    editingMenuItem = null;
+    document.getElementById('admin-form-title').textContent = '➕ Neuen Artikel hinzufügen';
+    document.getElementById('admin-item-id').value = '';
+    document.getElementById('admin-item-name').value = '';
+    document.getElementById('admin-item-desc').value = '';
+    document.getElementById('admin-item-price').value = '';
+    document.getElementById('admin-item-category').value = 'vorspeisen';
+    document.getElementById('admin-item-type').value = 'food';
+    document.getElementById('admin-item-img').value = '';
+    document.getElementById('admin-item-active').checked = true;
+    document.getElementById('admin-form-section').style.display = 'block';
+    document.getElementById('admin-form-section').scrollIntoView({behavior:'smooth'});
+}
+
+function openEditItem(id) {
+    const item = adminMenuItems.find(i => i.id === id);
+    if (!item) return;
+    editingMenuItem = item;
+    document.getElementById('admin-form-title').textContent = '✏️ Artikel bearbeiten';
+    document.getElementById('admin-item-id').value = item.id;
+    document.getElementById('admin-item-name').value = item.name;
+    document.getElementById('admin-item-desc').value = item.description || '';
+    document.getElementById('admin-item-price').value = item.price;
+    document.getElementById('admin-item-category').value = item.category;
+    document.getElementById('admin-item-type').value = item.item_type;
+    document.getElementById('admin-item-img').value = item.img_url || '';
+    document.getElementById('admin-item-active').checked = item.active;
+    document.getElementById('admin-form-section').style.display = 'block';
+    document.getElementById('admin-form-section').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelAdminForm() {
+    document.getElementById('admin-form-section').style.display = 'none';
+    editingMenuItem = null;
+}
+
+function saveMenuItem() {
+    const name     = document.getElementById('admin-item-name').value.trim();
+    const price    = parseFloat(document.getElementById('admin-item-price').value);
+    const category = document.getElementById('admin-item-category').value;
+    if (!name || isNaN(price) || price <= 0) {
+        alert('⚠️ Bitte Name und gültigen Preis eingeben!');
+        return;
+    }
+    const data = {
+        name,
+        description: document.getElementById('admin-item-desc').value.trim(),
+        price,
+        category,
+        item_type: document.getElementById('admin-item-type').value,
+        img_url:   document.getElementById('admin-item-img').value.trim(),
+        active:    document.getElementById('admin-item-active').checked,
+    };
+    const itemId = document.getElementById('admin-item-id').value;
+    const url    = itemId ? `${API}/admin/menu/${itemId}` : `${API}/admin/menu`;
+    const method = itemId ? 'PUT' : 'POST';
+    const btn    = document.getElementById('admin-save-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Speichern...';
+    fetch(url, {
+        method,
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(() => {
+        btn.disabled = false;
+        btn.textContent = '💾 Speichern';
+        cancelAdminForm();
+        loadAdminMenu();
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.textContent = '💾 Speichern';
+        alert('❌ Fehler beim Speichern!');
+    });
+}
+
+function deleteMenuItem(id) {
+    const item = adminMenuItems.find(i => i.id === id);
+    if (!confirm(`🗑️ "${item?.name}" wirklich löschen?`)) return;
+    fetch(`${API}/admin/menu/${id}`, {method:'DELETE'})
+    .then(() => loadAdminMenu())
+    .catch(() => alert('❌ Fehler beim Löschen!'));
+}
 
 // ── Categories known to be drinks (19% MwSt) ──
 // Items fetched from API don't have category; we use name heuristics or a flag
@@ -440,61 +777,123 @@ function loadOrders() {
     });
 }
 
+function getTimerInfo(createdAt) {
+    if (!createdAt) return null;
+    const created = new Date(createdAt.replace(' ', 'T'));
+    const mins = Math.floor((Date.now() - created.getTime()) / 60000);
+    if (isNaN(mins) || mins < 0) return null;
+    if (mins < 15)  return { cls: 'timer-fresh',  label: `${mins} min` };
+    if (mins < 35)  return { cls: 'timer-medium', label: `${mins} min` };
+    return { cls: 'timer-old', label: `${mins} min ⚠️`, old: true };
+}
+
 function renderOrders() {
     const filtered = currentFilter === "all"
-        ? allOrders
+        ? allOrders.filter(o => o.status !== "ready")
         : allOrders.filter(o => o.status === currentFilter);
 
+    // pending اول، بعد paid — هر گروه جدیدترین بالا
+    filtered.sort((a, b) => {
+        if (a.status !== b.status)
+            return a.status === "pending" ? -1 : 1;
+        return (b.id || 0) - (a.id || 0);
+    });
+
+    // header badge
     document.getElementById("total-count").textContent = filtered.length + " Bestellungen";
+    const inlineCount = document.getElementById("total-count-inline");
+    if (inlineCount) inlineCount.textContent = `${filtered.length} angezeigt`;
+
+    // stats bar
+    const pendingCount = allOrders.filter(o => o.status === "pending").length;
+    const paidCount    = allOrders.filter(o => o.status === "paid").length;
+    const statsBar = document.getElementById("stats-bar");
+    if (statsBar) {
+        statsBar.innerHTML = `
+            <div style="background:#fff3cd;border:1.5px solid #f39c12;border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:10px;flex:1;min-width:130px">
+                <span style="font-size:1.6rem">🟡</span>
+                <div>
+                    <div style="font-size:1.5rem;font-weight:900;color:#856404;line-height:1">${pendingCount}</div>
+                    <div style="font-size:0.72rem;color:#856404;font-weight:700">Ausstehend</div>
+                </div>
+            </div>
+            <div style="background:#f0f0f0;border:1.5px solid #95a5a6;border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:10px;flex:1;min-width:130px">
+                <span style="font-size:1.6rem">✅</span>
+                <div>
+                    <div style="font-size:1.5rem;font-weight:900;color:#555;line-height:1">${paidCount}</div>
+                    <div style="font-size:0.72rem;color:#777;font-weight:700">Bezahlt</div>
+                </div>
+            </div>`;
+    }
+
+    if (!filtered.length) {
+        document.getElementById("orders").innerHTML =
+            `<div class="col-12 text-center py-5" style="color:#bbb">
+                <div style="font-size:3.5rem">🍽️</div>
+                <div style="font-weight:700;margin-top:10px;font-size:1rem">Keine Bestellungen</div>
+            </div>`;
+        return;
+    }
 
     let html = "";
     filtered.forEach(order => {
-        let color = "secondary";
-        if (order.status === "pending") color = "warning";
-        if (order.status === "ready")   color = "success";
+        const timer = order.status === "pending" ? getTimerInfo(order.created_at) : null;
+        const isNew = order.status === "pending" && timer && parseInt(timer.label) < 3;
 
-        let itemsHtml = "";
-        if (Array.isArray(order.items)) {
+        // item chips
+        let chipsHtml = "";
+        if (Array.isArray(order.items) && order.items.length) {
             order.items.forEach(item => {
-                itemsHtml += `<span class="badge bg-light text-dark me-1 mb-1">${item.name} x${item.qty}</span>`;
+                chipsHtml += `<div class="item-chip"><span class="qty-badge">${item.qty}</span>${item.name}</div>`;
             });
+        } else {
+            chipsHtml = `<span style="font-size:0.8rem;color:#bbb">—</span>`;
         }
 
-        const payLabel = order.paymentMethod === 'bar' ? '💵 Bar' : order.paymentMethod === 'karte' ? '💳 Karte' : '';
+        const payLabel = order.paymentMethod === 'bar'
+            ? `<span style="background:#d4edda;color:#155724;border-radius:8px;padding:3px 9px;font-size:0.72rem;font-weight:800">💵 Bar</span>`
+            : order.paymentMethod === 'karte'
+            ? `<span style="background:#cce5ff;color:#004085;border-radius:8px;padding:3px 9px;font-size:0.72rem;font-weight:800">💳 Karte</span>`
+            : '';
+
+        const statusPill = order.status === "pending"
+            ? `<span class="order-status-pill pill-pending">⏳ Ausstehend</span>`
+            : `<span class="order-status-pill pill-paid">✅ Bezahlt</span>`;
+
+        const timerHtml = timer
+            ? `<div class="order-timer ${timer.cls}">⏱ ${timer.label}</div>` : '';
+
+        const timeSmall = order.created_at
+            ? `<div class="order-time-small">🕐 ${order.created_at.slice(11,16)} Uhr</div>` : '';
 
         html += `
-            <div class="col-md-4 mb-3">
-                <div class="card p-3 status-${order.status}">
-                    <div class="d-flex justify-content-between">
-                        <h5>Tisch ${order.table_number}</h5>
-                        <div class="d-flex gap-1 align-items-center">
-                            ${payLabel ? `<span class="badge bg-light text-dark" style="font-size:0.7rem">${payLabel}</span>` : ''}
-                            <span class="badge bg-${color}">${order.status}</span>
-                        </div>
-                    </div>
-                    <small class="text-muted">${order.created_at || ""}</small>
-                    <div class="mt-2">${itemsHtml}</div>
-                    <div class="fw-bold mt-2">EUR ${order.total ? order.total.toFixed(2) : "-"}</div>
-                    <div class="d-flex gap-2 mt-2 flex-wrap">
-                        ${order.status !== "paid" ? `
-                            <button onclick="openPaymentModal(${order.id})" class="btn btn-sm btn-outline-success flex-fill">
-                                💰 Bezahlen
-                            </button>` : ""}
-                        <button onclick="showReceiptPreview(${order.id})" class="btn btn-sm btn-outline-primary">
-                            🧾 Quittung
-                        </button>
-                        <button onclick="printKitchenTicket(${order.id})" class="btn btn-sm btn-kitchen-print">
-                            🍳 Küche
-                        </button>
-                        <button onclick="openEditModal(${order.id})" class="btn btn-sm btn-edit-table" title="Bestellung bearbeiten">
-                            ✏️ Bearbeiten
-                        </button>
+        <div class="col-sm-6 col-lg-4 mb-3">
+            <div class="order-card status-${order.status}${isNew ? ' brand-new' : ''}">
+                <div class="order-card-header">
+                    <div class="order-table-num">🪑 Tisch <span style="color:#c8972a">${order.table_number}</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end">
+                        ${statusPill}${timerHtml}
                     </div>
                 </div>
-            </div>`;
+                <div class="order-items-area">${chipsHtml}</div>
+                <div class="order-footer">
+                    <div>
+                        <div class="order-total-display">${order.total ? order.total.toFixed(2) + ' €' : '—'}</div>
+                        ${timeSmall}
+                    </div>
+                    <div>${payLabel}</div>
+                </div>
+                <div class="order-actions">
+                    ${order.status !== "paid" ? `<button class="action-btn action-pay" onclick="openPaymentModal(${order.id})">💰 Bezahlen</button>` : ''}
+                    <button class="action-btn action-edit" onclick="openEditModal(${order.id})">✏️ Bearbeiten</button>
+                    <button class="action-btn action-kitchen" onclick="printKitchenTicket(${order.id})">🍳 Küche</button>
+                    <button class="action-btn action-receipt" onclick="showReceiptPreview(${order.id})">🧾</button>
+                </div>
+            </div>
+        </div>`;
     });
 
-    document.getElementById("orders").innerHTML = html || '<p class="text-muted">Keine Bestellungen</p>';
+    document.getElementById("orders").innerHTML = html;
 }
 
 // ══════════ PAYMENT MODAL ══════════
