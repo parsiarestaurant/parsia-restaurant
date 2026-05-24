@@ -1068,50 +1068,6 @@
 <script>
 const API = "https://parsia-restaurant.onrender.com";
 
-const menuData = {
-    vorspeisen: [
-        { id:101, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mirza_Ghasemi.jpeg",    name:"Mirza Ghasemi",    farsi:"میرزا قاسمی",   desc:"Rauchige, gegrillte Auberginen mit Tomaten, Knoblauch und Ei · بادمجان کبابی با گوجه، سیر و تخم‌مرغ", price:7.90 },
-        { id:102, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Kashke_Bademjoon.jpeg", name:"Kashke Bademjoon", farsi:"کشک بادمجان",   desc:"Auberginen mit Röstzwiebeln, Walnüssen, Minze und Kashk · بادمجان با کشک، پیاز داغ و گردو", price:7.50 },
-        { id:103, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mast-o_Khiar.jpeg",     name:"Mast-o Khiar",     farsi:"ماست و خیار",   desc:"Joghurt-Dip mit Gurke und Minze · ماست با خیار و نعنا خشک", price:5.50 },
-        { id:104, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mast-o_Moosir.jpeg",    name:"Mast-o Moosir",    farsi:"ماست و موسیر",  desc:"Joghurt-Dip mit Wildknoblauch · ماست با موسیر کوهی", price:5.50 },
-        { id:105, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Felafel.jpeg",           name:"Felafel",          farsi:"فلافل",         desc:"Knusprige Kichererbsen-Bällchen mit Kräutern · فلافل ترد با سبزیجات و ادویه", price:5.50 },
-        { id:106, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Zeytoon_Parvarde.jpeg", name:"Zeytoon Parvarde", farsi:"زیتون پرورده",  desc:"Oliven in Walnuss-Granatapfel-Paste · زیتون با گردو، رب انار و سبزی", price:5.50 },
-    ],
-    eintoepfe: [
-        { id:201, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Ghorme_Sabzi.jpeg", name:"Chelo Ghorme Sabzi", farsi:"چلو قورمه سبزی", desc:"Kräutereintopf mit Lammfleisch, Kidneybohnen und Limetten · خورش سبزی با گوشت بره و لیمو عمانی", price:14.90 },
-        { id:202, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Ghormeh_Sabzi_vegetarisch.jpeg", name:"Chelo Ghormeh Sabzi (vegetarisch)", farsi:"چلو قورمه سبزی گیاهی", desc:"Vegetarisch: Kräutereintopf mit Champignons · خورش سبزی گیاهی با قارچ و لیمو عمانی", price:14.90 },
-        { id:203, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Khoresh_Fesenjan.jpeg", name:"Chelo Khoresh Fesenjan", farsi:"چلو خورش فسنجان", desc:"Süß-saurer Eintopf mit Rinderhackfleisch, Walnüssen, Granatapfel · خورش فسنجان با گوشت چرخ‌کرده", price:18.90 },
-        { id:204, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Khoresh_Fesenjan_vegetarisch.jpeg", name:"Chelo Khoresh Fesenjan (vegetarisch)", farsi:"چلو خورش فسنجان گیاهی", desc:"Vegetarisch: Süß-saurer Eintopf mit Walnüssen, Granatapfel · فسنجان گیاهی با گردو و رب انار", price:18.90 },
-        { id:205, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Baghali_Polo_Ba_Mahiche.jpeg", name:"Baghali Polo Ba Mahiche", farsi:"باقالی پلو با ماهیچه", desc:"Lammhaxe mit Dill-Safranreis und grünen Bohnen · ماهیچه با باقالی پلو و زعفران", price:22.90 },
-        { id:206, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Zereshk_Polo_Ba_Morgh.jpeg", name:"Zereshk Polo Ba Morgh", farsi:"زرشک پلو با مرغ", desc:"Hähnchenschenkel mit Berberitzen-Safranreis · مرغ با زرشک پلو و زعفران", price:19.90 },
-        { id:207, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Mahi.jpeg", name:"Chelo Mahi", farsi:"چلو ماهی", desc:"Gebratenes Fischfilet mit Safranreis oder grünen Bohnen · ماهی سرخ‌شده با برنج زعفرانی", price:22.90 },
-    ],
-    grill: [
-        { id:301, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Koobideh.jpeg", name:"Chelo Kabab Koobideh", farsi:"چلو کباب کوبیده", desc:"Zwei Spieße Lamm- und Rinderhackfleisch, gegrillt · دو سیخ کباب کوبیده با برنج زعفرانی", price:18.50 },
-        { id:302, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Barg.jpeg", name:"Chelo Kabab Barg", farsi:"چلو کباب برگ", desc:"Zartes mariniertes Lammfilet in Streifen · فیله بره مرینیت‌شده با برنج زعفرانی", price:24.50 },
-        { id:303, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Joojeh_Kabab.jpeg", name:"Chelo Joojeh Kabab", farsi:"چلو جوجه کباب", desc:"Mariniertes Hähnchenfleisch in Safran · جوجه کباب زعفرانی با برنج", price:19.50 },
-        { id:304, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Soltani.jpeg", name:"Chelo Kabab Soltani", farsi:"چلو کباب سلطانی", desc:"Königsplatte: Koobideh und Barg Spieß · ترکیب کباب کوبیده و برگ با برنج زعفرانی", price:29.50 },
-    ],
-    desserts: [
-        { id:401, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Bastani_Sonati.jpeg", name:"Bastani Sonati", farsi:"بستنی سنتی", desc:"Traditionelles iranisches Safraneis mit Pistazie · بستنی زعفرانی سنتی ایرانی با پسته", price:5.00 },
-        { id:402, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Tiramisu.jpeg", name:"Tiramisu", farsi:"تیرامیسو", desc:"Klassisches italienisches Tiramisu · تیرامیسوی کلاسیک ایتالیایی", price:5.00 },
-        { id:403, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Baklava.jpeg", name:"Baklava", farsi:"باقلوا", desc:"Zwei frische Pistazien-Baklava mit Chai · دو تکه باقلوای تازه پسته‌ای با چای", price:6.00 },
-    ],
-    getraenke: [
-        { id:501, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Doogh_0.2L.jpg", name:"Doogh 0.2L", farsi:"دوغ ۰.۲ لیتر", desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:3.00 },
-        { id:502, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Doogh_0.4L.jpg", name:"Doogh 0.4L", farsi:"دوغ ۰.۴ لیتر", desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:4.00 },
-        { id:503, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Softdrinks_0.2L.jpg", name:"Softdrinks 0.2L", farsi:"نوشابه ۰.۲ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:2.40 },
-        { id:504, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Softdrinks_0.4L.jpg", name:"Softdrinks 0.4L", farsi:"نوشابه ۰.۴ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:4.00 },
-        { id:505, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Wasser_0.25L.jpg", name:"Wasser 0.25L", farsi:"آب ۰.۲۵ لیتر", desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:2.50 },
-        { id:506, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Wasser 0.75L.jpg", name:"Wasser 0.75L", farsi:"آب ۰.۷۵ لیتر", desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:6.50 },
-    ],
-    heisse: [
-        { id:601, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Kaffee.jpg", name:"Kaffee", farsi:"قهوه", desc:"Frisch gebrühter Kaffee · قهوه تازه‌دم", price:2.50 },
-        { id:602, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Espresso.jpg", name:"Espresso", farsi:"اسپرسو", desc:"Klassischer Espresso · اسپرسوی کلاسیک", price:2.50 },
-        { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", farsi:"چای", desc:"Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", price:2.00 },
-    ]
-};
-
 let cart = [];
 
 // ─── TABLE FROM QR ───
@@ -1128,43 +1084,129 @@ function getTable() {
     return tableFromQR || document.getElementById("table-input").value;
 }
 
+// ─── FALLBACK IMAGES (GitHub) ───
+const BASE = "https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images";
+const FALLBACK_IMAGES = {
+    101: `${BASE}/Vorspeisen/Mirza_Ghasemi.jpeg`,
+    102: `${BASE}/Vorspeisen/Kashke_Bademjoon.jpeg`,
+    103: `${BASE}/Vorspeisen/Mast-o_Khiar.jpeg`,
+    104: `${BASE}/Vorspeisen/Mast-o_Moosir.jpeg`,
+    105: `${BASE}/Vorspeisen/Felafel.jpeg`,
+    106: `${BASE}/Vorspeisen/Zeytoon_Parvarde.jpeg`,
+    201: `${BASE}/Eintöpfe/Chelo_Ghorme_Sabzi.jpeg`,
+    202: `${BASE}/Eintöpfe/Chelo_Ghormeh_Sabzi_vegetarisch.jpeg`,
+    203: `${BASE}/Eintöpfe/Chelo_Khoresh_Fesenjan.jpeg`,
+    204: `${BASE}/Eintöpfe/Chelo_Khoresh_Fesenjan_vegetarisch.jpeg`,
+    205: `${BASE}/Eintöpfe/Baghali_Polo_Ba_Mahiche.jpeg`,
+    206: `${BASE}/Eintöpfe/Zereshk_Polo_Ba_Morgh.jpeg`,
+    207: `${BASE}/Eintöpfe/Chelo_Mahi.jpeg`,
+    301: `${BASE}/Gegrilltes/Chelo_Kabab_Koobideh.jpeg`,
+    302: `${BASE}/Gegrilltes/Chelo_Kabab_Barg.jpeg`,
+    303: `${BASE}/Gegrilltes/Chelo_Joojeh_Kabab.jpeg`,
+    304: `${BASE}/Gegrilltes/Chelo_Kabab_Soltani.jpeg`,
+    401: `${BASE}/Desserts/Bastani_Sonati.jpeg`,
+    402: `${BASE}/Desserts/Tiramisu.jpeg`,
+    403: `${BASE}/Desserts/Baklava.jpeg`,
+    501: `${BASE}/Getränke/Doogh_0.2L.jpg`,
+    502: `${BASE}/Getränke/Doogh_0.4L.jpg`,
+    503: `${BASE}/Getränke/Softdrinks_0.2L.jpg`,
+    504: `${BASE}/Getränke/Softdrinks_0.4L.jpg`,
+    505: `${BASE}/Getränke/Wasser_0.25L.jpg`,
+    506: `${BASE}/Getränke/Wasser 0.75L.jpg`,
+    601: `${BASE}/HeißeGetränke/Kaffee.jpg`,
+    602: `${BASE}/HeißeGetränke/Espresso.jpg`,
+    603: `${BASE}/HeißeGetränke/Chai_Persischer_Schwarztee.jpg`,
+};
+
 // ─── RENDER MENU CARDS ───
-function renderMenus() {
+function renderSectionCards(section, items) {
     const icons = { getraenke:'🥤', heisse:'☕' };
-    for (const [section, items] of Object.entries(menuData)) {
-        const icon = icons[section] || '🍽️';
-        document.getElementById("grid-"+section).innerHTML = items.map(item => {
-            // Split desc into German and Farsi parts by · separator
-            let descHtml = '';
-            if (item.desc) {
-                const parts = item.desc.split('·');
-                const de = parts[0] ? parts[0].trim() : '';
-                const fa = parts[1] ? parts[1].trim() : '';
-                if (de && fa) {
-                    descHtml = `<div class="card-desc"><span class="card-desc-de">${de}</span><span class="card-desc-fa">${fa}</span></div>`;
-                } else {
-                    descHtml = `<div class="card-desc">${item.desc}</div>`;
-                }
+    const icon = icons[section] || '🍽️';
+    const grid = document.getElementById("grid-" + section);
+    if (!grid) return;
+
+    if (!items.length) {
+        grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-soft);font-family:\'Taviraj\',serif;letter-spacing:2px;">Keine Artikel verfügbar</div>';
+        return;
+    }
+
+    grid.innerHTML = items.map(item => {
+        // API uses img_url; fallback to GitHub images by item id
+        const imgUrl = item.img_url || FALLBACK_IMAGES[item.id] || '';
+        const descText = item.description || '';
+
+        // Split description into German and Farsi parts by · separator
+        let descHtml = '';
+        if (descText) {
+            const parts = descText.split('·');
+            const de = parts[0] ? parts[0].trim() : '';
+            const fa = parts[1] ? parts[1].trim() : '';
+            if (de && fa) {
+                descHtml = `<div class="card-desc"><span class="card-desc-de">${de}</span><span class="card-desc-fa">${fa}</span></div>`;
+            } else {
+                descHtml = `<div class="card-desc">${descText}</div>`;
             }
-            return `
-            <div class="menu-card" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)" id="card-${item.id}">
-                <div class="card-corner-br"></div>
-                <div class="card-img-wrap">
-                    ${item.img
-                        ? `<img class="card-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                           <div class="card-img-placeholder" style="display:none">${icon}</div>`
-                        : `<div class="card-img-placeholder" style="display:flex">${icon}</div>`
-                    }
-                    <div class="card-price-badge">${item.price.toFixed(2)} €</div>
-                    <div class="card-add-badge" id="badge-${item.id}">+</div>
-                </div>
-                <div class="card-body">
-                    <div class="card-name">${item.name}</div>
-                    ${item.farsi ? `<span class="card-farsi">${item.farsi}</span>` : ''}
-                    ${descHtml}
-                </div>
-            </div>`;
-        }).join('');
+        }
+
+        return `
+        <div class="menu-card" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)" id="card-${item.id}">
+            <div class="card-corner-br"></div>
+            <div class="card-img-wrap">
+                ${imgUrl
+                    ? `<img class="card-img" src="${imgUrl}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                       <div class="card-img-placeholder" style="display:none">${icon}</div>`
+                    : `<div class="card-img-placeholder" style="display:flex">${icon}</div>`
+                }
+                <div class="card-price-badge">${item.price.toFixed(2)} €</div>
+                <div class="card-add-badge" id="badge-${item.id}">+</div>
+            </div>
+            <div class="card-body">
+                <div class="card-name">${item.name}</div>
+                ${item.farsi ? `<span class="card-farsi">${item.farsi}</span>` : ''}
+                ${descHtml}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function renderMenus() {
+    const SECTIONS = ['vorspeisen', 'eintoepfe', 'grill', 'desserts', 'getraenke', 'heisse'];
+
+    // Show loading state in all grids
+    SECTIONS.forEach(section => {
+        const grid = document.getElementById("grid-" + section);
+        if (grid) grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-soft);font-family:\'Taviraj\',serif;letter-spacing:2px;">Wird geladen …</div>';
+    });
+
+    try {
+        const response = await fetch(API + "/admin/menu");
+        if (!response.ok) throw new Error("API error: " + response.status);
+        const allItems = await response.json();
+
+        // Group active items by category
+        const grouped = {};
+        SECTIONS.forEach(s => grouped[s] = []);
+
+        allItems
+            .filter(item => item.active === true)
+            .forEach(item => {
+                const cat = item.category;
+                if (grouped[cat] !== undefined) {
+                    grouped[cat].push(item);
+                }
+            });
+
+        // Render each section
+        SECTIONS.forEach(section => {
+            renderSectionCards(section, grouped[section]);
+        });
+
+    } catch (err) {
+        console.error("Fehler beim Laden des Menüs:", err);
+        SECTIONS.forEach(section => {
+            const grid = document.getElementById("grid-" + section);
+            if (grid) grid.innerHTML = '<div style="text-align:center;padding:40px;color:#c0392b;font-family:\'Taviraj\',serif;">Menü konnte nicht geladen werden. Bitte Seite neu laden.</div>';
+        });
     }
 }
 
