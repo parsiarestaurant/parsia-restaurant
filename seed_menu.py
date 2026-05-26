@@ -43,7 +43,7 @@ menu_items = [
     {"name": "Softdrinks 0.2L", "description": "Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle",           "price": 2.40, "category": "getraenke", "item_type": "drink", "img_url": f"{BASE}/Getraenke/Softdrinks_0.2L.jpg",  "active": True},
     {"name": "Softdrinks 0.4L", "description": "Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle",           "price": 4.00, "category": "getraenke", "item_type": "drink", "img_url": f"{BASE}/Getraenke/Softdrinks_0.4L.jpg",  "active": True},
     {"name": "Wasser 0.25L",    "description": "Still oder Sprudel · آب معدنی ساده یا گازدار",                  "price": 2.50, "category": "getraenke", "item_type": "drink", "img_url": f"{BASE}/Getraenke/Wasser_0.25L.jpg",     "active": True},
-    {"name": "Wasser 0.75L",    "description": "Still oder Sprudel · آب معدنی ساده یا گازدار",                  "price": 6.50, "category": "getraenke", "item_type": "drink", "img_url": f"{BASE}/Getraenke/Wasser%200.75L.jpg",   "active": True},
+    {"name": "Wasser 0.75L",    "description": "Still oder Sprudel · آب معدنی ساده یا گازدار",                  "price": 6.50, "category": "getraenke", "item_type": "drink", "img_url": f"{BASE}/Getraenke/Wasser_0.75L.jpg",   "active": True},
 
     # HEISSE GETRAENKE  (HeißeGetränke → Hei%C3%9FeGetraenke)
     {"name": "Kaffee",                       "description": "Frisch gebrühter Kaffee · قهوه تازه‌دم",                      "price": 2.50, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/HeisseGetraenke/Kaffee.jpg",                    "active": True},
