@@ -46,9 +46,9 @@ menu_items = [
     {"name": "Wasser 0.75L",    "description": "Still oder Sprudel · آب معدنی ساده یا گازدار",                  "price": 6.50, "category": "getraenke", "item_type": "drink", "img_url": f"{BASE}/Getraenke/Wasser%200.75L.jpg",   "active": True},
 
     # HEISSE GETRAENKE  (HeißeGetränke → Hei%C3%9FeGetraenke)
-    {"name": "Kaffee",                       "description": "Frisch gebrühter Kaffee · قهوه تازه‌دم",                      "price": 2.50, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/Hei%C3%9FeGetraenke/Kaffee.jpg",                    "active": True},
-    {"name": "Espresso",                     "description": "Klassischer Espresso · اسپرسوی کلاسیک",                        "price": 2.50, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/Hei%C3%9FeGetraenke/Espresso.jpg",                  "active": True},
-    {"name": "Chai – Persischer Schwarztee", "description": "Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", "price": 2.00, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/Hei%C3%9FeGetraenke/Chai_Persischer_Schwarztee.jpg", "active": True},
+    {"name": "Kaffee",                       "description": "Frisch gebrühter Kaffee · قهوه تازه‌دم",                      "price": 2.50, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/HeisseGetraenke/Kaffee.jpg",                    "active": True},
+    {"name": "Espresso",                     "description": "Klassischer Espresso · اسپرسوی کلاسیک",                        "price": 2.50, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/HeisseGetraenke/Espresso.jpg",                  "active": True},
+    {"name": "Chai – Persischer Schwarztee", "description": "Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", "price": 2.00, "category": "heisse", "item_type": "drink", "img_url": f"{BASE}/HeisseGetraenke/Chai_Persischer_Schwarztee.jpg", "active": True},
 ]
 
 # ─── ابتدا همه آیتم‌های قدیمی را پاک کن ───
