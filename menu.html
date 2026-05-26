@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parsia Restaurant – Speisekarte</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:wght@300;400;500;600&family=Taviraj:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #0f0a06;
+            --gold:      #d4a843;
+            --gold-light:#f0c96a;
+            --gold-dim:  #8a6820;
+            --card-bg:   #1a1008;
+            --card-bg2:  #150d05;
+            --warm-dark: #2a1a06;
+            --text-main: #f0c96a;
+            --text-soft: rgba(240,201,106,0.55);
+            --text-body: #c8a86a;
+            --border:    rgba(212,168,67,0.3);
+            --border-bright: rgba(212,168,67,0.7);
+            --shadow:    0 8px 40px rgba(0,0,0,0.7);
+            --glow:      0 0 20px rgba(212,168,67,0.15);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text-body);
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            /* Subtle noise texture */
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(42,26,6,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(26,16,8,0.5) 0%, transparent 50%);
+        }
+
+        /* ═══ ARABESQE PATTERN SVG ═══ */
+        .arabesqe-bg {
+            position: fixed;
+            inset: 0;
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a843' fill-rule='evenodd'%3E%3Cpath d='M40 0 C20 0 0 20 0 40 C0 60 20 80 40 80 C60 80 80 60 80 40 C80 20 60 0 40 0 Z M40 8 C55 8 72 25 72 40 C72 55 55 72 40 72 C25 72 8 55 8 40 C8 25 25 8 40 8 Z'/%3E%3Cpath d='M40 16 C28 16 16 28 16 40 C16 52 28 64 40 64 C52 64 64 52 64 40 C64 28 52 16 40 16 Z M40 22 C49 22 58 31 58 40 C58 49 49 58 40 58 C31 58 22 49 22 40 C22 31 31 22 40 22 Z'/%3E%3Cpath d='M40 2 L42 38 L78 40 L42 42 L40 78 L38 42 L2 40 L38 38 Z' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 80px 80px;
+        }
+
+        /* ═══ HEADER ═══ */
+        .header {
+            position: relative;
+            text-align: center;
+            padding: 52px 20px 40px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(212,168,67,0.05) 0%, transparent 100%),
+                url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a843' fill-opacity='0.06'%3E%3Cpath d='M60 10 L70 50 L110 60 L70 70 L60 110 L50 70 L10 60 L50 50 Z'/%3E%3Cpath d='M60 30 L66 54 L90 60 L66 66 L60 90 L54 66 L30 60 L54 54 Z'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: auto, 120px 120px;
+        }
+
+        .header-ornament {
+            color: var(--gold);
+            font-size: 0.85rem;
+            letter-spacing: 16px;
+            margin-bottom: 18px;
+            opacity: 0.65;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 7vw, 4.2rem);
+            color: var(--gold-light);
+            font-weight: 400;
+            letter-spacing: 6px;
+            text-shadow: 0 0 60px rgba(212,168,67,0.3), 0 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .header-farsi {
+            font-size: clamp(2.4rem, 7vw, 4.2rem);
+            color: var(--gold-light);
+            margin-top: 6px;
+            opacity: 1;
+            direction: rtl;
+            font-family: 'Noto Naskh Arabic', serif;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-shadow: 0 0 60px rgba(212,168,67,0.3), 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .header-subtitle {
+            color: var(--text-soft);
+            font-size: 1.05rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-top: 16px;
+            font-family: 'Taviraj', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .header-subtitle .sub-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            text-transform: none;
+            direction: rtl;
+            font-weight: 500;
+        }
+        .header-subtitle .sub-sep {
+            display: none;
+        }
+
+        /* Arabesqe border top/bottom */
+        .gold-ornament-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 500px;
+        }
+        .gold-ornament-line .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .gold-ornament-line .diamond {
+            color: var(--gold);
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* ═══ CART BAR ═══ */
+        .cart-bar {
+            background: rgba(15,10,6,0.92);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+            min-height: 60px;
+        }
+
+        /* چپ: آیکون سبد + تعداد */
+        .cart-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .cart-icon-wrap {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--gold);
+            font-size: 1.1rem;
+            transition: all 0.25s;
+        }
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--gold);
+            color: var(--bg);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.65rem;
+            font-family: 'Taviraj', sans-serif;
+            border: 1.5px solid var(--bg);
+            transition: transform 0.2s;
+        }
+        .cart-count.bump { transform: scale(1.4); }
+
+        .cart-label-wrap {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .cart-label-de {
+            font-family: 'Taviraj', serif;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-soft);
+            white-space: nowrap;
+        }
+        .cart-label-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 0.85rem;
+            color: var(--gold);
+            font-weight: 500;
+            direction: rtl;
+            white-space: nowrap;
+        }
+
+        /* راست: دکمه سفارش */
+        .btn-order {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            border: 1px solid var(--border-bright);
+            border-radius: 2px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.2,.8,.3,1);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+        .btn-order::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold);
+            transform: translateX(-101%);
+            transition: transform 0.3s cubic-bezier(.2,.8,.3,1);
+        }
+        .btn-order:hover::before { transform: translateX(0); }
+        .btn-order:hover .btn-text-de,
+        .btn-order:hover .btn-text-fa,
+        .btn-order:hover .btn-arrow { color: var(--bg); }
+
+        .btn-text-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-text-de {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            transition: color 0.25s;
+            white-space: nowrap;
+        }
+        .btn-text-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            color: var(--text-soft);
+            transition: color 0.25s;
+            opacity: 0.7;
+        }
+        .btn-arrow {
+            font-size: 1.2rem;
+            color: var(--gold);
+            position: relative;
+            z-index: 1;
+            transition: color 0.25s, transform 0.25s;
+        }
+        .btn-order:hover .btn-arrow { transform: translateX(3px); }
+
+        /* ═══ TABS ═══ */
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            background: var(--card-bg2);
+            padding: 10px 14px;
+            gap: 8px;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            color: var(--text-soft);
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Taviraj', serif;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            background: transparent;
+            transition: all 0.25s cubic-bezier(.2,.8,.3,1);
+        }
+
+        .tab:hover {
+            color: var(--gold-light);
+            border-color: rgba(212,168,67,0.5);
+            background: rgba(212,168,67,0.06);
+        }
+
+        .tab.active {
+            color: var(--bg);
+            background: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 16px rgba(212,168,67,0.3);
+        }
+
+        /* دوزبانه بودن تب */
+        .tab-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.3;
+            gap: 2px;
+        }
+        .tab-de {
+            font-family: 'Taviraj', serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .tab-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0;
+            text-transform: none;
+            direction: rtl;
+            opacity: 0.8;
+        }
+        .tab.active .tab-fa {
+            opacity: 1;
+        }
+
+        /* ═══ SECTION ═══ */
+        .menu-container {
+            padding: 32px 16px 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            color: var(--gold-light);
+            text-align: center;
+            padding: 36px 0 8px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 0 40px rgba(212,168,67,0.2);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--gold);
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            font-family: 'Noto Naskh Arabic', serif;
+            font-weight: 500;
+            direction: rtl;
+            text-shadow: 0 0 30px rgba(212,168,67,0.2);
+        }
+        .section-subtitle .sub-ornament {
+            font-family: 'Taviraj', serif;
+            font-size: 0.8em;
+            opacity: 0.5;
+            letter-spacing: 6px;
+        }
+        .section-subtitle-de {
+            text-align: center;
+            color: var(--text-soft);
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            font-family: 'Taviraj', serif;
+            direction: ltr;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 auto 32px;
+            max-width: 300px;
+        }
+        .section-divider .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+        }
+        .section-divider .sym {
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 22px;
+        }
+
+        /* ═══ MENU CARD ═══ */
+        .menu-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.28s cubic-bezier(.2,.8,.3,1), box-shadow 0.28s, border-color 0.28s;
+            animation: fadeInUp 0.5s ease both;
+            box-shadow: var(--shadow);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 20px rgba(212,168,67,0.12);
+        }
+
+        /* gold flash on click */
+        .menu-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(212,168,67,0.12);
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: none;
+        }
+        .menu-card.flash::after { opacity: 1; }
+
+        /* Corner ornaments */
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 20px; height: 20px;
+            border-top: 1px solid var(--gold);
+            border-left: 1px solid var(--gold);
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: 2;
+        }
+        .menu-card:hover::before { opacity: 0.6; }
+
+        .card-corner-br {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 20px; height: 20px;
+            border-bottom: 1px solid var(--gold);
+            border-right: 1px solid var(--gold);
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: 2;
+        }
+        .menu-card:hover .card-corner-br { opacity: 0.6; }
+
+        .card-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+            filter: brightness(0.88) saturate(0.9);
+        }
+        .menu-card:hover .card-img {
+            transform: scale(1.06);
+            filter: brightness(0.95) saturate(1.0);
+        }
+
+        /* Gold gradient overlay on image bottom */
+        .card-img-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(transparent, var(--card-bg));
+            pointer-events: none;
+        }
+
+        .card-img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a1008, #0f0a06);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        /* Add badge */
+        .card-add-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(15,10,6,0.85);
+            border: 1px solid var(--gold-dim);
+            color: var(--gold-light);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 300;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            transition: all 0.2s;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .menu-card:hover .card-add-badge {
+            background: var(--gold);
+            color: var(--bg);
+            border-color: var(--gold);
+            box-shadow: 0 0 16px rgba(212,168,67,0.4);
+        }
+        .card-add-badge.added {
+            background: #2a7a4a !important;
+            color: #90ffb8 !important;
+            border-color: #2a7a4a !important;
+            transform: scale(1.15);
+        }
+
+        .card-body {
+            padding: 16px 18px 18px;
+        }
+
+        .card-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.18rem;
+            color: #f5e8c8;
+            margin-bottom: 4px;
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: 0.3px;
+        }
+
+        .card-farsi {
+            font-size: 1.18rem;
+            color: var(--gold);
+            direction: rtl;
+            display: block;
+            margin-bottom: 9px;
+            font-family: 'Noto Naskh Arabic', serif;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .card-desc {
+            font-size: 0.88rem;
+            color: rgba(200,168,106,0.6);
+            line-height: 1.65;
+            margin-bottom: 14px;
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .card-desc-de {
+            display: block;
+            color: rgba(200,168,106,0.65);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+        .card-desc-fa {
+            display: block;
+            color: rgba(200,168,106,0.5);
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 0.85rem;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            display: none;
+        }
+
+        /* Price overlay on image */
+        .card-price-badge {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            background: transparent;
+            color: var(--gold-light);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 10px rgba(0,0,0,0.95), 0 0 24px rgba(0,0,0,0.8);
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* ═══ CART PANEL ═══ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 200;
+            justify-content: flex-end;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+        .modal-overlay.open { display: flex; }
+
+        /* جلوگیری از اسکرول بدنه وقتی modal باز است */
+        body.modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+        .cart-panel {
+            background: var(--card-bg);
+            border-left: 1px solid var(--border);
+            width: min(420px, 100vw);
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
+            -webkit-overflow-scrolling: touch;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .cart-header {
+            background: var(--warm-dark);
+            border-bottom: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 22px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+        .btn-close {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 1px;
+        }
+        .btn-close:hover { background: var(--gold); color: var(--bg); }
+
+        .cart-items {
+            flex: 1;
+            padding: 16px;
+            overflow-y: visible;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+        .cart-item-name { font-size: 1.2rem; color: var(--text-main); flex: 1; font-family: 'Cormorant Garamond', serif; }
+        .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            background: var(--warm-dark);
+            color: var(--gold-light);
+            border: 1px solid var(--border);
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .qty-btn:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+        .qty-label { font-size: 1.2rem; min-width: 20px; text-align: center; font-family: 'Playfair Display', serif; color: var(--gold-light); }
+        .cart-item-price { font-size: 1.2rem; color: var(--gold); min-width: 60px; text-align: right; font-family: 'Playfair Display', serif; }
+
+        .cart-footer {
+            padding: 16px 18px;
+            background: var(--card-bg2);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #f5e8c8;
+            margin-bottom: 16px;
+        }
+        .cart-total span:last-child { color: var(--gold); }
+
+        .table-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 1px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            background: var(--warm-dark);
+            color: var(--gold-light);
+        }
+        .table-input::placeholder { color: var(--text-soft); }
+        .table-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 10px rgba(212,168,67,0.2); }
+
+        .btn-confirm {
+            width: 100%;
+            background: var(--gold);
+            border: none;
+            padding: 15px 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.25s, gap 0.25s;
+            gap: 0;
+        }
+        .btn-confirm:hover {
+            background: var(--gold-light);
+        }
+        .btn-confirm:hover .btn-confirm-arrow {
+            transform: translateX(5px);
+        }
+        .btn-confirm-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--bg);
+            line-height: 1;
+        }
+        .btn-confirm-arrow {
+            font-size: 1.1rem;
+            color: var(--bg);
+            transition: transform 0.25s cubic-bezier(.2,.8,.3,1);
+            opacity: 0.7;
+            line-height: 1;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: var(--text-soft);
+            padding: 50px 20px;
+            font-size: 1.2rem;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* ═══ RECEIPT ═══ */
+        .receipt-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .receipt-overlay.open { display: flex; }
+
+        .receipt-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-bright);
+            max-width: 370px;
+            width: 100%;
+            padding: 28px;
+            font-family: 'Courier New', monospace;
+            border-radius: 3px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 60px rgba(212,168,67,0.1);
+        }
+        .receipt-title { text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; color: var(--gold-light); }
+        .receipt-sub { text-align: center; font-size: 0.82rem; color: var(--text-soft); margin-bottom: 12px; }
+        .receipt-line { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 3px 0; color: var(--text-body); }
+        .receipt-divider { border: none; border-top: 1px dashed var(--border); margin: 10px 0; }
+        .receipt-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; color: var(--gold); }
+        .receipt-thanks { text-align: center; margin-top: 12px; font-size: 0.8rem; color: var(--text-soft); }
+        .btn-print { width: 100%; background: #27ae60; color: white; border: none; padding: 12px; margin-top: 16px; cursor: pointer; font-size: 0.95rem; border-radius: 2px; }
+        .btn-close-receipt { width: 100%; background: var(--gold); color: var(--bg); border: none; padding: 11px; margin-top: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+
+        /* ═══ TOAST ═══ */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--warm-dark);
+            border: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 11px 26px;
+            border-radius: 2px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 400;
+            pointer-events: none;
+            white-space: nowrap;
+            font-family: 'Cormorant Garamond', serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ═══ TABLE DISPLAY ═══ */
+        #table-display {
+            display: none;
+            background: var(--gold);
+            color: var(--bg);
+            padding: 9px 14px;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+        }
+
+        /* Staggered animation for cards */
+        .menu-card:nth-child(1) { animation-delay: 0.05s; }
+        .menu-card:nth-child(2) { animation-delay: 0.1s; }
+        .menu-card:nth-child(3) { animation-delay: 0.15s; }
+        .menu-card:nth-child(4) { animation-delay: 0.2s; }
+        .menu-card:nth-child(5) { animation-delay: 0.25s; }
+        .menu-card:nth-child(6) { animation-delay: 0.3s; }
+        .menu-card:nth-child(7) { animation-delay: 0.35s; }
+
+        /* ═══ MOBILE FIXES ═══ */
+        @media (max-width: 420px) {
+            .cart-bar {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            .cart-label-wrap {
+                display: none;
+            }
+            .btn-text-de {
+                font-size: 0.85rem;
+                letter-spacing: 2px;
+            }
+            .btn-text-fa {
+                font-size: 0.65rem;
+            }
+            .btn-order {
+                padding: 8px 12px;
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="arabesqe-bg"></div>
+
+<div class="header">
+    <div class="header-ornament">✦ ✦ ✦ ✦ ✦</div>
+    <h1>Parsia Restaurant</h1>
+    <div class="header-farsi">رستوران پارسیا</div>
+    <div class="gold-ornament-line">
+        <div class="line"></div>
+        <div class="diamond">✦</div>
+        <div class="diamond">◆</div>
+        <div class="diamond">✦</div>
+        <div class="line"></div>
+    </div>
+    <div class="header-subtitle"></div>
+</div>
+
+<div class="cart-bar">
+    <div class="cart-left">
+        <div class="cart-icon-wrap">
+            🛒
+            <span class="cart-count" id="cart-count">0</span>
+        </div>
+        <div class="cart-label-wrap">
+            <span class="cart-label-de">Warenkorb</span>
+            <span class="cart-label-fa">سبد سفارش</span>
+        </div>
+    </div>
+    <button class="btn-order" onclick="openCart()">
+        <div class="btn-text-wrap">
+            <span class="btn-text-de">Bestellen</span>
+            <span class="btn-text-fa">سفارش دهید</span>
+        </div>
+        <span class="btn-arrow">→</span>
+    </button>
+</div>
+
+<div class="category-tabs">
+    <div class="tab active" onclick="showSection('vorspeisen',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Vorspeisen</span>
+            <span class="tab-fa">پیش‌غذا</span>
+        </span>
+    </div>
+    <div class="tab" onclick="showSection('eintoepfe',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Eintöpfe</span>
+            <span class="tab-fa">خورش</span>
+        </span>
+    </div>
+    <div class="tab" onclick="showSection('grill',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Gegrilltes</span>
+            <span class="tab-fa">کباب</span>
+        </span>
+    </div>
+    <div class="tab" onclick="showSection('desserts',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Desserts</span>
+            <span class="tab-fa">دسر</span>
+        </span>
+    </div>
+    <div class="tab" onclick="showSection('getraenke',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Getränke</span>
+            <span class="tab-fa">نوشیدنی</span>
+        </span>
+    </div>
+    <div class="tab" onclick="showSection('heisse',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Heiße Getränke</span>
+            <span class="tab-fa">نوشیدنی گرم</span>
+        </span>
+    </div>
+</div>
+
+<div class="menu-container">
+    <div class="section active" id="vorspeisen">
+        <div class="section-title">Vorspeisen</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> پیش‌غذاها <span class="sub-ornament">✦</span></div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-vorspeisen"></div>
+    </div>
+    <div class="section" id="eintoepfe">
+        <div class="section-title">Eintöpfe & Hauptgerichte</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> خورش‌ها <span class="sub-ornament">✦</span></div>
+        <div class="section-subtitle-de">Wird mit Basmatireis serviert</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-eintoepfe"></div>
+    </div>
+    <div class="section" id="grill">
+        <div class="section-title">Vom Grill</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> کباب‌ها <span class="sub-ornament">✦</span></div>
+        <div class="section-subtitle-de">Wird mit Basmatireis serviert</div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-grill"></div>
+    </div>
+    <div class="section" id="desserts">
+        <div class="section-title">Desserts & Süßes</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> دسرها <span class="sub-ornament">✦</span></div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-desserts"></div>
+    </div>
+    <div class="section" id="getraenke">
+        <div class="section-title">Getränke</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> نوشیدنی‌ها <span class="sub-ornament">✦</span></div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-getraenke"></div>
+    </div>
+    <div class="section" id="heisse">
+        <div class="section-title">Heiße Getränke</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> نوشیدنی‌های گرم <span class="sub-ornament">✦</span></div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-heisse"></div>
+    </div>
+</div>
+
+<!-- Cart Modal -->
+<div class="modal-overlay" id="cart-modal" onclick="handleOverlayClick(event)">
+    <div class="cart-panel">
+        <div class="cart-header">
+            <h3>Ihre Bestellung</h3>
+            <button class="btn-close" onclick="closeCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cart-items-list"></div>
+        <div class="cart-footer">
+            <div id="table-display"></div>
+            <input class="table-input" id="table-input" type="number" placeholder="Tischnummer eingeben" min="1" inputmode="numeric">
+            <div class="cart-total"><span>Gesamt</span><span id="cart-total-price">0.00 €</span></div>
+            <button class="btn-confirm" onclick="sendOrder()">
+                <span class="btn-confirm-text">Jetzt Bestellen</span>
+                <span class="btn-confirm-arrow">→</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="receipt-overlay" id="receipt-modal">
+    <div class="receipt-box">
+        <div id="receipt-content"></div>
+        <button class="btn-close-receipt" onclick="closeReceipt()">✓ OK</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "https://parsia-restaurant.onrender.com";
+
+const menuData = {
+    vorspeisen: [
+        { id:101, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mirza_Ghasemi.jpeg",    name:"Mirza Ghasemi",    farsi:"میرزا قاسمی",   desc:"Rauchige, gegrillte Auberginen mit Tomaten, Knoblauch und Ei · بادمجان کبابی با گوجه، سیر و تخم‌مرغ", price:7.90 },
+        { id:102, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Kashke_Bademjoon.jpeg", name:"Kashke Bademjoon", farsi:"کشک بادمجان",   desc:"Auberginen mit Röstzwiebeln, Walnüssen, Minze und Kashk · بادمجان با کشک، پیاز داغ و گردو", price:7.50 },
+        { id:103, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mast-o_Khiar.jpeg",     name:"Mast-o Khiar",     farsi:"ماست و خیار",   desc:"Joghurt-Dip mit Gurke und Minze · ماست با خیار و نعنا خشک", price:5.50 },
+        { id:104, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Mast-o_Moosir.jpeg",    name:"Mast-o Moosir",    farsi:"ماست و موسیر",  desc:"Joghurt-Dip mit Wildknoblauch · ماست با موسیر کوهی", price:5.50 },
+        { id:105, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Felafel.jpeg",           name:"Felafel",          farsi:"فلافل",         desc:"Knusprige Kichererbsen-Bällchen mit Kräutern · فلافل ترد با سبزیجات و ادویه", price:5.50 },
+        { id:106, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Vorspeisen/Zeytoon_Parvarde.jpeg", name:"Zeytoon Parvarde", farsi:"زیتون پرورده",  desc:"Oliven in Walnuss-Granatapfel-Paste · زیتون با گردو، رب انار و سبزی", price:5.50 },
+    ],
+    eintoepfe: [
+        { id:201, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Ghorme_Sabzi.jpeg", name:"Chelo Ghorme Sabzi", farsi:"چلو قورمه سبزی", desc:"Kräutereintopf mit Lammfleisch, Kidneybohnen und Limetten · خورش سبزی با گوشت بره و لیمو عمانی", price:14.90 },
+        { id:202, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Ghormeh_Sabzi_vegetarisch.jpeg", name:"Chelo Ghormeh Sabzi (vegetarisch)", farsi:"چلو قورمه سبزی گیاهی", desc:"Vegetarisch: Kräutereintopf mit Champignons · خورش سبزی گیاهی با قارچ و لیمو عمانی", price:14.90 },
+        { id:203, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Khoresh_Fesenjan.jpeg", name:"Chelo Khoresh Fesenjan", farsi:"چلو خورش فسنجان", desc:"Süß-saurer Eintopf mit Rinderhackfleisch, Walnüssen, Granatapfel · خورش فسنجان با گوشت چرخ‌کرده", price:18.90 },
+        { id:204, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Khoresh_Fesenjan_vegetarisch.jpeg", name:"Chelo Khoresh Fesenjan (vegetarisch)", farsi:"چلو خورش فسنجان گیاهی", desc:"Vegetarisch: Süß-saurer Eintopf mit Walnüssen, Granatapfel · فسنجان گیاهی با گردو و رب انار", price:18.90 },
+        { id:205, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Baghali_Polo_Ba_Mahiche.jpeg", name:"Baghali Polo Ba Mahiche", farsi:"باقالی پلو با ماهیچه", desc:"Lammhaxe mit Dill-Safranreis und grünen Bohnen · ماهیچه با باقالی پلو و زعفران", price:22.90 },
+        { id:206, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Zereshk_Polo_Ba_Morgh.jpeg", name:"Zereshk Polo Ba Morgh", farsi:"زرشک پلو با مرغ", desc:"Hähnchenschenkel mit Berberitzen-Safranreis · مرغ با زرشک پلو و زعفران", price:19.90 },
+        { id:207, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Eintöpfe/Chelo_Mahi.jpeg", name:"Chelo Mahi", farsi:"چلو ماهی", desc:"Gebratenes Fischfilet mit Safranreis oder grünen Bohnen · ماهی سرخ‌شده با برنج زعفرانی", price:22.90 },
+    ],
+    grill: [
+        { id:301, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Koobideh.jpeg", name:"Chelo Kabab Koobideh", farsi:"چلو کباب کوبیده", desc:"Zwei Spieße Lamm- und Rinderhackfleisch, gegrillt · دو سیخ کباب کوبیده با برنج زعفرانی", price:18.50 },
+        { id:302, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Barg.jpeg", name:"Chelo Kabab Barg", farsi:"چلو کباب برگ", desc:"Zartes mariniertes Lammfilet in Streifen · فیله بره مرینیت‌شده با برنج زعفرانی", price:24.50 },
+        { id:303, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Joojeh_Kabab.jpeg", name:"Chelo Joojeh Kabab", farsi:"چلو جوجه کباب", desc:"Mariniertes Hähnchenfleisch in Safran · جوجه کباب زعفرانی با برنج", price:19.50 },
+        { id:304, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Gegrilltes/Chelo_Kabab_Soltani.jpeg", name:"Chelo Kabab Soltani", farsi:"چلو کباب سلطانی", desc:"Königsplatte: Koobideh und Barg Spieß · ترکیب کباب کوبیده و برگ با برنج زعفرانی", price:29.50 },
+    ],
+    desserts: [
+        { id:401, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Bastani_Sonati.jpeg", name:"Bastani Sonati", farsi:"بستنی سنتی", desc:"Traditionelles iranisches Safraneis mit Pistazie · بستنی زعفرانی سنتی ایرانی با پسته", price:5.00 },
+        { id:402, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Tiramisu.jpeg", name:"Tiramisu", farsi:"تیرامیسو", desc:"Klassisches italienisches Tiramisu · تیرامیسوی کلاسیک ایتالیایی", price:5.00 },
+        { id:403, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Baklava.jpeg", name:"Baklava", farsi:"باقلوا", desc:"Zwei frische Pistazien-Baklava mit Chai · دو تکه باقلوای تازه پسته‌ای با چای", price:6.00 },
+    ],
+    getraenke: [
+        { id:501, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Doogh_0.2L.jpg", name:"Doogh 0.2L", farsi:"دوغ ۰.۲ لیتر", desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:3.00 },
+        { id:502, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Doogh_0.4L.jpg", name:"Doogh 0.4L", farsi:"دوغ ۰.۴ لیتر", desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:4.00 },
+        { id:503, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Softdrinks_0.2L.jpg", name:"Softdrinks 0.2L", farsi:"نوشابه ۰.۲ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:2.40 },
+        { id:504, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Softdrinks_0.4L.jpg", name:"Softdrinks 0.4L", farsi:"نوشابه ۰.۴ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:4.00 },
+        { id:505, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Wasser_0.25L.jpg", name:"Wasser 0.25L", farsi:"آب ۰.۲۵ لیتر", desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:2.50 },
+        { id:506, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getränke/Wasser 0.75L.jpg", name:"Wasser 0.75L", farsi:"آب ۰.۷۵ لیتر", desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:6.50 },
+    ],
+    heisse: [
+        { id:601, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Kaffee.jpg", name:"Kaffee", farsi:"قهوه", desc:"Frisch gebrühter Kaffee · قهوه تازه‌دم", price:2.50 },
+        { id:602, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Espresso.jpg", name:"Espresso", farsi:"اسپرسو", desc:"Klassischer Espresso · اسپرسوی کلاسیک", price:2.50 },
+        { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", farsi:"چای", desc:"Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", price:2.00 },
+    ]
+};
+
+let cart = [];
+
+// ─── TABLE FROM QR ───
+const urlParams = new URLSearchParams(window.location.search);
+const tableFromQR = urlParams.get("table");
+if (tableFromQR) {
+    document.getElementById("table-input").style.display = "none";
+    const display = document.getElementById("table-display");
+    display.style.display = "block";
+    display.textContent = "🪑 Tisch Nr. " + tableFromQR;
+}
+
+function getTable() {
+    return tableFromQR || document.getElementById("table-input").value;
+}
+
+// ─── RENDER MENU CARDS ───
+function renderMenus() {
+    const icons = { getraenke:'🥤', heisse:'☕' };
+    for (const [section, items] of Object.entries(menuData)) {
+        const icon = icons[section] || '🍽️';
+        document.getElementById("grid-"+section).innerHTML = items.map(item => {
+            // Split desc into German and Farsi parts by · separator
+            let descHtml = '';
+            if (item.desc) {
+                const parts = item.desc.split('·');
+                const de = parts[0] ? parts[0].trim() : '';
+                const fa = parts[1] ? parts[1].trim() : '';
+                if (de && fa) {
+                    descHtml = `<div class="card-desc"><span class="card-desc-de">${de}</span><span class="card-desc-fa">${fa}</span></div>`;
+                } else {
+                    descHtml = `<div class="card-desc">${item.desc}</div>`;
+                }
+            }
+            return `
+            <div class="menu-card" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)" id="card-${item.id}">
+                <div class="card-corner-br"></div>
+                <div class="card-img-wrap">
+                    ${item.img
+                        ? `<img class="card-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                           <div class="card-img-placeholder" style="display:none">${icon}</div>`
+                        : `<div class="card-img-placeholder" style="display:flex">${icon}</div>`
+                    }
+                    <div class="card-price-badge">${item.price.toFixed(2)} €</div>
+                    <div class="card-add-badge" id="badge-${item.id}">+</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">${item.name}</div>
+                    ${item.farsi ? `<span class="card-farsi">${item.farsi}</span>` : ''}
+                    ${descHtml}
+                </div>
+            </div>`;
+        }).join('');
+    }
+}
+
+
+// ─── ADD ITEM ───
+function addItem(id, name, price, cardEl) {
+    const ex = cart.find(i => i.id === id);
+    if (ex) { ex.qty++; } else { cart.push({id, name, price, qty:1}); }
+    updateCartCount();
+    showToast(name + " hinzugefügt ✓");
+
+    if (cardEl) {
+        cardEl.classList.add("flash");
+        setTimeout(() => cardEl.classList.remove("flash"), 300);
+    }
+
+    const badge = document.getElementById("badge-"+id);
+    if (badge) {
+        const count = cart.find(i=>i.id===id)?.qty || 1;
+        badge.textContent = count > 1 ? count : "✓";
+        badge.classList.add("added");
+        setTimeout(() => {
+            badge.classList.remove("added");
+            badge.textContent = "+";
+        }, 1200);
+    }
+}
+
+function updateCartCount() {
+    const el = document.getElementById("cart-count");
+    el.textContent = cart.reduce((s,i)=>s+i.qty,0);
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+    setTimeout(() => el.classList.remove("bump"), 300);
+}
+
+// ─── CART RENDER ───
+function renderCartItems() {
+    const list = document.getElementById("cart-items-list");
+    if (!cart.length) {
+        list.innerHTML = '<div class="empty-cart">Ihr Warenkorb ist leer</div>';
+        document.getElementById("cart-total-price").textContent = "0.00 €";
+        return;
+    }
+    let total = 0;
+    list.innerHTML = cart.map((item, i) => {
+        total += item.price * item.qty;
+        return `<div class="cart-item">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-controls">
+                <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+                <span class="qty-label">${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+            </div>
+            <div class="cart-item-price">${(item.price*item.qty).toFixed(2)} €</div>
+        </div>`;
+    }).join('');
+    document.getElementById("cart-total-price").textContent = total.toFixed(2) + " €";
+}
+
+function changeQty(i, d) {
+    cart[i].qty += d;
+    if (cart[i].qty <= 0) cart.splice(i, 1);
+    updateCartCount();
+    renderCartItems();
+}
+
+function openCart() { 
+    renderCartItems(); 
+    document.getElementById("cart-modal").classList.add("open"); 
+    document.body.classList.add("modal-open");
+}
+function closeCart() { 
+    document.getElementById("cart-modal").classList.remove("open"); 
+    document.body.classList.remove("modal-open");
+}
+function handleOverlayClick(e) { if (e.target === e.currentTarget) closeCart(); }
+
+// ─── SEND ORDER ───
+function sendOrder() {
+    if (!cart.length) { showToast("Bitte Artikel auswählen!"); return; }
+    const table = getTable();
+    if (!table) { showToast("Bitte Tischnummer eingeben!"); return; }
+
+    const savedCart = [...cart];
+
+    fetch(API + "/orders?table=" + table)
+    .then(r => r.json())
+    .then(orders => {
+        const existing = Array.isArray(orders)
+            ? orders.filter(o => o.table_number == table && o.status !== "paid")
+                    .sort((a,b) => b.id - a.id)[0]
+            : null;
+
+        if (existing) {
+            const merged = [...existing.items];
+            savedCart.forEach(newItem => {
+                const found = merged.find(m => m.id === newItem.id);
+                if (found) { found.qty += newItem.qty; }
+                else { merged.push(newItem); }
+            });
+            const newTotal = merged.reduce((s,i) => s + i.price*i.qty, 0);
+
+            return fetch(API + "/orders/" + existing.id, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ items: merged, total: newTotal })
+            }).then(r => r.json()).then(data => ({ merged: true, orderId: existing.id, table, savedCart }));
+        } else {
+            return fetch(API + "/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ table, items: savedCart })
+            }).then(r => r.json()).then(data => ({ merged: false, orderId: data.order_id || data.id, table, savedCart }));
+        }
+    })
+    .then(result => {
+        closeCart();
+        cart = [];
+        updateCartCount();
+        showThankYou(result.table, result.merged);
+    })
+    .catch(() => {
+        fetch(API + "/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ table, items: savedCart })
+        })
+        .then(r => r.json())
+        .then(data => {
+            closeCart();
+            cart = [];
+            updateCartCount();
+            showThankYou(table, false);
+        })
+        .catch(() => showToast("Verbindungsfehler!"));
+    });
+}
+
+
+// ─── THANK YOU ───
+function showThankYou(table, merged) {
+    document.getElementById("receipt-content").innerHTML = `
+        <div style="text-align:center;padding:28px 10px">
+            <div style="font-size:3rem;margin-bottom:16px">🙏</div>
+            <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:#f0c96a;margin-bottom:14px;letter-spacing:1px">Vielen Dank!</div>
+            <div style="font-size:1rem;color:rgba(240,201,106,0.6);margin-bottom:8px">
+                ${merged ? "Ihre Artikel wurden zur laufenden Bestellung hinzugefügt." : "Ihre Bestellung wurde aufgenommen."}
+            </div>
+            <div style="font-size:1rem;color:rgba(240,201,106,0.6);margin-bottom:8px">Tisch Nr. <b style="color:#f0c96a">${table}</b></div>
+            <div style="font-size:1.1rem;color:#d4a843;margin-top:20px;direction:rtl">سفارش شما ثبت شد ✦</div>
+        </div>`;
+    document.getElementById("receipt-modal").classList.add("open");
+}
+
+function closeReceipt() { document.getElementById("receipt-modal").classList.remove("open"); }
+
+// ─── NAVIGATION ───
+function showSection(id, tab) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    tab.classList.add('active');
+}
+
+function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+renderMenus();
+</script>
+</body>
+</html>
