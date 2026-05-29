@@ -181,6 +181,14 @@
             color: #555;
         }
 
+        .section-toggle-btn {
+            background: transparent; border: 1.5px solid #ccc;
+            border-radius: 8px; padding: 3px 10px;
+            font-size: 0.75rem; color: #888; cursor: pointer;
+            transition: all 0.15s;
+        }
+        .section-toggle-btn:hover { border-color: #c8972a; color: #c8972a; }
+
         .header-bar {
             background: #1a1008;
             color: #e8b84b;
@@ -301,6 +309,69 @@
             padding: 8px 0; border-bottom: 1px solid #eee;
         }
         .no-cart-row:last-child { border-bottom: none; }
+
+        /* ── Table Map – Modern ── */
+        .table-map-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .tmap-cell {
+            border-radius: 12px;
+            padding: 10px 6px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
+            position: relative;
+            min-height: 80px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .tmap-cell:hover { transform: scale(1.07) translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.14); }
+        .tmap-cell.tmap-free {
+            background: linear-gradient(135deg,#eafaf1 60%,#d5f5e3);
+            border-color: #27ae60;
+            box-shadow: 0 2px 6px rgba(39,174,96,0.12);
+        }
+        .tmap-cell.tmap-pending {
+            background: linear-gradient(135deg,#fff8e1 60%,#fdebd0);
+            border-color: #f39c12;
+            box-shadow: 0 2px 8px rgba(243,156,18,0.18);
+        }
+        .tmap-cell.tmap-pending:hover { box-shadow: 0 6px 18px rgba(243,156,18,0.28); }
+        .tmap-icon   { font-size: 1.4rem; line-height: 1; }
+        .tmap-num    { font-size: 1.05rem; font-weight: 900; margin-top: 3px; color: #1a1008; letter-spacing: 0.5px; }
+        .tmap-status { font-size: 0.6rem; font-weight: 800; margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .tmap-note-dot {
+            position: absolute; top: 5px; right: 6px;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #2c6fad; box-shadow: 0 0 0 2px #fff;
+        }
+        .tmap-amount {
+            font-size: 0.65rem; color: #e67e22; font-weight: 900; margin-top: 2px;
+            background: rgba(230,126,34,0.10); border-radius: 6px; padding: 1px 5px;
+        }
+
+        /* ── Daily Summary ── */
+        .summary-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .summary-num { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+        .summary-label { font-size: 0.72rem; font-weight: 700; color: #888; }
+
+        /* ── Note chip on order cards ── */
+        .note-chip-inline {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #eaf2ff; border: 1.5px solid #2c6fad;
+            border-radius: 20px; padding: 3px 10px;
+            font-size: 0.75rem; font-weight: 700; color: #1a4b8a;
+            cursor: pointer; transition: all 0.15s; margin-top: 4px;
+        }
+        .note-chip-inline:hover { background: #d0e8ff; }
     </style>
 </head>
 <body>
@@ -311,9 +382,6 @@
         <button class="new-order-btn-header" onclick="openNewOrderModal()">
             📝 Neue Bestellung
         </button>
-        <button onclick="openAdminPanel()" style="background:#2c6fad;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:0.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(44,111,173,0.4);transition:all 0.2s" onmouseover="this.style.background='#245a8e'" onmouseout="this.style.background='#2c6fad'">
-            ⚙️ Menü verwalten
-        </button>
         <span class="badge bg-warning text-dark" id="total-count">0 Bestellungen</span>
         <button id="install-btn" onclick="installApp()" style="display:none;background:#e8b84b;color:#1a1008;border:none;border-radius:8px;padding:8px 14px;font-weight:800;font-size:0.85rem;cursor:pointer;align-items:center;gap:6px;">
             📲 App installieren
@@ -322,6 +390,79 @@
 </div>
 
 <div class="px-3">
+
+<!-- ══════════ DAILY SUMMARY ══════════ -->
+<div style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:0.85rem;font-weight:800;color:#1a1008">📊 Tagesübersicht</span>
+        <button class="section-toggle-btn" onclick="toggleSection('summary-section','summary-arrow')">
+            <span id="summary-arrow">▲</span> ausblenden
+        </button>
+    </div>
+    <div id="summary-section">
+        <!-- Date navigation -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:#fff;border-radius:12px;padding:8px 12px;box-shadow:0 1px 6px rgba(0,0,0,0.07)">
+            <button onclick="summaryNavDay(-1)" style="background:#f0ece6;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:1rem;font-weight:700">◀</button>
+            <div style="flex:1;text-align:center">
+                <input type="date" id="summary-date-picker"
+                    style="border:none;background:transparent;font-size:0.9rem;font-weight:800;color:#1a1008;text-align:center;cursor:pointer;width:auto"
+                    onchange="setSummaryDate(this.value)">
+                <span id="summary-day-label" style="font-size:0.72rem;color:#888;display:block"></span>
+            </div>
+            <button onclick="summaryNavDay(1)" id="summary-nav-next" style="background:#f0ece6;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:1rem;font-weight:700">▶</button>
+            <button onclick="setSummaryToday()" style="background:#c8972a;color:#1a1008;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.75rem;font-weight:800;white-space:nowrap">Heute</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
+            <div class="summary-card" style="border-left:4px solid #27ae60">
+                <div class="summary-num" id="sum-revenue" style="color:#27ae60">0,00 €</div>
+                <div class="summary-label">💰 Umsatz</div>
+            </div>
+            <div class="summary-card" style="border-left:4px solid #c8972a">
+                <div class="summary-num" id="sum-orders" style="color:#c8972a">0</div>
+                <div class="summary-label">📋 Bestellungen</div>
+            </div>
+            <div class="summary-card" style="border-left:4px solid #8e44ad">
+                <div class="summary-num" id="sum-avg" style="color:#8e44ad">0,00 €</div>
+                <div class="summary-label">📐 Ø pro Tisch</div>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px">
+            <div class="summary-card flex-fill" style="border-left:4px solid #2c6fad;flex-direction:row;align-items:center;gap:14px">
+                <div style="font-size:1.6rem">💵</div>
+                <div>
+                    <div class="summary-num" id="sum-bar" style="color:#2c6fad;font-size:1.3rem">0,00 €</div>
+                    <div class="summary-label">Bar</div>
+                </div>
+            </div>
+            <div class="summary-card flex-fill" style="border-left:4px solid #e74c3c;flex-direction:row;align-items:center;gap:14px">
+                <div style="font-size:1.6rem">💳</div>
+                <div>
+                    <div class="summary-num" id="sum-karte" style="color:#e74c3c;font-size:1.3rem">0,00 €</div>
+                    <div class="summary-label">Karte</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ TABLE MAP ══════════ -->
+<div style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:0.85rem;font-weight:800;color:#1a1008">🏷️ Tischübersicht</span>
+        <div style="display:flex;gap:10px;align-items:center">
+            <span style="font-size:0.72rem;color:#888">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#27ae60;margin-right:3px"></span>Frei
+                <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#f39c12;margin-left:8px;margin-right:3px"></span>Offen
+            </span>
+            <button class="section-toggle-btn" onclick="toggleSection('table-map-section','map-arrow')">
+                <span id="map-arrow">▲</span> ausblenden
+            </button>
+        </div>
+    </div>
+    <div id="table-map-section">
+        <div class="table-map-grid" id="table-map"></div>
+    </div>
+</div>
 
 <!-- Stats bar -->
 <div id="stats-bar" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"></div>
@@ -337,10 +478,35 @@
 <div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
     <span style="font-size:0.8rem;font-weight:700;color:#888">📅 Zeitraum:</span>
     <button class="filter-btn active" id="df-today" onclick="setDateFilter('today',this)" style="background:#e8f4fd;color:#2c6fad;border-color:#2c6fad;font-size:0.82rem;padding:6px 14px">Heute</button>
+    <button class="filter-btn" id="df-yesterday" onclick="setDateFilter('yesterday',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Gestern</button>
+    <button class="filter-btn" id="df-week" onclick="setDateFilter('week',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Diese Woche</button>
     <button class="filter-btn" id="df-all" onclick="setDateFilter('all',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Alle Tage</button>
+    <div style="display:flex;align-items:center;gap:4px;margin-left:4px">
+        <input type="date" id="df-custom-date" style="border:1.5px solid #ccc;border-radius:8px;padding:5px 8px;font-size:0.78rem;color:#333"
+            onchange="setDateFilter('custom',null,this.value)">
+    </div>
 </div>
 
 <div id="orders" class="row"></div>
+</div>
+
+<!-- ══════════ NOTE MODAL ══════════ -->
+<div class="modal-overlay" id="note-modal">
+    <div class="modal-box" style="max-width:380px">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">📝 Tischnotiz – <span id="note-modal-title">Tisch ?</span></h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="closeNoteModal()">✕</button>
+        </div>
+        <p style="font-size:0.85rem;color:#888;margin-bottom:10px">z.B. "Allergie gegen Nüsse", "Geburtstag", "VIP Gast"</p>
+        <textarea id="note-textarea" rows="4" class="form-control mb-3"
+            placeholder="Notiz eingeben..."
+            style="resize:vertical;font-size:0.9rem;border-radius:10px"></textarea>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary fw-bold flex-fill" onclick="saveNote()">💾 Speichern</button>
+            <button class="btn btn-outline-danger" onclick="deleteNote()">🗑️ Löschen</button>
+            <button class="btn btn-outline-secondary" onclick="closeNoteModal()">Abbrechen</button>
+        </div>
+    </div>
 </div>
 
 <!-- ══════════ PAYMENT MODAL ══════════ -->
@@ -392,7 +558,10 @@
 
         <div class="d-flex gap-2">
             <button class="btn btn-success flex-fill fw-bold" onclick="saveEditedOrder()">💾 Speichern</button>
-            <button class="btn btn-outline-danger" onclick="deleteOrder()">🗑️ Bestellung löschen</button>
+            <button class="btn btn-outline-warning" onclick="deleteOrder()">📦 Archivieren</button>
+        </div>
+        <div style="margin-top:8px;font-size:0.75rem;color:#888;text-align:center">
+            📋 Bestellungen werden dauerhaft für das Finanzamt gespeichert.
         </div>
     </div>
 </div>
@@ -425,103 +594,7 @@
     </div>
 </div>
 
-<!-- ══════════ ADMIN PANEL MODAL ══════════ -->
-<div class="modal-overlay" id="admin-modal" style="z-index:1300">
-    <div class="modal-box" style="max-width:680px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:96vh">
 
-        <!-- Header -->
-        <div style="background:#1a1008;color:#e8b84b;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-            <span style="font-weight:bold;font-size:1.05rem">⚙️ Menü verwalten – Parsia</span>
-            <button class="btn btn-sm btn-outline-warning" onclick="closeAdminPanel()">✕ Schließen</button>
-        </div>
-
-        <!-- Content -->
-        <div style="padding:16px;overflow-y:auto;flex:1;background:#f5f2ee">
-
-            <!-- Add button -->
-            <button onclick="openAddItem()" style="width:100%;background:#c8972a;color:#1a1008;border:none;border-radius:10px;padding:12px;font-size:1rem;font-weight:800;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px">
-                ➕ Neuen Artikel hinzufügen
-            </button>
-
-            <!-- Form section (hidden by default) -->
-            <div id="admin-form-section" style="display:none;background:#fff;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
-                <div id="admin-form-title" style="font-weight:800;font-size:1rem;margin-bottom:14px;color:#1a1008">➕ Neuen Artikel hinzufügen</div>
-                <input type="hidden" id="admin-item-id">
-
-                <div class="mb-2">
-                    <label style="font-size:0.82rem;font-weight:700;color:#555">Name *</label>
-                    <input id="admin-item-name" type="text" class="form-control form-control-sm mt-1" placeholder="z.B. Chelo Kebab">
-                </div>
-                <div class="mb-2">
-                    <label style="font-size:0.82rem;font-weight:700;color:#555">Beschreibung</label>
-                    <input id="admin-item-desc" type="text" class="form-control form-control-sm mt-1" placeholder="kurze Beschreibung (optional)">
-                </div>
-                <div class="row g-2 mb-2">
-                    <div class="col-6">
-                        <label style="font-size:0.82rem;font-weight:700;color:#555">Preis (€) *</label>
-                        <input id="admin-item-price" type="number" step="0.10" min="0" class="form-control form-control-sm mt-1" placeholder="0.00">
-                    </div>
-                    <div class="col-6">
-                        <label style="font-size:0.82rem;font-weight:700;color:#555">Typ</label>
-                        <select id="admin-item-type" class="form-select form-select-sm mt-1">
-                            <option value="food">🍽️ Essen (7% MwSt)</option>
-                            <option value="drink">🥤 Getränk (19% MwSt)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <label style="font-size:0.82rem;font-weight:700;color:#555">Kategorie *</label>
-                    <select id="admin-item-category" class="form-select form-select-sm mt-1">
-                        <option value="vorspeisen">🥗 Vorspeisen</option>
-                        <option value="eintoepfe">🍲 Eintöpfe</option>
-                        <option value="grill">🔥 Gegrilltes</option>
-                        <option value="desserts">🍮 Desserts</option>
-                        <option value="getraenke">🥤 Getränke</option>
-                        <option value="heisse">☕ Heiße Getränke</option>
-                    </select>
-                </div>
-                <div class="mb-2">
-                    <label style="font-size:0.82rem;font-weight:700;color:#555">Bild</label>
-                    <div class="mt-1" style="display:flex;flex-direction:column;gap:8px">
-                        <!-- Upload Button -->
-                        <label id="cloudinary-upload-label" style="display:flex;align-items:center;gap:10px;background:#f8f9fa;border:2px dashed #c8972a;border-radius:8px;padding:12px 14px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='#fffbf2'" onmouseout="this.style.background='#f8f9fa'">
-                            <input type="file" id="cloudinary-file-input" accept="image/*" style="display:none" onchange="uploadToCloudinary(this)">
-                            <span style="font-size:1.5rem">📷</span>
-                            <div>
-                                <div style="font-weight:700;font-size:0.85rem;color:#1a1008">Bild hochladen</div>
-                                <div style="font-size:0.75rem;color:#888">Von Handy oder Computer auswählen</div>
-                            </div>
-                        </label>
-                        <!-- Upload Progress -->
-                        <div id="cloudinary-upload-status" style="display:none;font-size:0.8rem;font-weight:600;padding:8px 12px;border-radius:6px"></div>
-                        <!-- Preview -->
-                        <div id="cloudinary-preview" style="display:none">
-                            <img id="cloudinary-preview-img" src="" alt="Vorschau" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px;border:1px solid #eee">
-                        </div>
-                        <!-- URL field (readonly, auto-filled) -->
-                        <input id="admin-item-img" type="text" class="form-control form-control-sm" placeholder="Wird automatisch nach Upload ausgefüllt..." readonly style="background:#f0f0f0;font-size:0.75rem;color:#666">
-                    </div>
-                </div>
-                <div class="mb-3 d-flex align-items-center gap-2">
-                    <input id="admin-item-active" type="checkbox" class="form-check-input" checked style="width:18px;height:18px;cursor:pointer">
-                    <label style="font-size:0.85rem;font-weight:700;cursor:pointer" onclick="document.getElementById('admin-item-active').click()">Im Menü anzeigen (Aktiv)</label>
-                </div>
-                <div class="d-flex gap-2">
-                    <button id="admin-save-btn" onclick="saveMenuItem()" style="background:#27ae60;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:800;cursor:pointer;flex:1">💾 Speichern</button>
-                    <button onclick="cancelAdminForm()" style="background:#95a5a6;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Abbrechen</button>
-                </div>
-            </div>
-
-            <!-- Menu list -->
-            <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
-                <div style="font-weight:800;font-size:0.9rem;color:#1a1008;margin-bottom:12px">📋 Aktuelle Speisekarte</div>
-                <div id="admin-menu-list">
-                    <p class="text-muted text-center py-3">Wird geladen...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- ══════════ NEW ORDER MODAL ══════════ -->
 <div class="modal-overlay" id="new-order-modal" style="z-index:1200">
@@ -588,54 +661,8 @@
 
 <script>
 const API = "https://parsia-restaurant.onrender.com";
-const ADMIN_PASSWORD = "parsia2024"; // 🔑 رمز مالک رستوران — اینجا تغییر دهید
-// ══════════ CLOUDINARY UPLOAD ══════════
-const CLOUDINARY_CLOUD_NAME = "dmcgszod1";
-const CLOUDINARY_UPLOAD_PRESET = "restaurant_upload";
 
-async function uploadToCloudinary(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const status = document.getElementById("cloudinary-upload-status");
-    const preview = document.getElementById("cloudinary-preview");
-    const previewImg = document.getElementById("cloudinary-preview-img");
-    const urlInput = document.getElementById("admin-item-img");
-    const label = document.getElementById("cloudinary-upload-label");
-    status.style.display = "block";
-    status.style.background = "#fff3cd";
-    status.style.color = "#856404";
-    status.textContent = "⏳ Bild wird hochgeladen...";
-    preview.style.display = "none";
-    label.style.pointerEvents = "none";
-    label.style.opacity = "0.6";
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    try {
-        const res = await fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/image/upload", {
-            method: "POST", body: formData
-        });
-        if (!res.ok) throw new Error("Upload fehlgeschlagen");
-        const data = await res.json();
-        const url = data.secure_url;
-        urlInput.value = url;
-        previewImg.src = url;
-        preview.style.display = "block";
-        status.style.background = "#d4edda";
-        status.style.color = "#155724";
-        status.textContent = "✅ Bild erfolgreich hochgeladen!";
-        setTimeout(() => { status.style.display = "none"; }, 3000);
-    } catch (err) {
-        status.style.background = "#f8d7da";
-        status.style.color = "#721c24";
-        status.textContent = "❌ Fehler beim Hochladen. Bitte nochmal versuchen.";
-        console.error("Cloudinary upload error:", err);
-    } finally {
-        label.style.pointerEvents = "";
-        label.style.opacity = "";
-        input.value = "";
-    }
-}
+
 
 let currentFilter = "all";
 let currentDateFilter = "today"; // today | yesterday | all
@@ -644,38 +671,89 @@ let paymentOrderId = null;
 let selectedPaymentMethod = null;
 let editingOrder = null;
 let editItems = [];
-let adminMenuItems = [];
-let editingMenuItem = null;
 
-// ══════════ ADMIN PANEL ══════════
-function openAdminPanel() {
-    const pw = prompt("🔐 Bitte Passwort eingeben:");
-    if (pw !== ADMIN_PASSWORD) {
-        if (pw !== null) alert("❌ Falsches Passwort!");
-        return;
+// ── Summary date navigation ──
+let selectedSummaryDate = new Date(); // defaults to today
+
+function _dateToStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function _isToday(d) {
+    const t = new Date();
+    return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate();
+}
+
+function initSummaryDatePicker() {
+    const picker = document.getElementById('summary-date-picker');
+    if (!picker) return;
+    picker.value = _dateToStr(selectedSummaryDate);
+    picker.max = _dateToStr(new Date());
+    updateSummaryDayLabel();
+}
+
+function updateSummaryDayLabel() {
+    const picker = document.getElementById('summary-date-picker');
+    const label = document.getElementById('summary-day-label');
+    const nextBtn = document.getElementById('summary-nav-next');
+    if (!picker || !label) return;
+    const days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    if (_isToday(selectedSummaryDate)) {
+        label.textContent = '📅 Heute';
+    } else {
+        const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+        if (_dateToStr(selectedSummaryDate) === _dateToStr(yesterday)) {
+            label.textContent = '📅 Gestern';
+        } else {
+            label.textContent = '📅 ' + days[selectedSummaryDate.getDay()] + ', ' + selectedSummaryDate.toLocaleDateString('de-DE');
+        }
     }
-    document.getElementById('admin-modal').classList.add('open');
-    loadAdminMenu();
+    if (nextBtn) nextBtn.disabled = _isToday(selectedSummaryDate);
+    if (nextBtn) nextBtn.style.opacity = _isToday(selectedSummaryDate) ? '0.4' : '1';
 }
 
-function closeAdminPanel() {
-    document.getElementById('admin-modal').classList.remove('open');
-    editingMenuItem = null;
+function setSummaryDate(val) {
+    selectedSummaryDate = new Date(val + 'T00:00:00');
+    updateSummaryDayLabel();
+    renderDailySummary();
 }
 
-function loadAdminMenu() {
-    fetch(API + "/admin/menu")
-    .then(r => r.json())
-    .then(data => {
-        adminMenuItems = data;
-        renderAdminMenu();
-    })
-    .catch(() => {
-        // اگر دیتابیس خالی است
-        adminMenuItems = [];
-        renderAdminMenu();
-    });
+function summaryNavDay(delta) {
+    const d = new Date(selectedSummaryDate);
+    d.setDate(d.getDate() + delta);
+    if (d > new Date()) return;
+    selectedSummaryDate = d;
+    const picker = document.getElementById('summary-date-picker');
+    if (picker) picker.value = _dateToStr(d);
+    updateSummaryDayLabel();
+    renderDailySummary();
 }
+
+function setSummaryToday() {
+    selectedSummaryDate = new Date();
+    const picker = document.getElementById('summary-date-picker');
+    if (picker) picker.value = _dateToStr(selectedSummaryDate);
+    updateSummaryDayLabel();
+    renderDailySummary();
+}
+
+// ── Table Notes (saved in localStorage) ──
+const TABLE_COUNT = 12;
+let tableNotes = JSON.parse(localStorage.getItem('parsiaTableNotes') || '{}');
+let noteTargetTable = null;
+
+function toggleSection(id, arrowId) {
+    const el = document.getElementById(id);
+    const arrow = document.getElementById(arrowId);
+    if (el.style.display === 'none') {
+        el.style.display = '';
+        arrow.textContent = '▲';
+    } else {
+        el.style.display = 'none';
+        arrow.textContent = '▼';
+    }
+}
+
 
 const CATEGORIES = {
     vorspeisen: "🥗 Vorspeisen",
@@ -685,139 +763,6 @@ const CATEGORIES = {
     getraenke:  "🥤 Getränke",
     heisse:     "☕ Heiße Getränke",
 };
-
-function renderAdminMenu() {
-    const list = document.getElementById('admin-menu-list');
-    if (!adminMenuItems.length) {
-        list.innerHTML = '<p class="text-muted text-center py-4">Noch keine Artikel. Ersten Artikel hinzufügen ➕</p>';
-        return;
-    }
-    // Group by category
-    const grouped = {};
-    adminMenuItems.forEach(item => {
-        if (!grouped[item.category]) grouped[item.category] = [];
-        grouped[item.category].push(item);
-    });
-    let html = '';
-    Object.entries(grouped).forEach(([cat, items]) => {
-        html += `<div class="mb-3">
-            <div style="font-weight:800;font-size:0.85rem;color:#c8972a;text-transform:uppercase;letter-spacing:1px;padding:6px 0;border-bottom:1px solid #eee;margin-bottom:8px">
-                ${CATEGORIES[cat] || cat}
-            </div>`;
-        items.forEach(item => {
-            html += `
-            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                ${item.img_url
-                    ? `<img src="${item.img_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">`
-                    : `<div style="width:48px;height:48px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">${item.item_type==='drink'?'🥤':'🍽️'}</div>`
-                }
-                <div style="flex:1;min-width:0">
-                    <div style="font-weight:700;font-size:0.9rem">${item.name}</div>
-                    <div style="font-size:0.8rem;color:#c8972a;font-weight:700">${item.price.toFixed(2)} €
-                        <span style="color:${item.active?'#27ae60':'#e74c3c'};font-size:0.75rem;margin-left:6px">${item.active?'✅ Aktiv':'⛔ Inaktiv'}</span>
-                    </div>
-                </div>
-                <div style="display:flex;gap:6px;flex-shrink:0">
-                    <button onclick="openEditItem(${item.id})" style="background:#2c6fad;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;cursor:pointer">✏️</button>
-                    <button onclick="deleteMenuItem(${item.id})" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;cursor:pointer">🗑️</button>
-                </div>
-            </div>`;
-        });
-        html += '</div>';
-    });
-    list.innerHTML = html;
-}
-
-function openAddItem() {
-    editingMenuItem = null;
-    document.getElementById('admin-form-title').textContent = '➕ Neuen Artikel hinzufügen';
-    document.getElementById('admin-item-id').value = '';
-    document.getElementById('admin-item-name').value = '';
-    document.getElementById('admin-item-desc').value = '';
-    document.getElementById('admin-item-price').value = '';
-    document.getElementById('admin-item-category').value = 'vorspeisen';
-    document.getElementById('admin-item-type').value = 'food';
-    document.getElementById('admin-item-img').value = '';
-    document.getElementById('cloudinary-preview').style.display = 'none';
-    document.getElementById('admin-item-active').checked = true;
-    document.getElementById('admin-form-section').style.display = 'block';
-    document.getElementById('admin-form-section').scrollIntoView({behavior:'smooth'});
-}
-
-function openEditItem(id) {
-    const item = adminMenuItems.find(i => i.id === id);
-    if (!item) return;
-    editingMenuItem = item;
-    document.getElementById('admin-form-title').textContent = '✏️ Artikel bearbeiten';
-    document.getElementById('admin-item-id').value = item.id;
-    document.getElementById('admin-item-name').value = item.name;
-    document.getElementById('admin-item-desc').value = item.description || '';
-    document.getElementById('admin-item-price').value = item.price;
-    document.getElementById('admin-item-category').value = item.category;
-    document.getElementById('admin-item-type').value = item.item_type;
-    document.getElementById('admin-item-img').value = item.img_url || '';
-    const _prevImg = document.getElementById('cloudinary-preview-img');
-    const _prev = document.getElementById('cloudinary-preview');
-    if (item.img_url) { _prevImg.src = item.img_url; _prev.style.display = 'block'; } else { _prev.style.display = 'none'; }
-    document.getElementById('admin-item-active').checked = item.active;
-    document.getElementById('admin-form-section').style.display = 'block';
-    document.getElementById('admin-form-section').scrollIntoView({behavior:'smooth'});
-}
-
-function cancelAdminForm() {
-    document.getElementById('admin-form-section').style.display = 'none';
-    editingMenuItem = null;
-}
-
-function saveMenuItem() {
-    const name     = document.getElementById('admin-item-name').value.trim();
-    const price    = parseFloat(document.getElementById('admin-item-price').value);
-    const category = document.getElementById('admin-item-category').value;
-    if (!name || isNaN(price) || price <= 0) {
-        alert('⚠️ Bitte Name und gültigen Preis eingeben!');
-        return;
-    }
-    const data = {
-        name,
-        description: document.getElementById('admin-item-desc').value.trim(),
-        price,
-        category,
-        item_type: document.getElementById('admin-item-type').value,
-        img_url:   document.getElementById('admin-item-img').value.trim(),
-        active:    document.getElementById('admin-item-active').checked,
-    };
-    const itemId = document.getElementById('admin-item-id').value;
-    const url    = itemId ? `${API}/admin/menu/${itemId}` : `${API}/admin/menu`;
-    const method = itemId ? 'PUT' : 'POST';
-    const btn    = document.getElementById('admin-save-btn');
-    btn.disabled = true;
-    btn.textContent = '⏳ Speichern...';
-    fetch(url, {
-        method,
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-    })
-    .then(r => r.json())
-    .then(() => {
-        btn.disabled = false;
-        btn.textContent = '💾 Speichern';
-        cancelAdminForm();
-        loadAdminMenu();
-    })
-    .catch(() => {
-        btn.disabled = false;
-        btn.textContent = '💾 Speichern';
-        alert('❌ Fehler beim Speichern!');
-    });
-}
-
-function deleteMenuItem(id) {
-    const item = adminMenuItems.find(i => i.id === id);
-    if (!confirm(`🗑️ "${item?.name}" wirklich löschen?`)) return;
-    fetch(`${API}/admin/menu/${id}`, {method:'DELETE'})
-    .then(() => loadAdminMenu())
-    .catch(() => alert('❌ Fehler beim Löschen!'));
-}
 
 // ── Categories known to be drinks (19% MwSt) ──
 // Items fetched from API don't have category; we use name heuristics or a flag
@@ -845,15 +790,25 @@ function setFilter(filter, btn) {
     renderOrders();
 }
 
-function setDateFilter(range, btn) {
+function setDateFilter(range, btn, customVal) {
     currentDateFilter = range;
-    ['df-today','df-all'].forEach(id => {
+    ['df-today','df-yesterday','df-week','df-all'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('active');
     });
-    btn.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (range === 'custom' && customVal) {
+        currentDateFilter = 'custom';
+        currentCustomDate = customVal;
+        // deactivate other buttons
+        ['df-today','df-yesterday','df-week','df-all'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        });
+    }
     renderOrders();
 }
+let currentCustomDate = null;
 
 function loadOrders() {
     fetch(API + "/orders")
@@ -873,9 +828,24 @@ function getTimerInfo(createdAt) {
     const created = new Date(createdAt.replace(' ', 'T'));
     const mins = Math.floor((Date.now() - created.getTime()) / 60000);
     if (isNaN(mins) || mins < 0) return null;
-    if (mins < 15)  return { cls: 'timer-fresh',  label: `${mins} min` };
-    if (mins < 35)  return { cls: 'timer-medium', label: `${mins} min` };
-    return { cls: 'timer-old', label: `${mins} min ⚠️`, old: true };
+
+    let label, cls, emoji;
+    if (mins < 5) {
+        label = 'Gerade bestellt'; cls = 'timer-fresh'; emoji = '🟢';
+    } else if (mins < 15) {
+        label = `Vor ${mins} Min`; cls = 'timer-fresh'; emoji = '🟢';
+    } else if (mins < 35) {
+        const h = Math.floor(mins/60), m = mins%60;
+        label = h > 0 ? `Seit ${h}h ${m}min` : `Seit ${mins} Min`;
+        cls = 'timer-medium'; emoji = '🟡';
+    } else if (mins < 60) {
+        label = `Seit ${mins} Min – Dringend`; cls = 'timer-old'; emoji = '🔴';
+    } else {
+        const h = Math.floor(mins/60), m = mins%60;
+        label = `Seit ${h}h ${m > 0 ? m+'min ' : ''}– Dringend`;
+        cls = 'timer-old'; emoji = '🔴';
+    }
+    return { cls, label: emoji + ' ' + label, old: mins >= 35, mins };
 }
 
 function renderOrders() {
@@ -896,6 +866,18 @@ function renderOrders() {
             return orderDate.getFullYear() === yesterday.getFullYear() &&
                    orderDate.getMonth() === yesterday.getMonth() &&
                    orderDate.getDate() === yesterday.getDate();
+        }
+        if (currentDateFilter === "week") {
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay() + (today.getDay()===0?-6:1));
+            weekStart.setHours(0,0,0,0);
+            return orderDate >= weekStart;
+        }
+        if (currentDateFilter === "custom" && currentCustomDate) {
+            const cd = new Date(currentCustomDate + 'T00:00:00');
+            return orderDate.getFullYear() === cd.getFullYear() &&
+                   orderDate.getMonth() === cd.getMonth() &&
+                   orderDate.getDate() === cd.getDate();
         }
         return true;
     }
@@ -950,7 +932,7 @@ function renderOrders() {
     let html = "";
     filtered.forEach(order => {
         const timer = order.status === "pending" ? getTimerInfo(order.created_at) : null;
-        const isNew = order.status === "pending" && timer && parseInt(timer.label) < 3;
+        const isNew = order.status === "pending" && timer && timer.mins !== undefined && timer.mins < 3;
 
         // item chips
         let chipsHtml = "";
@@ -988,6 +970,12 @@ function renderOrders() {
                     </div>
                 </div>
                 <div class="order-items-area">${chipsHtml}</div>
+                ${tableNotes[order.table_number] ? `
+                <div style="padding:0 16px 8px">
+                    <span class="note-chip-inline" onclick="openNoteModal(${order.table_number})">
+                        📝 ${tableNotes[order.table_number].length > 40 ? tableNotes[order.table_number].slice(0,40)+'…' : tableNotes[order.table_number]}
+                    </span>
+                </div>` : ''}
                 <div class="order-footer">
                     <div>
                         <div class="order-total-display">${order.total ? order.total.toFixed(2) + ' €' : '—'}</div>
@@ -1006,6 +994,118 @@ function renderOrders() {
     });
 
     document.getElementById("orders").innerHTML = html;
+    renderTableMap();
+    renderDailySummary();
+}
+
+// ══════════ NOTE MODAL ══════════
+function openNoteModal(tableNum) {
+    noteTargetTable = tableNum;
+    document.getElementById('note-modal-title').textContent = `Tisch ${tableNum}`;
+    document.getElementById('note-textarea').value = tableNotes[tableNum] || '';
+    document.getElementById('note-modal').classList.add('open');
+    setTimeout(() => document.getElementById('note-textarea').focus(), 100);
+}
+
+function closeNoteModal() {
+    document.getElementById('note-modal').classList.remove('open');
+    noteTargetTable = null;
+}
+
+function saveNote() {
+    const text = document.getElementById('note-textarea').value.trim();
+    if (noteTargetTable === null) return;
+    if (text) {
+        tableNotes[noteTargetTable] = text;
+    } else {
+        delete tableNotes[noteTargetTable];
+    }
+    localStorage.setItem('parsiaTableNotes', JSON.stringify(tableNotes));
+    closeNoteModal();
+    renderTableMap();
+    renderOrders();
+}
+
+function deleteNote() {
+    if (noteTargetTable === null) return;
+    delete tableNotes[noteTargetTable];
+    localStorage.setItem('parsiaTableNotes', JSON.stringify(tableNotes));
+    closeNoteModal();
+    renderTableMap();
+    renderOrders();
+}
+
+// ══════════ TABLE MAP ══════════
+function renderTableMap() {
+    const grid = document.getElementById('table-map');
+    if (!grid) return;
+    const pendingTables = new Set();
+    const tableAmounts = {};
+    allOrders.forEach(o => {
+        if (o.status === 'pending') {
+            pendingTables.add(Number(o.table_number));
+            tableAmounts[o.table_number] = (tableAmounts[o.table_number] || 0) + (o.total || 0);
+        }
+    });
+    let html = '';
+    for (let t = 1; t <= TABLE_COUNT; t++) {
+        const isPending = pendingTables.has(t);
+        const hasNote = !!tableNotes[t];
+        const cls = isPending ? 'tmap-pending' : 'tmap-free';
+        const icon = isPending ? '🪑' : '🪑';
+        const statusText = isPending ? 'Belegt' : 'Frei';
+        const statusColor = isPending ? '#e67e22' : '#27ae60';
+        const amountHtml = isPending && tableAmounts[t]
+            ? `<div class="tmap-amount">${tableAmounts[t].toFixed(2)} €</div>` : '';
+        html += `
+        <div class="tmap-cell ${cls}" onclick="openNoteModal(${t})" title="Notiz für Tisch ${t}">
+            ${hasNote ? '<div class="tmap-note-dot" title="Notiz vorhanden"></div>' : ''}
+            <div class="tmap-icon" style="color:${isPending?'#e67e22':'#27ae60'}">${icon}</div>
+            <div class="tmap-num">T${t}</div>
+            <div class="tmap-status" style="color:${statusColor}">${statusText}</div>
+            ${amountHtml}
+        </div>`;
+    }
+    grid.innerHTML = html;
+}
+
+// ══════════ DAILY SUMMARY ══════════
+function renderDailySummary() {
+    const selDate = selectedSummaryDate || new Date();
+    const targetOrders = allOrders.filter(o => {
+        if (!o.created_at) return false;
+        const d = new Date(o.created_at.replace(' ', 'T'));
+        return d.getFullYear() === selDate.getFullYear() &&
+               d.getMonth() === selDate.getMonth() &&
+               d.getDate() === selDate.getDate();
+    });
+
+    const paidToday = targetOrders.filter(o => o.status === 'paid');
+    const totalRevenue = paidToday.reduce((s, o) => s + (o.total || 0), 0);
+    const orderCount = targetOrders.length;
+    const pendingCount = targetOrders.filter(o => o.status === 'pending').length;
+
+    // Unique tables with orders today
+    const uniqueTables = new Set(targetOrders.map(o => o.table_number)).size;
+    const avg = uniqueTables > 0 ? totalRevenue / uniqueTables : 0;
+    // rename locally to fix references below
+    const todayOrders = targetOrders;
+
+    const barRevenue = paidToday.filter(o => o.paymentMethod === 'bar').reduce((s, o) => s + (o.total || 0), 0);
+    const karteRevenue = paidToday.filter(o => o.paymentMethod === 'karte').reduce((s, o) => s + (o.total || 0), 0);
+
+    const fmt = v => v.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+
+    const revEl = document.getElementById('sum-revenue');
+    const ordEl = document.getElementById('sum-orders');
+    const avgEl = document.getElementById('sum-avg');
+    const barEl = document.getElementById('sum-bar');
+    const karEl = document.getElementById('sum-karte');
+    if (revEl) revEl.textContent = fmt(totalRevenue);
+    if (ordEl) ordEl.textContent = `${orderCount}${pendingCount > 0 ? ` (${pendingCount} offen)` : ''}`;
+    if (avgEl) avgEl.textContent = fmt(avg);
+    if (barEl) barEl.textContent = fmt(barRevenue);
+    if (karEl) karEl.textContent = fmt(karteRevenue);
 }
 
 // ══════════ PAYMENT MODAL ══════════
@@ -1225,17 +1325,14 @@ function saveEditedOrder() {
 
 function deleteOrder() {
     if (!editingOrder) return;
-    if (!confirm(`Bestellung für Tisch ${editingOrder.table_number} wirklich löschen?`)) return;
-    fetch(API + "/orders/" + editingOrder.id, { method: "DELETE" })
-    .then(() => { closeEditModal(); loadOrders(); })
-    .catch(() => {
-        // If no DELETE endpoint, mark as paid
-        fetch(API + "/orders/" + editingOrder.id, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: "paid" })
-        }).then(() => { closeEditModal(); loadOrders(); });
-    });
+    // Orders are archived permanently for tax reporting (Finanzamt).
+    // We mark them as "paid" instead of hard-deleting.
+    if (!confirm(`Bestellung für Tisch ${editingOrder.table_number} als bezahlt markieren und archivieren?\n\n(Bestellungen werden für die Steuer dauerhaft gespeichert.)`)) return;
+    fetch(API + "/orders/" + editingOrder.id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "paid" })
+    }).then(() => { closeEditModal(); loadOrders(); });
 }
 
 // ══════════ RECEIPT LOGIC ══════════
@@ -1249,9 +1346,9 @@ function buildReceiptHtml(order, forPrint = false) {
         if (isGetrank(item)) drinkNetto += subtotal;
         else foodNetto += subtotal;
         rows += `<tr>
-            <td style="word-break:break-word;max-width:45mm">${item.name}</td>
-            <td style="text-align:center;white-space:nowrap;padding:0 4px">${item.qty}</td>
-            <td style="text-align:right;white-space:nowrap">${subtotal.toFixed(2)}</td>
+            <td style="word-break:break-word;overflow-wrap:break-word;padding:1px 2px 1px 0">${item.name}</td>
+            <td style="text-align:center;padding:1px 2px">${item.qty}</td>
+            <td style="text-align:right;padding:1px 0 1px 2px">${subtotal.toFixed(2)}</td>
         </tr>`;
     });
 
@@ -1276,36 +1373,36 @@ function buildReceiptHtml(order, forPrint = false) {
     const noteHtml = order.note ? `<tr><td colspan="3" style="font-style:italic;color:#666;font-size:0.85em">Notiz: ${order.note}</td></tr>` : '';
 
     return `
-<div style="font-family:'Courier New',Courier,monospace;font-size:12pt;line-height:1.5;width:72mm;margin:0 auto;padding:0 2mm">
+<div style="font-family:'Courier New',Courier,monospace;font-size:10pt;line-height:1.5;width:68mm;margin:0 auto;padding:2mm">
   ${logoLine}
-  <div style="text-align:center;font-size:10pt">
-    <div>Max-Braun-Str. 4,</div>
-    <div>66538 Neunkirchen</div>
+  <div style="text-align:center;font-size:9pt">
+    <div>Max-Braun-Str. 4, 66538 Neunkirchen</div>
     <div>Tel: 06821 6364421</div>
     <div>${now}</div>
-    <div style="font-size:11pt">Tisch Nr. <b>${order.table_number}</b></div>
+    <div style="font-size:10.5pt;margin-top:3px">Tisch Nr. <b>${order.table_number}</b></div>
   </div>
-  <hr style="border:none;border-top:1px dashed #333;margin:6px 0">
-  <table style="width:100%;border-collapse:collapse;font-size:10pt">
-    <tr><th style="text-align:left">Artikel</th><th style="text-align:center;width:1.5em">x</th><th style="text-align:right;white-space:nowrap">Preis</th></tr>
+  <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
+  <table style="width:100%;border-collapse:collapse;font-size:9pt;table-layout:fixed">
+    <colgroup><col style="width:58%"><col style="width:12%"><col style="width:30%"></colgroup>
+    <tr><th style="text-align:left;padding-bottom:3px">Artikel</th><th style="text-align:center">x</th><th style="text-align:right">Preis</th></tr>
     ${rows}
     ${noteHtml}
   </table>
-  <hr style="border:none;border-top:1px dashed #333;margin:6px 0">
-  <table style="width:100%;border-collapse:collapse;font-size:10pt">
-    <tr><td>Netto</td><td style="text-align:right;white-space:nowrap">${totalNetto.toFixed(2)} EUR</td></tr>
+  <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
+  <table style="width:100%;border-collapse:collapse;font-size:9pt">
+    <tr><td>Netto</td><td style="text-align:right">${totalNetto.toFixed(2)} EUR</td></tr>
     ${mwstRows}
-    <tr style="font-weight:bold;font-size:11pt">
+    <tr style="font-weight:bold;font-size:10.5pt">
         <td style="padding-top:4px;border-top:1px dashed #333">GESAMT</td>
-        <td style="text-align:right;padding-top:4px;border-top:1px dashed #333;white-space:nowrap">${totalBrutto.toFixed(2)} EUR</td>
+        <td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${totalBrutto.toFixed(2)} EUR</td>
     </tr>
   </table>
-  <hr style="border:none;border-top:1px dashed #333;margin:6px 0">
-  <div style="text-align:center;font-size:9pt">
+  <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
+  <div style="text-align:center;font-size:8.5pt">
     <div>Alle Preise inkl. MwSt.</div>
-    <div style="margin-top:6px">Vielen Dank fuer Ihren Besuch!</div>
-    <div style="direction:rtl;margin-top:6px;font-size:10pt">ممنون از بازدید شما</div>
-    <div style="margin-top:38px"></div>
+    <div style="margin-top:5px">Vielen Dank fuer Ihren Besuch!</div>
+    <div style="direction:rtl;margin-top:5px;font-size:9.5pt">ممنون از بازدید شما</div>
+    <div style="margin-top:20px"></div>
   </div>
 </div>`;
 }
@@ -1357,10 +1454,12 @@ function doPrintReceipt() {
         win.document.write(`<html><head><title>Drucken</title>
         <style>
           * { box-sizing: border-box; }
-          body { margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; width: 80mm; }
+          body { margin: 0; padding: 4mm 6mm; font-family: 'Courier New', Courier, monospace; font-size: 11pt; width: 80mm; }
+          table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+          td, th { word-break: break-word; overflow-wrap: break-word; }
           @media print {
-            body { margin: 0; padding: 0; width: 80mm; }
-            @page { margin: 0mm; size: 80mm auto; }
+            body { margin: 0; padding: 4mm 6mm; width: 80mm; font-size: 10pt; }
+            @page { margin: 4mm 6mm; size: 80mm auto; }
           }
         </style>
         </head><body>
@@ -1506,7 +1605,7 @@ let noCart = {}; // {itemId: {item, qty}}
 let noCartVisible = false;
 let noActiveCat = 'vorspeisen';
 
-const NO_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+const NO_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12];
 
 function openNewOrderModal() {
     noSelectedTable = null;
@@ -1721,6 +1820,7 @@ function noShowStep(activeId) {
 
 setInterval(loadOrders, 5000);
 loadOrders();
+initSummaryDatePicker();
 
 // ── PWA Service Worker ──
 if ('serviceWorker' in navigator) {
