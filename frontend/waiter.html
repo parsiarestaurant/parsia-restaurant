@@ -249,15 +249,15 @@
 
         /* NO category tabs scrollable */
         .no-cat-tabs {
-            display: flex; overflow-x: auto; gap: 8px;
+            display: flex; overflow-x: auto; gap: 5px;
             padding: 8px 0; scrollbar-width: none;
         }
         .no-cat-tab {
             flex-shrink: 0;
-            padding: 8px 16px; border-radius: 20px;
+            padding: 4px 8px; border-radius: 20px;
             border: 2px solid rgba(200,151,42,0.4);
             background: transparent; color: #c8972a;
-            font-weight: 700; font-size: 0.85rem; cursor: pointer;
+            font-weight: 700; font-size: 0.72rem; cursor: pointer;
             transition: all 0.15s;
         }
         .no-cat-tab.active { background: #c8972a; color: #1a1008; border-color: #c8972a; }
@@ -620,8 +620,11 @@
         <!-- Step 2: Menu Selection -->
         <div id="no-step-2" class="no-step" style="display:flex;flex-direction:column;overflow:hidden;flex:1">
             <!-- Category tabs -->
-            <div style="background:#2a1a06;padding:8px 12px;flex-shrink:0">
-                <div class="no-cat-tabs" id="no-cat-tabs"></div>
+            <div style="background:#2a1a06;padding:8px 12px;flex-shrink:0;position:relative">
+                <div class="no-cat-tabs" id="no-cat-tabs" onscroll="updateTabsScroll()"></div>
+                <div id="tabs-fade-right" style="position:absolute;top:0;right:0;width:48px;height:100%;background:linear-gradient(to right,transparent,#2a1a06);pointer-events:none;display:flex;align-items:center;justify-content:flex-end;padding-right:6px">
+                    <span style="color:#c8972a;font-size:1.1rem;font-weight:900">›</span>
+                </div>
             </div>
             <!-- Items -->
             <div id="no-menu-panel" style="padding:14px;overflow-y:auto;flex:1;background:#f5f2ee"></div>
@@ -762,7 +765,7 @@ const CATEGORIES = {
     desserts:   "🍮 Desserts",
     getraenke:  "🥤 Getränke",
     heisse:     "☕ Heiße Getränke",
-    alkohol:    "🍺 Alkohol",
+    alkohol:    "Alkohol",
 };
 
 // ── Categories known to be drinks (19% MwSt) ──
@@ -1237,7 +1240,7 @@ const menuData = {
         { id:602, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Espresso.jpg", name:"Espresso", price:2.50, type:'drink' },
         { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", price:2.00, type:'drink' },
     ]},
-    alkohol: { label:'🍺 Alkohol', items:[
+    alkohol: { label:'Alkohol', items:[
         { id:701, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Karlsberg_mit_und_ohne_Alkohol.jpg", name:"Karlsberg", price:3.50, type:'drink' },
         { id:702, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Radler.jpg", name:"Radler", price:3.50, type:'drink' },
         { id:703, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Weizen.jpg", name:"Weizen", price:5.00, type:'drink' },
@@ -1811,6 +1814,14 @@ function noNewOrder() {
     noSelectedTable = null;
     noCartVisible = false;
     noGoToStep1();
+}
+
+function updateTabsScroll() {
+    const tabs = document.getElementById('no-cat-tabs');
+    const fade = document.getElementById('tabs-fade-right');
+    if (!tabs || !fade) return;
+    const atEnd = tabs.scrollLeft + tabs.clientWidth >= tabs.scrollWidth - 4;
+    fade.style.display = atEnd ? 'none' : 'flex';
 }
 
 function noShowStep(activeId) {
