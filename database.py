@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, Index
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 # ----------------------
@@ -21,7 +21,11 @@ class Order(Base):
     items        = Column(String)          # JSON string
     status       = Column(String)          # pending / ready / paid
     total        = Column(Float, default=0.0)
-    created_at   = Column(String)
+    created_at   = Column(String, index=True)   # ایندکس برای فیلتر سریع تاریخ
+
+    # ── Soft-delete: سفارش‌ها هیچ‌گاه حذف نمی‌شوند (برای گزارش مالیاتی) ──
+    archived     = Column(Boolean, default=False)  # True = بایگانی‌شده (نه حذف‌شده)
+    archived_at  = Column(String, nullable=True)   # زمان بایگانی
 
 # ----------------------
 # MENU ITEM TABLE MODEL
@@ -42,3 +46,24 @@ class MenuItem(Base):
 # CREATE TABLES
 # ----------------------
 Base.metadata.create_all(bind=engine)
+
+# ── Migration: اگر ستون‌های جدید در دیتابیس قدیمی وجود ندارند، اضافه کن ──
+def run_migrations():
+    import sqlite3
+    conn = sqlite3.connect("restaurant.db")
+    cur = conn.cursor()
+    cur.execute("PRAGMA table_info(orders)")
+    existing_cols = {row[1] for row in cur.fetchall()}
+
+    if "archived" not in existing_cols:
+        cur.execute("ALTER TABLE orders ADD COLUMN archived BOOLEAN DEFAULT 0")
+        print("✅ Migration: 'archived' column added")
+
+    if "archived_at" not in existing_cols:
+        cur.execute("ALTER TABLE orders ADD COLUMN archived_at TEXT")
+        print("✅ Migration: 'archived_at' column added")
+
+    conn.commit()
+    conn.close()
+
+run_migrations()
