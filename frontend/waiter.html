@@ -1773,40 +1773,33 @@ function noSubmitOrder() {
     const total = items.reduce((s, i) => s + i.price * i.qty, 0);
     const btn = document.getElementById('no-confirm-btn');
     btn.disabled = true;
+    btn.textContent = '⏳ Wird gesendet...';
 
-    function doPost(attempt) {
-        btn.textContent = attempt === 1 ? '⏳ Wird gesendet...' : '⏳ Server aufwecken... (kann 30s dauern)';
-        fetch(API + "/orders", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ table: noSelectedTable, items, total, status: "pending" })
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.json();
-        })
-        .then(() => {
-            noShowStep('no-step-3');
-            document.getElementById('no-header-title').textContent = '✅ Bestellt!';
-            document.getElementById('no-success-msg').textContent = `Tisch ${noSelectedTable} – Bestellung aufgegeben!`;
-            document.getElementById('no-success-sub').textContent =
-                `${items.length} Artikel · ${total.toFixed(2)} €`;
-            loadOrders();
-        })
-        .catch(err => {
-            if (attempt < 3) {
-                // Retry after 5 seconds (server may be waking up)
-                setTimeout(() => doPost(attempt + 1), 5000);
-            } else {
-                btn.disabled = false;
-                btn.textContent = '✅ Bestellung absenden';
-                console.error('Order error:', err);
-                alert('Verbindung zum Server fehlgeschlagen.\n\nBitte kurz warten und nochmal versuchen – der Server benötigt manchmal ~30 Sekunden zum Starten.');
-            }
-        });
-    }
-
-    doPost(1);
+    // ⚠️ Kein Retry — ein POST = eine Bestellung
+    // Bei langsamem Server (Render cold start) einfach warten
+    fetch(API + "/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ table: noSelectedTable, items, total, status: "pending" })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
+    .then(() => {
+        noShowStep('no-step-3');
+        document.getElementById('no-header-title').textContent = '✅ Bestellt!';
+        document.getElementById('no-success-msg').textContent = `Tisch ${noSelectedTable} – Bestellung aufgegeben!`;
+        document.getElementById('no-success-sub').textContent =
+            `${items.length} Artikel · ${total.toFixed(2)} €`;
+        loadOrders();
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.textContent = '✅ Bestellung absenden';
+        console.error('Order error:', err);
+        alert('Verbindung zum Server fehlgeschlagen.\n\nBitte kurz warten und nochmal versuchen.\n(Der Server benötigt manchmal ~30 Sekunden zum Starten.)');
+    });
 }
 
 function noNewOrder() {
