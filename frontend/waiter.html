@@ -762,6 +762,7 @@ const CATEGORIES = {
     desserts:   "🍮 Desserts",
     getraenke:  "🥤 Getränke",
     heisse:     "☕ Heiße Getränke",
+    alkohol:    "🍺 Alkohol",
 };
 
 // ── Categories known to be drinks (19% MwSt) ──
@@ -774,7 +775,7 @@ function isGetrank(item) {
     if (item.itemType === 'drink') return true;
     if (item.itemType === 'food') return false;
     // Heuristic: common drink names
-    const drinkKeywords = ['cola','fanta','wasser','saft','bier','tee','kaffee','espresso','latte','juice','ayran','doogh','limonade','cappuccino','mokka','chai','mineralwasser','apfelschorle','orangensaft'];
+    const drinkKeywords = ['cola','fanta','wasser','saft','bier','tee','kaffee','espresso','latte','juice','ayran','doogh','limonade','cappuccino','mokka','chai','mineralwasser','apfelschorle','orangensaft','karlsberg','radler','weizen','wein','sekt','aragh','schnaps'];
     const name = (item.name || '').toLowerCase();
     return drinkKeywords.some(k => name.includes(k));
 }
@@ -1235,6 +1236,13 @@ const menuData = {
         { id:601, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Kaffee.jpg", name:"Kaffee", price:2.50, type:'drink' },
         { id:602, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Espresso.jpg", name:"Espresso", price:2.50, type:'drink' },
         { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", price:2.00, type:'drink' },
+    ]},
+    alkohol: { label:'🍺 Alkohol', items:[
+        { id:701, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Karlsberg_mit_und_ohne_Alkohol.jpg", name:"Karlsberg", price:3.50, type:'drink' },
+        { id:702, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Radler.jpg", name:"Radler", price:3.50, type:'drink' },
+        { id:703, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Weizen.jpg", name:"Weizen", price:5.00, type:'drink' },
+        { id:704, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Wein.jpg", name:"Wein / Sekt", price:0.00, type:'drink' },
+        { id:705, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Aragh_Sagi.jpg", name:"Aragh Sagi 0.2L", price:5.00, type:'drink' },
     ]},
 };
 
