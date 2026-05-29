@@ -992,6 +992,12 @@
             <span class="tab-fa">نوشیدنی گرم</span>
         </span>
     </div>
+    <div class="tab" onclick="showSection('alkohol',this)">
+        <span class="tab-inner">
+            <span class="tab-de">Alkohol</span>
+            <span class="tab-fa">نوشیدنی الکلی</span>
+        </span>
+    </div>
 </div>
 
 <div class="menu-container">
@@ -1032,6 +1038,12 @@
         <div class="section-subtitle"><span class="sub-ornament">✦</span> نوشیدنی‌های گرم <span class="sub-ornament">✦</span></div>
         <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
         <div class="menu-grid" id="grid-heisse"></div>
+    </div>
+    <div class="section" id="alkohol">
+        <div class="section-title">Alkoholische Getränke</div>
+        <div class="section-subtitle"><span class="sub-ornament">✦</span> نوشیدنی‌های الکلی <span class="sub-ornament">✦</span></div>
+        <div class="section-divider"><div class="line"></div><div class="sym">◆</div><div class="line"></div></div>
+        <div class="menu-grid" id="grid-alkohol"></div>
     </div>
 </div>
 
@@ -1109,6 +1121,13 @@ const menuData = {
         { id:601, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Kaffee.jpg", name:"Kaffee", farsi:"قهوه", desc:"Frisch gebrühter Kaffee · قهوه تازه‌دم", price:2.50 },
         { id:602, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Espresso.jpg", name:"Espresso", farsi:"اسپرسو", desc:"Klassischer Espresso · اسپرسوی کلاسیک", price:2.50 },
         { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeißeGetränke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", farsi:"چای", desc:"Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", price:2.00 },
+    ],
+    alkohol: [
+        { id:701, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Karlsberg_mit_und_ohne_Alkohol.jpg", name:"Karlsberg", farsi:"کارلزبرگ", desc:"Mit und ohne Alkohol · با الکل و بدون الکل", price:3.50 },
+        { id:702, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Radler.jpg", name:"Radler", farsi:"رادلر", desc:"Bier-Limonadenmischung · مخلوط آبجو و لیموناد", price:3.50 },
+        { id:703, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Weizen.jpg", name:"Weizen", farsi:"آبجو ویتسن", desc:"Hell / Dunkel / Alkoholfrei · روشن / تیره / بدون الکل", price:5.00 },
+        { id:704, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Wein.jpg", name:"Wein / Sekt", farsi:"شراب / شامپاین", desc:"Bitte die Weinkarte anfordern · لطفاً منوی شراب را درخواست کنید", price:0 },
+        { id:705, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Aragh_Sagi.jpg", name:"Aragh Sagi 0.2L", farsi:"عرق سگی", desc:"Starker iranischer Rosinenschnaps · عرق کشمش قوی ایرانی", price:5.00 },
     ]
 };
 
@@ -1155,7 +1174,7 @@ function renderMenus() {
                            <div class="card-img-placeholder" style="display:none">${icon}</div>`
                         : `<div class="card-img-placeholder" style="display:flex">${icon}</div>`
                     }
-                    <div class="card-price-badge">${item.price.toFixed(2)} €</div>
+                    <div class="card-price-badge">${item.price > 0 ? item.price.toFixed(2) + ' €' : 'Auf Anfrage'}</div>
                     <div class="card-add-badge" id="badge-${item.id}">+</div>
                 </div>
                 <div class="card-body">
