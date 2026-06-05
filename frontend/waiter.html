@@ -1511,11 +1511,11 @@ function buildReceiptHtml(order, forPrint = false) {
   <table style="width:100%;border-collapse:collapse;font-size:9pt">
     <tr><td>Netto</td><td style="text-align:right">${totalNetto.toFixed(2)} EUR</td></tr>
     ${mwstRows}
-    <tr><td style="padding-top:4px;border-top:1px dashed #333">Zwischensumme</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${totalBrutto.toFixed(2)} EUR</td></tr>
-    ${(order.trinkgeld > 0) ? `<tr><td>🪙 Trinkgeld</td><td style="text-align:right;font-weight:bold">${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
+    <tr><td style="padding-top:4px;border-top:1px dashed #333">${(order.trinkgeld > 0) ? 'Zwischensumme' : 'Gesamt (Speisen)'}</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${totalBrutto.toFixed(2)} EUR</td></tr>
+    ${(order.trinkgeld > 0) ? `<tr><td style="font-style:italic">inkl. Trinkgeld (انعام)</td><td style="text-align:right;font-weight:bold">+ ${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
     <tr style="font-weight:bold;font-size:10.5pt">
-        <td style="padding-top:4px;border-top:1px dashed #333">GESAMTBETRAG</td>
-        <td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${(order.total || totalBrutto).toFixed(2)} EUR</td>
+        <td style="padding-top:4px;border-top:2px solid #333">GESAMTBETRAG</td>
+        <td style="text-align:right;padding-top:4px;border-top:2px solid #333">${(order.total || totalBrutto).toFixed(2)} EUR</td>
     </tr>
   </table>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
