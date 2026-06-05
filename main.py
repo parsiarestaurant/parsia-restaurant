@@ -251,13 +251,23 @@ def update_order(order_id: int, data: dict, db: Session = Depends(get_db)):
         order.items = json.dumps(data["items"], ensure_ascii=False)
     if "total" in data:
         order.total = round(data["total"], 2)
-    if "paymentMethod" in data:
+    if "paymentMethod" in data or "trinkgeld" in data:
         try:
             items = json.loads(order.items)
         except:
             items = []
         items_clean = [i for i in items if not i.get("_meta")]
-        items_clean.append({"_meta": True, "paymentMethod": data["paymentMethod"]})
+        meta = next((i for i in items if i.get("_meta")), {})
+        new_meta = {"_meta": True}
+        if "paymentMethod" in data:
+            new_meta["paymentMethod"] = data["paymentMethod"]
+        elif meta.get("paymentMethod"):
+            new_meta["paymentMethod"] = meta["paymentMethod"]
+        if "trinkgeld" in data:
+            new_meta["trinkgeld"] = round(float(data["trinkgeld"]), 2)
+        elif meta.get("trinkgeld"):
+            new_meta["trinkgeld"] = meta["trinkgeld"]
+        items_clean.append(new_meta)
         order.items = json.dumps(items_clean, ensure_ascii=False)
     db.commit()
     db.refresh(order)
@@ -317,6 +327,7 @@ def parse_order(order):
         "total":         order.total,
         "created_at":    order.created_at,
         "paymentMethod": meta.get("paymentMethod", None),
+        "trinkgeld":     meta.get("trinkgeld", 0),
         "archived":      order.archived or False,
         "archived_at":   order.archived_at,
     }

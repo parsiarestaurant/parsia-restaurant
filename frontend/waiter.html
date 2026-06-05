@@ -372,6 +372,42 @@
             cursor: pointer; transition: all 0.15s; margin-top: 4px;
         }
         .note-chip-inline:hover { background: #d0e8ff; }
+
+        /* ── Trinkgeld ── */
+        .trinkgeld-section {
+            background: #fffbf2;
+            border: 1.5px solid rgba(200,151,42,0.3);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+        .trinkgeld-title {
+            font-weight: 800; font-size: 0.88rem;
+            color: #1a1008; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .trinkgeld-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tg-btn {
+            padding: 8px 14px; border-radius: 8px;
+            border: 2px solid #dee2e6; background: #fff;
+            font-weight: 700; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.15s; color: #555;
+        }
+        .tg-btn:hover { border-color: var(--gold); color: #1a1008; }
+        .tg-btn.tg-active { border-color: var(--gold); background: var(--gold); color: #1a1008; }
+        .tg-custom-wrap { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+        .tg-custom-input {
+            border: 2px solid #dee2e6; border-radius: 8px;
+            padding: 7px 10px; font-size: 0.95rem; font-weight: 700;
+            width: 120px; color: #1a1008; transition: border-color 0.15s;
+        }
+        .tg-custom-input:focus { outline: none; border-color: var(--gold); }
+        .tg-summary {
+            margin-top: 10px; padding-top: 10px;
+            border-top: 1px dashed rgba(200,151,42,0.3);
+            font-size: 0.82rem; color: #666; line-height: 1.8;
+        }
+        .tg-total { font-size: 1.1rem; font-weight: 900; color: #1a1008; }
     </style>
 </head>
 <body>
@@ -511,9 +547,35 @@
 
 <!-- ══════════ PAYMENT MODAL ══════════ -->
 <div class="modal-overlay" id="payment-modal">
-    <div class="modal-box" style="max-width:400px">
+    <div class="modal-box" style="max-width:420px">
         <h5 class="mb-1">💳 Zahlungsart wählen</h5>
         <p class="text-muted mb-3" id="payment-table-label" style="font-size:0.9rem"></p>
+
+        <!-- Trinkgeld -->
+        <div class="trinkgeld-section">
+            <div class="trinkgeld-title">🪙 Trinkgeld hinzufügen <span style="font-weight:400;color:#888;font-size:0.78rem">(انعام)</span></div>
+            <div class="trinkgeld-options">
+                <button class="tg-btn tg-active" onclick="setTrinkgeld(0,this)">Kein</button>
+                <button class="tg-btn" onclick="setTrinkgeld(1,this)">1 €</button>
+                <button class="tg-btn" onclick="setTrinkgeld(2,this)">2 €</button>
+                <button class="tg-btn" onclick="setTrinkgeld(3,this)">3 €</button>
+                <button class="tg-btn" onclick="setTrinkgeld(5,this)">5 €</button>
+            </div>
+            <div class="tg-custom-wrap">
+                <span style="font-size:0.82rem;color:#888;font-weight:600">Freier Betrag:</span>
+                <input class="tg-custom-input" type="number" id="tg-custom-input"
+                    min="0" step="0.50" placeholder="0.00"
+                    oninput="setTrinkgeldCustom(this.value)">
+                <span style="font-weight:700;color:#888">€</span>
+            </div>
+            <div class="tg-summary" id="tg-summary" style="display:none">
+                <div>Zwischensumme: <span id="tg-subtotal">0,00 €</span></div>
+                <div>Trinkgeld: <span id="tg-tip-display" style="color:#c8972a;font-weight:700">0,00 €</span></div>
+                <div class="tg-total">Gesamtbetrag: <span id="tg-grand-total">0,00 €</span></div>
+            </div>
+        </div>
+
+        <!-- Zahlungsart -->
         <div class="d-flex flex-column gap-3 mb-4">
             <button class="pay-btn" id="btn-bar" onclick="selectPayment('bar')">
                 <span class="pay-icon">💵</span>
@@ -1113,21 +1175,58 @@ function renderDailySummary() {
 }
 
 // ══════════ PAYMENT MODAL ══════════
+let trinkgeldAmount = 0;
+let paymentOrderTotal = 0;
+
 function openPaymentModal(id) {
     paymentOrderId = id;
     selectedPaymentMethod = null;
+    trinkgeldAmount = 0;
     document.getElementById('confirm-pay-btn').disabled = true;
     document.getElementById('btn-bar').classList.remove('selected');
     document.getElementById('btn-karte').classList.remove('selected');
     const order = allOrders.find(o => o.id === id);
+    paymentOrderTotal = order ? (order.total || 0) : 0;
     document.getElementById('payment-table-label').textContent =
-        order ? `Tisch ${order.table_number} · EUR ${order.total ? order.total.toFixed(2) : '-'}` : '';
+        order ? `Tisch ${order.table_number} · ${paymentOrderTotal.toFixed(2)} €` : '';
+    // Reset Trinkgeld
+    document.querySelectorAll('.tg-btn').forEach(b => b.classList.remove('tg-active'));
+    document.querySelector('.tg-btn').classList.add('tg-active'); // "Kein"
+    document.getElementById('tg-custom-input').value = '';
+    document.getElementById('tg-summary').style.display = 'none';
     document.getElementById('payment-modal').classList.add('open');
 }
 
 function closePaymentModal() {
     document.getElementById('payment-modal').classList.remove('open');
     paymentOrderId = null;
+}
+
+function setTrinkgeld(amount, btn) {
+    trinkgeldAmount = parseFloat(amount) || 0;
+    document.getElementById('tg-custom-input').value = amount > 0 ? amount : '';
+    document.querySelectorAll('.tg-btn').forEach(b => b.classList.remove('tg-active'));
+    if (btn) btn.classList.add('tg-active');
+    updateTrinkgeldSummary();
+}
+
+function setTrinkgeldCustom(val) {
+    trinkgeldAmount = parseFloat(val) || 0;
+    document.querySelectorAll('.tg-btn').forEach(b => b.classList.remove('tg-active'));
+    updateTrinkgeldSummary();
+}
+
+function updateTrinkgeldSummary() {
+    const summary = document.getElementById('tg-summary');
+    const fmt = v => v.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+    if (trinkgeldAmount > 0) {
+        summary.style.display = 'block';
+        document.getElementById('tg-subtotal').textContent = fmt(paymentOrderTotal);
+        document.getElementById('tg-tip-display').textContent = fmt(trinkgeldAmount);
+        document.getElementById('tg-grand-total').textContent = fmt(paymentOrderTotal + trinkgeldAmount);
+    } else {
+        summary.style.display = 'none';
+    }
 }
 
 function selectPayment(method) {
@@ -1139,10 +1238,19 @@ function selectPayment(method) {
 
 function confirmPayment() {
     if (!paymentOrderId || !selectedPaymentMethod) return;
+    const finalTotal = paymentOrderTotal + trinkgeldAmount;
+    const tip = parseFloat(trinkgeldAmount.toFixed(2));
+    // paymentMethod is stored in items _meta by backend
+    // trinkgeld: we add it to total and also pass as separate field
     fetch(API + "/orders/" + paymentOrderId, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "paid", paymentMethod: selectedPaymentMethod })
+        body: JSON.stringify({
+            status: "paid",
+            paymentMethod: selectedPaymentMethod,
+            total: parseFloat(finalTotal.toFixed(2)),
+            trinkgeld: tip
+        })
     }).then(() => {
         closePaymentModal();
         loadOrders();
@@ -1403,9 +1511,11 @@ function buildReceiptHtml(order, forPrint = false) {
   <table style="width:100%;border-collapse:collapse;font-size:9pt">
     <tr><td>Netto</td><td style="text-align:right">${totalNetto.toFixed(2)} EUR</td></tr>
     ${mwstRows}
+    <tr><td style="padding-top:4px;border-top:1px dashed #333">Zwischensumme</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${totalBrutto.toFixed(2)} EUR</td></tr>
+    ${(order.trinkgeld > 0) ? `<tr><td>🪙 Trinkgeld</td><td style="text-align:right;font-weight:bold">${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
     <tr style="font-weight:bold;font-size:10.5pt">
-        <td style="padding-top:4px;border-top:1px dashed #333">GESAMT</td>
-        <td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${totalBrutto.toFixed(2)} EUR</td>
+        <td style="padding-top:4px;border-top:1px dashed #333">GESAMTBETRAG</td>
+        <td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${(order.total || totalBrutto).toFixed(2)} EUR</td>
     </tr>
   </table>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
