@@ -518,14 +518,17 @@
         /* برای نوشابه‌ها که عکس بطری دارند */
         .card-img.contain {
             object-fit: contain;
-            padding: 4px;
-            background: var(--card-bg);
+            padding: 12px;
+            background: transparent;
+            filter: brightness(0.95) saturate(1.05);
         }
         .menu-card:hover .card-img.contain {
             transform: scale(1.04);
+            filter: brightness(1.0) saturate(1.1);
         }
         .card-img-wrap.tall {
-            height: 380px;
+            height: 280px;
+            background: #1e1408;
         }
 
         /* Gold gradient overlay on image bottom */
