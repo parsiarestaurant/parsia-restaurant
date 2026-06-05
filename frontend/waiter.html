@@ -1479,7 +1479,7 @@ function buildReceiptHtml(order, forPrint = false) {
     const totalMwst = foodMwst + drinkMwst;
     const totalNetto = totalBrutto - totalMwst;
 
-    const logoLine = `<div style="text-align:center;font-size:1.1rem;font-weight:bold;letter-spacing:3px;margin-bottom:4px;white-space:nowrap">✦ PARSIA RESTAURANT ✦</div>`;
+    const logoLine = `<div style="text-align:center;font-size:1.1rem;font-weight:bold;letter-spacing:3px;margin-bottom:4px;white-space:nowrap;width:100%;display:block">✦ PARSIA RESTAURANT ✦</div>`;
 
     let mwstRows = '';
     if (foodNetto > 0) {
@@ -1495,8 +1495,7 @@ function buildReceiptHtml(order, forPrint = false) {
 <div style="font-family:'Courier New',Courier,monospace;font-size:10pt;line-height:1.5;width:68mm;margin:0 auto;padding:2mm">
   ${logoLine}
   <div style="text-align:center;font-size:9pt">
-    <div>Max-Braun-Str. 4, 66538 Neunkirchen</div>
-    <div>Tel: 06821 6364421</div>
+    <div>Max-Braun-Str. 4, 66538 Neunkirchen · Tel: 06821 6364421</div>
     <div>${now}</div>
     <div style="font-size:10.5pt;margin-top:3px">Tisch Nr. <b>${order.table_number}</b></div>
   </div>
@@ -1508,14 +1507,15 @@ function buildReceiptHtml(order, forPrint = false) {
     ${noteHtml}
   </table>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
-  <table style="width:100%;border-collapse:collapse;font-size:9pt">
-    <tr><td>Netto</td><td style="text-align:right">${totalNetto.toFixed(2)} EUR</td></tr>
+  <table style="width:100%;border-collapse:collapse;font-size:9pt;table-layout:fixed">
+    <colgroup><col style="width:55%"><col style="width:45%"></colgroup>
+    <tr><td>Netto</td><td style="text-align:right;white-space:nowrap">${totalNetto.toFixed(2)} EUR</td></tr>
     ${mwstRows}
-    <tr><td style="padding-top:4px;border-top:1px dashed #333">${(order.trinkgeld > 0) ? 'Zwischensumme' : 'Gesamt (Speisen)'}</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333">${totalBrutto.toFixed(2)} EUR</td></tr>
-    ${(order.trinkgeld > 0) ? `<tr><td style="font-style:italic">inkl. Trinkgeld (انعام)</td><td style="text-align:right;font-weight:bold">+ ${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
+    <tr><td style="padding-top:4px;border-top:1px dashed #333">${(order.trinkgeld > 0) ? 'Zwischensumme' : 'Gesamt'}</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333;white-space:nowrap">${totalBrutto.toFixed(2)} EUR</td></tr>
+    ${(order.trinkgeld > 0) ? `<tr><td style="font-style:italic">inkl. Trinkgeld</td><td style="text-align:right;font-weight:bold;white-space:nowrap">+ ${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
     <tr style="font-weight:bold;font-size:10.5pt">
         <td style="padding-top:4px;border-top:2px solid #333">GESAMTBETRAG</td>
-        <td style="text-align:right;padding-top:4px;border-top:2px solid #333">${(order.total || totalBrutto).toFixed(2)} EUR</td>
+        <td style="text-align:right;padding-top:4px;border-top:2px solid #333;white-space:nowrap">${(order.total || totalBrutto).toFixed(2)} EUR</td>
     </tr>
   </table>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
