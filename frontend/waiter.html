@@ -689,7 +689,7 @@
                 </div>
             </div>
             <!-- Items -->
-            <div id="no-menu-panel" style="padding:14px;overflow-y:auto;flex:1;background:#f5f2ee"></div>
+            <div id="no-menu-panel" style="padding:14px;overflow-y:auto;flex:1;min-height:0;background:#f5f2ee"></div>
             <!-- Cart bar -->
             <div style="padding:12px 16px;background:#fff;border-top:1px solid #eee;flex-shrink:0">
                 <div class="no-cart-bar mb-2" onclick="noToggleCart()">
@@ -724,6 +724,35 @@
     </div>
 </div>
 
+<!-- ══════════ WEIN MODAL (in New Order) ══════════ -->
+<div class="modal-overlay" id="wein-no-modal" style="z-index:1300">
+    <div class="modal-box" style="max-width:480px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:90vh">
+        <div style="background:#1a1008;color:#e8b84b;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span style="font-weight:bold;font-size:1.05rem">🍷 Wein & Sekt</span>
+            <button class="btn btn-sm btn-outline-warning" onclick="closeWeinNoModal()">✕</button>
+        </div>
+        <!-- Step 1: Glas or Flasche -->
+        <div id="wein-no-choice" style="padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <div style="font-size:0.95rem;color:#666;text-align:center">Wie möchten Sie bestellen?</div>
+            <div style="display:flex;gap:12px;width:100%;max-width:340px">
+                <button onclick="selectWeinNoMode('glas')" style="flex:1;padding:18px 10px;border:2px solid #dee2e6;border-radius:10px;background:#fff;cursor:pointer;font-weight:700;font-size:0.9rem;transition:all 0.2s" onmouseover="this.style.borderColor='#c8972a'" onmouseout="this.style.borderColor='#dee2e6'">
+                    🥂<br>Ein Glas<br><small style="color:#888;font-weight:400">Gl. 0,2 l · 6,50 €</small>
+                </button>
+                <button onclick="selectWeinNoMode('flasche')" style="flex:1;padding:18px 10px;border:2px solid #dee2e6;border-radius:10px;background:#fff;cursor:pointer;font-weight:700;font-size:0.9rem;transition:all 0.2s" onmouseover="this.style.borderColor='#c8972a'" onmouseout="this.style.borderColor='#dee2e6'">
+                    🍾<br>Eine Flasche<br><small style="color:#888;font-weight:400">Fl. 0,75 l</small>
+                </button>
+            </div>
+        </div>
+        <!-- Step 2: Wine list -->
+        <div id="wein-no-list" style="display:none;flex-direction:column;overflow:hidden;flex:1">
+            <div style="padding:10px 16px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;background:#fffbf2;flex-shrink:0">
+                <button onclick="backWeinNoChoice()" style="background:none;border:1.5px solid #ccc;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem">←</button>
+                <span id="wein-no-mode-label" style="font-weight:700;color:#1a1008;font-size:0.9rem"></span>
+            </div>
+            <div id="wein-no-items" style="overflow-y:auto;padding:8px 12px 16px"></div>
+        </div>
+    </div>
+</div>
 <script>
 const API = "https://parsia-restaurant.onrender.com";
 
@@ -1820,6 +1849,89 @@ function noGoToStep2() {
     noUpdateCartUI();
 }
 
+
+// ══════════ WEIN / SEKT MODAL (New Order) ══════════
+const weinDataNO = {
+    prickeln: { label: 'Prickeln / Sekt', items: [
+        { id:'w01', name:'Prosecco DOC Extra Dry Le Contesse', region:'Venetien', flPrice:29.00 },
+        { id:'w02', name:'Prosecco Rosé Brut Le Contesse',    region:'Venetien', flPrice:29.00 },
+    ]},
+    rot: { label: 'Rotweine', items: [
+        { id:'w03', name:'Merlot (Languedoc) Laurent Miquel',       region:'Frankreich', flPrice:26.00 },
+        { id:'w04', name:'Nemm Rosso Veneto IGT Fratelli Giuliari', region:'Venetien',   flPrice:26.00 },
+    ]},
+    rose: { label: 'Roséweine', items: [
+        { id:'w05', name:'DIANTHA Rosé Carlo Pellegrino', region:'Sizilien',  flPrice:26.00 },
+        { id:'w06', name:'Lumare IGT Tenuta Luzzolini',   region:'Kalabrien', flPrice:28.50 },
+    ]},
+    weiss: { label: 'Weißweine', items: [
+        { id:'w07', name:'Grauburgunder Ellermann & Spiegel', region:'Pfalz',    flPrice:26.00 },
+        { id:'w08', name:'DIANTHA IGP Carlo Pellegrino',      region:'Sizilien', flPrice:26.00 },
+        { id:'w09', name:'I Trubi Syrah Cantina Cusumano',    region:'Sizilien', flPrice:29.00 },
+    ]},
+};
+const WEIN_NO_GLAS_PRICE = 6.50;
+const WEIN_NO_GLAS_CATS  = ['rot','rose','weiss'];
+let weinNoMode = null;
+
+function openWeinNoModal() {
+    document.getElementById('wein-no-modal').classList.add('open');
+    document.getElementById('wein-no-choice').style.display = 'flex';
+    document.getElementById('wein-no-list').style.display   = 'none';
+}
+function closeWeinNoModal() {
+    document.getElementById('wein-no-modal').classList.remove('open');
+}
+function backWeinNoChoice() {
+    document.getElementById('wein-no-choice').style.display = 'flex';
+    document.getElementById('wein-no-list').style.display   = 'none';
+}
+function selectWeinNoMode(mode) {
+    weinNoMode = mode;
+    document.getElementById('wein-no-choice').style.display = 'none';
+    const listDiv = document.getElementById('wein-no-list');
+    listDiv.style.display = 'flex';
+    document.getElementById('wein-no-mode-label').textContent =
+        mode === 'glas' ? '🥂 Ein Glas · 6,50 €' : '🍾 Eine Flasche';
+
+    const cats = mode === 'glas'
+        ? Object.entries(weinDataNO).filter(([k]) => WEIN_NO_GLAS_CATS.includes(k))
+        : Object.entries(weinDataNO);
+
+    document.getElementById('wein-no-items').innerHTML = cats.map(([, cat]) => `
+        <div style="font-size:0.72rem;font-weight:800;color:#c8972a;letter-spacing:2px;text-transform:uppercase;padding:12px 4px 4px;border-bottom:1px solid #eee;margin-bottom:2px">${cat.label}</div>
+        ${cat.items.map(w => {
+            const price = mode === 'glas' ? WEIN_NO_GLAS_PRICE : w.flPrice;
+            const label = mode === 'glas' ? `Gl. 0,2 l · ${price.toFixed(2)} €` : `Fl. 0,75 l · ${price.toFixed(2)} €`;
+            const cartName = `${w.name} (${mode === 'glas' ? 'Glas' : 'Flasche'})`;
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid #f5f5f5;gap:8px">
+                <div>
+                    <div style="font-weight:600;font-size:0.88rem">${w.name}</div>
+                    <div style="font-size:0.75rem;color:#999">${w.region}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                    <div style="font-size:0.82rem;color:#c8972a;font-weight:700;white-space:nowrap">${label}</div>
+                    <button onclick="addWeinToNoOrder('${w.id}','${cartName.replace(/'/g,"\'")}',${price},this)"
+                        style="background:#1a1008;color:#e8b84b;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:0.82rem;font-weight:700;white-space:nowrap">
+                        ➕
+                    </button>
+                </div>
+            </div>`;
+        }).join('')}
+    `).join('');
+}
+function addWeinToNoOrder(id, name, price, btn) {
+    const cartId = 'wein-' + id + '-' + weinNoMode;
+    if (noCart[cartId]) {
+        noCart[cartId].qty += 1;
+    } else {
+        noCart[cartId] = { item: { id: cartId, name, price, type:'drink' }, qty: 1 };
+    }
+    if (btn) { btn.textContent = '✓'; setTimeout(() => btn.textContent = '➕', 800); }
+    noUpdateCartUI();
+    closeWeinNoModal();
+}
+
 function noShowCat(key) {
     noActiveCat = key;
     // Update tab styles
@@ -1833,13 +1945,13 @@ function noShowCat(key) {
         cat.items.map(item => {
             const qty = noCart[item.id] ? noCart[item.id].qty : 0;
             return `
-            <div class="no-item-card" id="nocard-${item.id}" onclick="noAddItem(${item.id})">
+            <div class="no-item-card" id="nocard-${item.id}" onclick="${item.id===706 ? 'openWeinNoModal()' : 'noAddItem('+item.id+')'}">
                 ${qty > 0 ? `<div class="no-item-badge">${qty}</div>` : ''}
                 <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'">
                 <div class="no-card-body">
                     <div class="no-card-name">${item.name}</div>
                     <div class="no-card-price">${item.price.toFixed(2)} €</div>
-                    <button class="no-card-add" onclick="event.stopPropagation();noAddItem(${item.id})">➕ Hinzufügen</button>
+                    <button class="no-card-add" onclick="event.stopPropagation();${item.id===706 ? 'openWeinNoModal()' : 'noAddItem('+item.id+')'}">➕ Hinzufügen</button>
                 </div>
             </div>`;
         }).join('') +
