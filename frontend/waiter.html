@@ -1492,34 +1492,41 @@ function buildReceiptHtml(order, forPrint = false) {
     const noteHtml = order.note ? `<tr><td colspan="3" style="font-style:italic;color:#666;font-size:0.85em">Notiz: ${order.note}</td></tr>` : '';
 
     return `
-<div style="font-family:'Courier New',Courier,monospace;font-size:10pt;line-height:1.5;width:68mm;margin:0 auto;padding:2mm">
-  ${logoLine}
-  <div style="text-align:center;font-size:9pt">
-    <div>Max-Braun-Str. 4, 66538 Neunkirchen · Tel: 06821 6364421</div>
-    <div>${now}</div>
-    <div style="font-size:10.5pt;margin-top:3px">Tisch Nr. <b>${order.table_number}</b></div>
+<div style="font-family:'Courier New',Courier,monospace;font-size:10pt;line-height:1.5;width:100%">
+  <div class="receipt-header" style="text-align:center">
+    ${logoLine}
+    <div style="font-size:9pt">
+      <div>Max-Braun-Str. 4,</div>
+      <div>66538 Neunkirchen</div>
+      <div>Tel: 06821 6364421</div>
+      <div>${now}</div>
+      <div style="font-size:10.5pt;margin-top:3px">Tisch Nr. <b>${order.table_number}</b></div>
+    </div>
   </div>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
-  <table style="width:100%;border-collapse:collapse;font-size:9pt;table-layout:fixed">
-    <colgroup><col style="width:58%"><col style="width:12%"><col style="width:30%"></colgroup>
-    <tr><th style="text-align:left;padding-bottom:3px">Artikel</th><th style="text-align:center">x</th><th style="text-align:right">Preis</th></tr>
+  <table class="items-table" style="width:100%;border-collapse:collapse;font-size:9pt;table-layout:fixed">
+    <colgroup><col class="c-name" style="width:58%"><col class="c-qty" style="width:12%"><col class="c-price" style="width:30%"></colgroup>
+    <tr>
+      <th class="c-name" style="text-align:left;padding-bottom:3px">Artikel</th>
+      <th class="c-qty" style="text-align:center">x</th>
+      <th class="c-price" style="text-align:right">Preis</th>
+    </tr>
     ${rows}
     ${noteHtml}
   </table>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
-  <table style="width:100%;border-collapse:collapse;font-size:9pt;table-layout:fixed">
-    <colgroup><col style="width:55%"><col style="width:45%"></colgroup>
-    <tr><td>Netto</td><td style="text-align:right;white-space:nowrap">${totalNetto.toFixed(2)} EUR</td></tr>
+  <table class="totals-table" style="width:100%;border-collapse:collapse;font-size:9pt">
+    <tr><td style="text-align:left">Netto</td><td style="text-align:right;white-space:nowrap">${totalNetto.toFixed(2)} EUR</td></tr>
     ${mwstRows}
-    <tr><td style="padding-top:4px;border-top:1px dashed #333">${(order.trinkgeld > 0) ? 'Zwischensumme' : 'Gesamt'}</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333;white-space:nowrap">${totalBrutto.toFixed(2)} EUR</td></tr>
-    ${(order.trinkgeld > 0) ? `<tr><td style="font-style:italic">inkl. Trinkgeld</td><td style="text-align:right;font-weight:bold;white-space:nowrap">+ ${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
+    <tr><td style="text-align:left;padding-top:4px;border-top:1px dashed #333">${(order.trinkgeld > 0) ? 'Zwischensumme' : 'Gesamt'}</td><td style="text-align:right;padding-top:4px;border-top:1px dashed #333;white-space:nowrap">${totalBrutto.toFixed(2)} EUR</td></tr>
+    ${(order.trinkgeld > 0) ? `<tr><td style="text-align:left;font-style:italic">inkl. Trinkgeld</td><td style="text-align:right;font-weight:bold;white-space:nowrap">+ ${parseFloat(order.trinkgeld).toFixed(2)} EUR</td></tr>` : ''}
     <tr style="font-weight:bold;font-size:10.5pt">
-        <td style="padding-top:4px;border-top:2px solid #333">GESAMTBETRAG</td>
-        <td style="text-align:right;padding-top:4px;border-top:2px solid #333;white-space:nowrap">${(order.total || totalBrutto).toFixed(2)} EUR</td>
+      <td style="text-align:left;padding-top:4px;border-top:2px solid #333">GESAMTBETRAG</td>
+      <td style="text-align:right;padding-top:4px;border-top:2px solid #333;white-space:nowrap">${(order.total || totalBrutto).toFixed(2)} EUR</td>
     </tr>
   </table>
   <hr style="border:none;border-top:1px dashed #333;margin:5px 0">
-  <div style="text-align:center;font-size:8.5pt">
+  <div class="footer-center" style="text-align:center;font-size:8.5pt">
     <div>Alle Preise inkl. MwSt.</div>
     <div style="margin-top:5px">Vielen Dank fuer Ihren Besuch!</div>
     <div style="direction:rtl;margin-top:5px;font-size:9.5pt">ممنون از بازدید شما</div>
@@ -1575,12 +1582,36 @@ function doPrintReceipt() {
         win.document.write(`<html><head><title>Drucken</title>
         <style>
           * { box-sizing: border-box; }
-          body { margin: 0; padding: 4mm 6mm; font-family: 'Courier New', Courier, monospace; font-size: 11pt; width: 80mm; }
-          table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-          td, th { word-break: break-word; overflow-wrap: break-word; }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            margin: 0;
+            padding: 3mm 4mm;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
+            width: 72mm;
+            text-align: center;
+          }
+          /* Header — always centered */
+          .receipt-header { text-align: center; width: 100%; }
+          /* Items table */
+          .items-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; }
+          .items-table colgroup col:nth-child(1) { width: 56%; }
+          .items-table colgroup col:nth-child(2) { width: 12%; }
+          .items-table colgroup col:nth-child(3) { width: 32%; }
+          .items-table th, .items-table td { padding: 1px 0; }
+          .items-table th:nth-child(1), .items-table td:nth-child(1) { text-align: left; }
+          .items-table th:nth-child(2), .items-table td:nth-child(2) { text-align: center; }
+          .items-table th:nth-child(3), .items-table td:nth-child(3) { text-align: right; white-space: nowrap; }
+          /* Totals table */
+          .totals-table { width: 100%; border-collapse: collapse; }
+          .totals-table td:nth-child(1) { text-align: left; }
+          .totals-table td:nth-child(2) { text-align: right; white-space: nowrap; }
+          /* Footer */
+          .footer-center { text-align: center; width: 100%; }
+          hr { border: none; border-top: 1px dashed #333; margin: 4px 0; width: 100%; }
           @media print {
-            body { margin: 0; padding: 4mm 6mm; width: 80mm; font-size: 10pt; }
-            @page { margin: 4mm 6mm; size: 80mm auto; }
+            body { margin: 0; padding: 3mm 4mm; width: 72mm; font-size: 10pt; }
+            @page { margin: 0; size: 80mm auto; }
           }
         </style>
         </head><body>
