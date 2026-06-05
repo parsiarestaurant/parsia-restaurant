@@ -989,6 +989,273 @@
         #drink-subtabs { display: none; }
         #drink-subtabs.visible { display: flex; }
 
+        /* ═══ WEINKARTE MODAL ═══ */
+        .wein-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        .wein-overlay.open { display: flex; }
+
+        .wein-modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border-bright);
+            border-radius: 4px;
+            width: min(560px, 100%);
+            max-height: 90dvh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 80px rgba(212,168,67,0.12);
+            animation: fadeInUp 0.3s cubic-bezier(.2,.8,.3,1);
+            overflow: hidden;
+        }
+
+        .wein-modal-header {
+            background: var(--warm-dark);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .wein-modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+        .wein-modal-title-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 1rem;
+            color: var(--gold);
+            direction: rtl;
+            display: block;
+            margin-top: 3px;
+            opacity: 0.8;
+        }
+
+        /* Step 1: choose Glas or Flasche */
+        .wein-choice-screen {
+            padding: 32px 24px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .wein-choice-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--text-soft);
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .wein-choice-label-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 1rem;
+            color: var(--text-soft);
+            direction: rtl;
+            display: block;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+        .wein-choice-btns {
+            display: flex;
+            gap: 14px;
+            width: 100%;
+            max-width: 380px;
+        }
+        .wein-choice-btn {
+            flex: 1;
+            background: var(--card-bg2);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 20px 12px 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.2,.8,.3,1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-body);
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .wein-choice-btn:hover {
+            border-color: var(--gold);
+            background: rgba(212,168,67,0.07);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 16px rgba(212,168,67,0.1);
+        }
+        .wein-choice-btn .choice-icon { font-size: 2.4rem; }
+        .wein-choice-btn .choice-de {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+        .wein-choice-btn .choice-fa {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 0.9rem;
+            color: var(--gold);
+            direction: rtl;
+            opacity: 0.8;
+        }
+        .wein-choice-btn .choice-price {
+            font-size: 0.82rem;
+            color: var(--text-soft);
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Step 2: wine list */
+        .wein-list-screen {
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .wein-list-screen.active { display: flex; }
+
+        .wein-list-topbar {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            background: rgba(42,26,6,0.5);
+        }
+        .wein-back-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--gold);
+            font-size: 1rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .wein-back-btn:hover { background: rgba(212,168,67,0.15); border-color: var(--gold); }
+        .wein-mode-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--gold-light);
+            flex: 1;
+        }
+        .wein-mode-label span {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 0.88rem;
+            color: var(--gold);
+            opacity: 0.7;
+            margin-right: 8px;
+        }
+
+        .wein-list-body {
+            overflow-y: auto;
+            padding: 12px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* Wine category heading */
+        .wein-cat-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.82rem;
+            color: var(--gold-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 16px 4px 8px;
+            border-bottom: 1px solid rgba(212,168,67,0.12);
+            margin-bottom: 4px;
+        }
+
+        /* Individual wine row */
+        .wein-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 6px;
+            border-bottom: 1px solid rgba(212,168,67,0.08);
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 2px;
+        }
+        .wein-row:hover { background: rgba(212,168,67,0.05); }
+        .wein-row-info { flex: 1; min-width: 0; }
+        .wein-row-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: #f5e8c8;
+            line-height: 1.35;
+            margin-bottom: 3px;
+        }
+        .wein-row-desc {
+            font-size: 0.8rem;
+            color: rgba(200,168,106,0.5);
+            line-height: 1.5;
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .wein-row-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .wein-row-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--gold-light);
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .wein-add-btn {
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold-light);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .wein-add-btn:hover {
+            background: var(--gold);
+            color: var(--bg);
+            border-color: var(--gold);
+            box-shadow: 0 0 14px rgba(212,168,67,0.35);
+        }
+        .wein-add-btn.added {
+            background: #2a7a4a !important;
+            color: #90ffb8 !important;
+            border-color: #2a7a4a !important;
+            transform: scale(1.15);
+        }
+
+        @media (max-width: 480px) {
+            .wein-choice-btns { flex-direction: column; max-width: 260px; }
+            .wein-row-desc { display: none; }
+        }
+
     </style>
 </head>
 <body>
@@ -1160,6 +1427,53 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ══════════════════════════════════════ -->
+<!-- WEINKARTE MODAL                        -->
+<!-- ══════════════════════════════════════ -->
+<div class="wein-overlay" id="wein-modal" onclick="handleWeinOverlayClick(event)">
+    <div class="wein-modal">
+        <!-- Header -->
+        <div class="wein-modal-header">
+            <div>
+                <div class="wein-modal-title">🍷 Wein &amp; Sekt</div>
+                <span class="wein-modal-title-fa">شراب و شامپاین</span>
+            </div>
+            <button class="btn-close" onclick="closeWeinModal()">✕</button>
+        </div>
+
+        <!-- Step 1: Glas or Flasche -->
+        <div class="wein-choice-screen" id="wein-choice-screen">
+            <div class="wein-choice-label">
+                Wie möchten Sie bestellen?
+                <span class="wein-choice-label-fa">چگونه می‌خواهید سفارش دهید؟</span>
+            </div>
+            <div class="wein-choice-btns">
+                <button class="wein-choice-btn" onclick="selectWeinMode('glas')">
+                    <span class="choice-icon">🥂</span>
+                    <span class="choice-de">Ein Glas</span>
+                    <span class="choice-fa">یک گیلاس</span>
+                    <span class="choice-price">Gl. 0,2 l · 6,50 €</span>
+                </button>
+                <button class="wein-choice-btn" onclick="selectWeinMode('flasche')">
+                    <span class="choice-icon">🍾</span>
+                    <span class="choice-de">Eine Flasche</span>
+                    <span class="choice-fa">یک بطری</span>
+                    <span class="choice-price">Fl. 0,75 l · je nach Wein</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Wine list -->
+        <div class="wein-list-screen" id="wein-list-screen">
+            <div class="wein-list-topbar">
+                <button class="wein-back-btn" onclick="backToWeinChoice()">←</button>
+                <div class="wein-mode-label" id="wein-mode-label"></div>
+            </div>
+            <div class="wein-list-body" id="wein-list-body"></div>
+        </div>
+    </div>
+</div>
+
 <script>
 const API = "https://parsia-restaurant.onrender.com";
 
@@ -1264,8 +1578,15 @@ function renderMenus() {
                     descHtml = `<div class="card-desc">${item.desc}</div>`;
                 }
             }
+            // Special: Wein / Sekt card opens Weinkarte modal
+            const isWein = item.id === 706;
+            const clickHandler = isWein
+                ? `openWeinModal()`
+                : `addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)`;
+            const badgeIcon = isWein ? '🍷' : '+';
+            const priceBadge = item.price > 0 ? item.price.toFixed(2) + ' €' : 'Weinkarte';
             return `
-            <div class="menu-card" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)" id="card-${item.id}">
+            <div class="menu-card" onclick="${clickHandler}" id="card-${item.id}">
                 <div class="card-corner-br"></div>
                 <div class="card-img-wrap${useContain ? ' tall' : ''}">
                     ${item.img
@@ -1273,8 +1594,8 @@ function renderMenus() {
                            <div class="card-img-placeholder" style="display:none">${useContain ? '🥤' : (icons[section]||'🍽️')}</div>`
                         : `<div class="card-img-placeholder" style="display:flex">${useContain ? '🥤' : (icons[section]||'🍽️')}</div>`
                     }
-                    <div class="card-price-badge">${item.price > 0 ? item.price.toFixed(2) + ' €' : 'Auf Anfrage'}</div>
-                    <div class="card-add-badge" id="badge-${item.id}">+</div>
+                    <div class="card-price-badge">${priceBadge}</div>
+                    <div class="card-add-badge" id="badge-${item.id}">${badgeIcon}</div>
                 </div>
                 <div class="card-body">
                     <div class="card-name">${item.name}</div>
@@ -1492,7 +1813,133 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove("show"), 2200);
 }
 
-renderMenus();
-</script>
+// ─── WEINKARTE DATA ───
+const weinData = {
+    prickeln: {
+        label: "Edles feinperliges Prickeln · شامپاین‌ها",
+        items: [
+            { id: "w01", name: "Prosecco DOC Extra Dry Le Contesse", region: "Venetien", desc: "Apfel, Zitrus und Birnennoten, angenehme heftige Nase.", flPrice: 29.00 },
+            { id: "w02", name: "Prosecco Rosé Brut Le Contesse",     region: "Venetien", desc: "Fruchtige Noten von Waldbeeren, Rosen und Veilchen.", flPrice: 29.00 },
+        ]
+    },
+    rot: {
+        label: "Elegante · Kraftvolle Rotweine · شراب‌های قرمز",
+        items: [
+            { id: "w03", name: "Merlot (Languedoc) Laurent Miquel",                  region: "Frankreich", desc: "Reif, großzügig und geschmeidig mit Beerenaromen und Eichenholz.", flPrice: 26.00 },
+            { id: "w04", name: "Nemm Rosso Veneto IGT Fratelli Giuliari",             region: "Venetien",   desc: "Noten von Zartbitterschokolade und reifen Kirschen.", flPrice: 26.00 },
+        ]
+    },
+    rose: {
+        label: "Rosé mit Eleganz und Frische · رزه",
+        items: [
+            { id: "w05", name: "DIANTHA Rosé Carlo Pellegrino",    region: "Sizilien",  desc: "Reife Erdbeeren und Himbeeren, Hauch von Zitrusfrüchten.", flPrice: 26.00 },
+            { id: "w06", name: "Lumare IGT Tenuta Luzzolini",      region: "Kalabrien", desc: "Erfrischend, elegant. Rote Beeren dominieren den Geschmack.", flPrice: 28.50 },
+        ]
+    },
+    weiss: {
+        label: "Weißweine · شراب‌های سفید",
+        items: [
+            { id: "w07", name: "Grauburgunder Gutswein Ellermann & Spiegel", region: "Pfalz",   desc: "Aromen von reifer Mirabelle, Maracuja, Birne und Walnuss.", flPrice: 26.00 },
+            { id: "w08", name: "DIANTHA IGP Carlo Pellegrino",               region: "Sizilien", desc: "Intensiver Duft nach Birnen, Orangenblüten und Jasmin.", flPrice: 26.00 },
+            { id: "w09", name: "I Trubi Syrah Cantina Cusumano",             region: "Sizilien", desc: "Strahlend hellgelb, intensiv und fruchtig, erinnert an Äpfel.", flPrice: 29.00 },
+        ]
+    }
+};
+
+// Wines available by the glass (all except Prosecco/Sekt)
+const weinByGlas = ['rot', 'rose', 'weiss'];
+const GLAS_PRICE = 6.50;
+
+let currentWeinMode = null; // 'glas' | 'flasche'
+
+function openWeinModal() {
+    document.getElementById("wein-modal").classList.add("open");
+    document.body.classList.add("modal-open");
+    // always start at choice screen
+    document.getElementById("wein-choice-screen").style.display = '';
+    document.getElementById("wein-list-screen").classList.remove("active");
+}
+
+function closeWeinModal() {
+    document.getElementById("wein-modal").classList.remove("open");
+    document.body.classList.remove("modal-open");
+}
+
+function handleWeinOverlayClick(e) {
+    if (e.target === e.currentTarget) closeWeinModal();
+}
+
+function backToWeinChoice() {
+    document.getElementById("wein-choice-screen").style.display = '';
+    document.getElementById("wein-list-screen").classList.remove("active");
+}
+
+function selectWeinMode(mode) {
+    currentWeinMode = mode;
+    document.getElementById("wein-choice-screen").style.display = 'none';
+    const listScreen = document.getElementById("wein-list-screen");
+    listScreen.classList.add("active");
+
+    // Set label
+    const lbl = document.getElementById("wein-mode-label");
+    if (mode === 'glas') {
+        lbl.innerHTML = '🥂 Ein Glas &nbsp;<span>یک گیلاس · 6,50 €</span>';
+    } else {
+        lbl.innerHTML = '🍾 Eine Flasche &nbsp;<span>یک بطری</span>';
+    }
+
+    // Build list
+    const body = document.getElementById("wein-list-body");
+    const categories = mode === 'glas'
+        ? Object.entries(weinData).filter(([k]) => weinByGlas.includes(k))
+        : Object.entries(weinData);
+
+    body.innerHTML = categories.map(([key, cat]) => {
+        const rows = cat.items.map(wine => {
+            const price = mode === 'glas' ? GLAS_PRICE : wine.flPrice;
+            const priceLabel = mode === 'glas'
+                ? `Gl. 0,2 l · ${price.toFixed(2)} €`
+                : `Fl. 0,75 l · ${price.toFixed(2)} €`;
+            const cartName = mode === 'glas'
+                ? `${wine.name} (Glas)`
+                : `${wine.name} (Flasche)`;
+            return `
+            <div class="wein-row" onclick="addWeinItem('${wine.id}','${cartName.replace(/'/g,"\\'")}',${price},'wein-add-${wine.id}')">
+                <div class="wein-row-info">
+                    <div class="wein-row-name">${wine.name}</div>
+                    <div class="wein-row-desc">${wine.region} — ${wine.desc}</div>
+                </div>
+                <div class="wein-row-right">
+                    <div class="wein-row-price">${priceLabel}</div>
+                    <button class="wein-add-btn" id="wein-add-${wine.id}">+</button>
+                </div>
+            </div>`;
+        }).join('');
+        return `<div class="wein-cat-heading">${cat.label}</div>${rows}`;
+    }).join('');
+}
+
+function addWeinItem(id, name, price, badgeId) {
+    // Use a unique cart id per wine+mode combination
+    const cartId = 'wein-' + id + '-' + currentWeinMode;
+    const ex = cart.find(i => i.id === cartId);
+    if (ex) { ex.qty++; } else { cart.push({ id: cartId, name, price, qty: 1 }); }
+    updateCartCount();
+    showToast(name + " hinzugefügt ✓");
+
+    const badge = document.getElementById(badgeId);
+    if (badge) {
+        const count = cart.find(i => i.id === cartId)?.qty || 1;
+        badge.textContent = count > 1 ? count : "✓";
+        badge.classList.add("added");
+        setTimeout(() => {
+            badge.classList.remove("added");
+            badge.textContent = "+";
+        }, 1200);
+    }
+}
+
+// ─── OVERRIDE WEIN/SEKT CARD CLICK ───
+// Handled directly in renderMenus() above for card id 706</script>
 </body>
 </html>
