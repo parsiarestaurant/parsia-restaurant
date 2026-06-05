@@ -515,6 +515,19 @@
             filter: brightness(0.95) saturate(1.0);
         }
 
+        /* برای نوشابه‌ها که عکس بطری دارند */
+        .card-img.contain {
+            object-fit: contain;
+            padding: 4px;
+            background: var(--card-bg);
+        }
+        .menu-card:hover .card-img.contain {
+            transform: scale(1.04);
+        }
+        .card-img-wrap.tall {
+            height: 380px;
+        }
+
         /* Gold gradient overlay on image bottom */
         .card-img-wrap::after {
             content: '';
@@ -1180,12 +1193,22 @@ const menuData = {
         { id:403, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Desserts/Baklava.jpeg", name:"Baklava", farsi:"باقلوا", desc:"Zwei frische Pistazien-Baklava mit Chai · دو تکه باقلوای تازه پسته‌ای با چای", price:6.00 },
     ],
     getraenke: [
-        { id:501, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Doogh_0.2L.jpg", name:"Doogh 0.2L", farsi:"دوغ ۰.۲ لیتر", desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:3.00 },
-        { id:502, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Doogh_0.4L.jpg", name:"Doogh 0.4L", farsi:"دوغ ۰.۴ لیتر", desc:"Persischer Joghurt-Drink · نوشیدنی ماستی ایرانی", price:4.00 },
-        { id:503, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Softdrinks_0.2L.jpg", name:"Softdrinks 0.2L", farsi:"نوشابه ۰.۲ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:2.40 },
-        { id:504, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Softdrinks_0.4L.jpg", name:"Softdrinks 0.4L", farsi:"نوشابه ۰.۴ لیتر", desc:"Cola, Cola Zero, Sprite, Fanta, Spezi, Apfelschorle", price:4.00 },
-        { id:505, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Wasser_0.25L.jpg", name:"Wasser 0.25L", farsi:"آب ۰.۲۵ لیتر", desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:2.50 },
-        { id:506, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Wasser_0.75L.jpg", name:"Wasser 0.75L", farsi:"آب ۰.۷۵ لیتر", desc:"Still oder Sprudel · آب معدنی ساده یا گازدار", price:6.50 },
+        { id:501, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Doogh_0.2L.jpg",       name:"Doogh 0.2L",          farsi:"دوغ ۰.۲ لیتر",           desc:"", price:3.00 },
+        { id:502, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/Doogh_0.4L.jpg",       name:"Doogh 0.4L",          farsi:"دوغ ۰.۴ لیتر",           desc:"", price:4.00 },
+        { id:503, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/cola0.2L.jpg",          name:"Coca-Cola 0.2L",       farsi:"کوکاکولا ۰.۲ لیتر",      desc:"", price:2.40 },
+        { id:504, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/cola0.4L.jpg",          name:"Coca-Cola 0.4L",       farsi:"کوکاکولا ۰.۴ لیتر",      desc:"", price:4.00 },
+        { id:505, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/coalzero0.2L.jpg",      name:"Coca-Cola Zero 0.2L",  farsi:"کوکاکولا زیرو ۰.۲ لیتر", desc:"", price:2.40 },
+        { id:506, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/coalzero0.4L.jpg",      name:"Coca-Cola Zero 0.4L",  farsi:"کوکاکولا زیرو ۰.۴ لیتر", desc:"", price:4.00 },
+        { id:507, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/sprite0.2L.jpg",        name:"Sprite 0.2L",          farsi:"اسپریت ۰.۲ لیتر",        desc:"", price:2.40 },
+        { id:508, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/sprite0.4L.jpg",        name:"Sprite 0.4L",          farsi:"اسپریت ۰.۴ لیتر",        desc:"", price:4.00 },
+        { id:509, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/fanta0.2L.webp",         name:"Fanta 0.2L",           farsi:"فانتا ۰.۲ لیتر",         desc:"", price:2.40 },
+        { id:510, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/fanta0.4L.jpg",         name:"Fanta 0.4L",           farsi:"فانتا ۰.۴ لیتر",         desc:"", price:4.00 },
+        { id:511, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/apfelschorde0.2L.jpg",  name:"Apfelschorle 0.2L",    farsi:"آب سیب گازدار ۰.۲ لیتر", desc:"", price:2.40 },
+        { id:512, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/apfelschorde0.4L.jpg",  name:"Apfelschorle 0.4L",    farsi:"آب سیب گازدار ۰.۴ لیتر", desc:"", price:4.00 },
+        { id:513, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/wasserstill0.2L.jpg",   name:"Wasser Still 0.2L",    farsi:"آب ساکن ۰.۲ لیتر",       desc:"", price:2.50 },
+        { id:514, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/wasserstill0.4L.jpg",   name:"Wasser Still 0.4L",    farsi:"آب ساکن ۰.۴ لیتر",       desc:"", price:6.50 },
+        { id:515, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/wasssersprudel0.2L.jpg", name:"Wasser Sprudel 0.2L",  farsi:"آب گازدار ۰.۲ لیتر",     desc:"", price:2.50 },
+        { id:516, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/Getraenke/wassersprudel0.4L.jpg", name:"Wasser Sprudel 0.4L",  farsi:"آب گازدار ۰.۴ لیتر",     desc:"", price:6.50 },
     ],
     heisse: [
         { id:601, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeisseGetraenke/Kaffee.jpg", name:"Kaffee", farsi:"قهوه", desc:"Frisch gebrühter Kaffee · قهوه تازه‌دم", price:2.50 },
@@ -1193,11 +1216,13 @@ const menuData = {
         { id:603, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/HeisseGetraenke/Chai_Persischer_Schwarztee.jpg", name:"Chai – Persischer Schwarztee", farsi:"چای", desc:"Traditioneller iranischer Schwarztee · چای سیاه سنتی ایرانی", price:2.00 },
     ],
     alkohol: [
-        { id:701, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Karlsberg.jpg", name:"Karlsberg", farsi:"کارلزبرگ", desc:"Mit und ohne Alkohol · با الکل و بدون الکل", price:3.50 },
-        { id:702, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Radler.jpg", name:"Radler", farsi:"رادلر", desc:"Bier-Limonadenmischung · مخلوط آبجو و لیموناد", price:3.50 },
-        { id:703, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Weizen.jpeg", name:"Weizen", farsi:"آبجو ویتسن", desc:"Hell / Dunkel / Alkoholfrei · روشن / تیره / بدون الکل", price:5.00 },
-        { id:704, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Wein.webp", name:"Wein / Sekt", farsi:"شراب / شامپاین", desc:"Bitte die Weinkarte anfordern · لطفاً منوی شراب را درخواست کنید", price:0 },
-        { id:705, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Aragh_Sagi.jpg", name:"Aragh Sagi 0.2L", farsi:"عرق سگی", desc:"Starker iranischer Rosinenschnaps · عرق کشمش قوی ایرانی", price:5.00 },
+        { id:701, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/karlsberg_alkoholfrei.webp", name:"Karlsberg Alkoholfrei", farsi:"کارلزبرگ بدون الکل",   desc:"", price:3.50 },
+        { id:702, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/karlsberg_mit_alkohol.jpg", name:"Karlsberg",             farsi:"کارلزبرگ با الکل",     desc:"", price:3.50 },
+        { id:703, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Radler.jpg",                name:"Radler",                farsi:"رادلر",                desc:"", price:3.50 },
+        { id:704, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/weizen_alkoholfrei.jpg",    name:"Weizen Alkoholfrei",    farsi:"آبجو ویتسن بدون الکل", desc:"", price:5.00 },
+        { id:705, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Weizen_mit_alkohol.jpeg",    name:"Weizen",                farsi:"آبجو ویتسن با الکل",   desc:"", price:5.00 },
+        { id:706, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Wein.webp",                 name:"Wein / Sekt",           farsi:"شراب / شامپاین",       desc:"Bitte die Weinkarte anfordern · لطفاً منوی شراب را درخواست کنید", price:0 },
+        { id:707, img:"https://raw.githubusercontent.com/parsiarestaurant/parsia-restaurant/main/frontend/images/AlkoholischeGetraenke/Aragh_Sagi.jpg",            name:"Aragh Sagi 0.2L",       farsi:"عرق سگی ۰.۲ لیتر",    desc:"", price:5.00 },
     ]
 };
 
@@ -1220,10 +1245,12 @@ function getTable() {
 // ─── RENDER MENU CARDS ───
 function renderMenus() {
     const icons = { getraenke:'🥤', heisse:'☕', alkohol:'🍺' };
+    const containSections = ['getraenke', 'alkohol'];
     for (const [section, items] of Object.entries(menuData)) {
         const icon = icons[section] || '🍽️';
         const grid = document.getElementById("grid-"+section);
         if (!grid) continue;
+        const useContain = containSections.includes(section);
         grid.innerHTML = items.map(item => {
             // Split desc into German and Farsi parts by · separator
             let descHtml = '';
@@ -1240,11 +1267,11 @@ function renderMenus() {
             return `
             <div class="menu-card" onclick="addItem(${item.id},'${item.name.replace(/'/g,"\\'")}',${item.price},this)" id="card-${item.id}">
                 <div class="card-corner-br"></div>
-                <div class="card-img-wrap">
+                <div class="card-img-wrap${useContain ? ' tall' : ''}">
                     ${item.img
-                        ? `<img class="card-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                           <div class="card-img-placeholder" style="display:none">${icon}</div>`
-                        : `<div class="card-img-placeholder" style="display:flex">${icon}</div>`
+                        ? `<img class="card-img${useContain ? ' contain' : ''}" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                           <div class="card-img-placeholder" style="display:none">${useContain ? '🥤' : (icons[section]||'🍽️')}</div>`
+                        : `<div class="card-img-placeholder" style="display:flex">${useContain ? '🥤' : (icons[section]||'🍽️')}</div>`
                     }
                     <div class="card-price-badge">${item.price > 0 ? item.price.toFixed(2) + ' €' : 'Auf Anfrage'}</div>
                     <div class="card-add-badge" id="badge-${item.id}">+</div>
