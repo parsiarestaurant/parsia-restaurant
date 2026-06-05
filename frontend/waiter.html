@@ -1979,7 +1979,8 @@ function confirmPayment() {
     const tip = parseFloat(trinkgeldAmount.toFixed(2));
     // paymentMethod is stored in items _meta by backend
     // trinkgeld: we add it to total and also pass as separate field
-    fetch(API + "/orders/" + paymentOrderId, {
+    const orderId = paymentOrderId;
+    fetch(API + "/orders/" + orderId, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1988,10 +1989,42 @@ function confirmPayment() {
             total: parseFloat(finalTotal.toFixed(2)),
             trinkgeld: tip
         })
-    }).then(() => {
+    })
+    .then(r => r.json())
+    .then(() => fetch(API + "/orders/" + orderId))
+    .then(r => r.json())
+    .then(order => {
         closePaymentModal();
         loadOrders();
+        // Auto-print receipt
+        autoPrintReceipt(order);
     });
+}
+
+function autoPrintReceipt(order) {
+    const receiptContent = buildReceiptHtml(order, true);
+    const win = window.open("", "_blank", "width=420,height=700");
+    if (!win) { showToast("⚠️ Bitte Popup erlauben für Druck!"); return; }
+    win.document.write(`<html><head><title>Quittung Tisch ${order.table_number}</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { margin: 0; padding: 3mm 4mm; font-family: 'Courier New', Courier, monospace; font-size: 10pt; width: 72mm; text-align: center; }
+      .receipt-header { text-align: center; width: 100%; }
+      .items-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+      .items-table th:nth-child(1), .items-table td:nth-child(1) { text-align: left; }
+      .items-table th:nth-child(2), .items-table td:nth-child(2) { text-align: center; }
+      .items-table th:nth-child(3), .items-table td:nth-child(3) { text-align: right; white-space: nowrap; }
+      .totals-table { width: 100%; border-collapse: collapse; }
+      .totals-table td:nth-child(1) { text-align: left; }
+      .totals-table td:nth-child(2) { text-align: right; white-space: nowrap; }
+      .footer-center { text-align: center; width: 100%; }
+      hr { border: none; border-top: 1px dashed #333; margin: 4px 0; width: 100%; }
+      @media print { body { margin: 0; padding: 3mm 4mm; width: 72mm; } @page { margin: 0; size: 80mm auto; } }
+    </style></head><body>
+    ${receiptContent}
+    </body></html>`);
+    win.document.close();
+    setTimeout(() => { win.print(); win.close(); }, 600);
 }
 
 // ══════════ EDIT MODAL ══════════
