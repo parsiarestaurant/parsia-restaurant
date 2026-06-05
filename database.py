@@ -42,6 +42,30 @@ class MenuItem(Base):
     img_url     = Column(String, default="")       # URL عکس
     active      = Column(Boolean, default=True)    # نمایش یا پنهان
 
+
+# ----------------------
+# EXPENSE TABLE MODEL
+# ----------------------
+class Expense(Base):
+    __tablename__ = "expenses"
+
+    id          = Column(Integer, primary_key=True, index=True)
+    date        = Column(String, nullable=False, index=True)   # YYYY-MM-DD
+    description = Column(String, nullable=False)
+    amount      = Column(Float, nullable=False)
+    category    = Column(String, default="Sonstiges")  # Lebensmittel / Getränke / Reinigung / Personal / Sonstiges
+    created_by  = Column(String, default="Inhaber")
+    created_at  = Column(String)
+
+# ----------------------
+# SETTINGS TABLE MODEL
+# ----------------------
+class Setting(Base):
+    __tablename__ = "settings"
+
+    key   = Column(String, primary_key=True)
+    value = Column(String, nullable=False)
+
 # ----------------------
 # CREATE TABLES
 # ----------------------
@@ -62,6 +86,30 @@ def run_migrations():
     if "archived_at" not in existing_cols:
         cur.execute("ALTER TABLE orders ADD COLUMN archived_at TEXT")
         print("✅ Migration: 'archived_at' column added")
+
+    # Expenses table
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='expenses'")
+    if not cur.fetchone():
+        cur.execute("""CREATE TABLE expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            description TEXT NOT NULL,
+            amount REAL NOT NULL,
+            category TEXT DEFAULT 'Sonstiges',
+            created_by TEXT DEFAULT 'Inhaber',
+            created_at TEXT
+        )""")
+        print("✅ Migration: 'expenses' table created")
+
+    # Settings table
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'")
+    if not cur.fetchone():
+        cur.execute("""CREATE TABLE settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )""")
+        cur.execute("INSERT INTO settings (key, value) VALUES ('owner_pin', '0000')")
+        print("✅ Migration: 'settings' table created with default PIN")
 
     conn.commit()
     conn.close()

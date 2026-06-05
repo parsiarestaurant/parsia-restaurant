@@ -427,105 +427,213 @@
 
 <div class="px-3">
 
-<!-- ══════════ DAILY SUMMARY ══════════ -->
-<div style="margin-bottom:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:0.85rem;font-weight:800;color:#1a1008">📊 Tagesübersicht</span>
-        <button class="section-toggle-btn" onclick="toggleSection('summary-section','summary-arrow')">
-            <span id="summary-arrow">▲</span> ausblenden
-        </button>
-    </div>
-    <div id="summary-section">
-        <!-- Date navigation -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:#fff;border-radius:12px;padding:8px 12px;box-shadow:0 1px 6px rgba(0,0,0,0.07)">
-            <button onclick="summaryNavDay(-1)" style="background:#f0ece6;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:1rem;font-weight:700">◀</button>
-            <div style="flex:1;text-align:center">
-                <input type="date" id="summary-date-picker"
-                    style="border:none;background:transparent;font-size:0.9rem;font-weight:800;color:#1a1008;text-align:center;cursor:pointer;width:auto"
-                    onchange="setSummaryDate(this.value)">
-                <span id="summary-day-label" style="font-size:0.72rem;color:#888;display:block"></span>
-            </div>
-            <button onclick="summaryNavDay(1)" id="summary-nav-next" style="background:#f0ece6;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:1rem;font-weight:700">▶</button>
-            <button onclick="setSummaryToday()" style="background:#c8972a;color:#1a1008;border:none;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.75rem;font-weight:800;white-space:nowrap">Heute</button>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
-            <div class="summary-card" style="border-left:4px solid #27ae60">
-                <div class="summary-num" id="sum-revenue" style="color:#27ae60">0,00 €</div>
-                <div class="summary-label">💰 Umsatz</div>
-            </div>
-            <div class="summary-card" style="border-left:4px solid #c8972a">
-                <div class="summary-num" id="sum-orders" style="color:#c8972a">0</div>
-                <div class="summary-label">📋 Bestellungen</div>
-            </div>
-            <div class="summary-card" style="border-left:4px solid #8e44ad">
-                <div class="summary-num" id="sum-avg" style="color:#8e44ad">0,00 €</div>
-                <div class="summary-label">📐 Ø pro Tisch</div>
-            </div>
-        </div>
-        <div style="display:flex;gap:10px">
-            <div class="summary-card flex-fill" style="border-left:4px solid #2c6fad;flex-direction:row;align-items:center;gap:14px">
-                <div style="font-size:1.6rem">💵</div>
-                <div>
-                    <div class="summary-num" id="sum-bar" style="color:#2c6fad;font-size:1.3rem">0,00 €</div>
-                    <div class="summary-label">Bar</div>
-                </div>
-            </div>
-            <div class="summary-card flex-fill" style="border-left:4px solid #e74c3c;flex-direction:row;align-items:center;gap:14px">
-                <div style="font-size:1.6rem">💳</div>
-                <div>
-                    <div class="summary-num" id="sum-karte" style="color:#e74c3c;font-size:1.3rem">0,00 €</div>
-                    <div class="summary-label">Karte</div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- ══════════ VIEW SWITCHER ══════════ -->
+<div style="display:flex;gap:8px;margin-bottom:16px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 10px rgba(0,0,0,0.07)">
+    <button id="view-btn-tisch" onclick="switchView('tisch')"
+        style="flex:1;padding:10px;border:none;border-radius:10px;font-weight:800;font-size:0.92rem;cursor:pointer;transition:all 0.2s;background:#1a1008;color:#e8b84b;box-shadow:0 2px 8px rgba(0,0,0,0.15)">
+        🪑 Tischübersicht
+    </button>
+    <button id="view-btn-liste" onclick="switchView('liste')"
+        style="flex:1;padding:10px;border:none;border-radius:10px;font-weight:800;font-size:0.92rem;cursor:pointer;transition:all 0.2s;background:transparent;color:#888">
+        📋 Bestellungsliste
+    </button>
+    <button id="view-btn-ausgaben" onclick="switchView('ausgaben')"
+        style="flex:1;padding:10px;border:none;border-radius:10px;font-weight:800;font-size:0.92rem;cursor:pointer;transition:all 0.2s;background:transparent;color:#888">
+        💼 Ausgaben
+    </button>
 </div>
 
-<!-- ══════════ TABLE MAP ══════════ -->
-<div style="margin-bottom:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:0.85rem;font-weight:800;color:#1a1008">🏷️ Tischübersicht</span>
-        <div style="display:flex;gap:10px;align-items:center">
-            <span style="font-size:0.72rem;color:#888">
-                <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#27ae60;margin-right:3px"></span>Frei
-                <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#f39c12;margin-left:8px;margin-right:3px"></span>Offen
-            </span>
-            <button class="section-toggle-btn" onclick="toggleSection('table-map-section','map-arrow')">
-                <span id="map-arrow">▲</span> ausblenden
+<!-- ══════════ VIEW: TISCHÜBERSICHT ══════════ -->
+<div id="view-tisch">
+
+    <!-- Table Map -->
+    <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:0.85rem;font-weight:800;color:#1a1008">🏷️ Tischübersicht</span>
+                <span style="font-size:0.72rem;color:#888">
+                    <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#27ae60;margin-right:3px"></span>Frei
+                    <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#f39c12;margin-left:8px;margin-right:3px"></span>Belegt
+                </span>
+            </div>
+            <div id="stats-bar-inline" style="display:flex;gap:8px;align-items:center"></div>
+        </div>
+        <div class="table-map-grid" id="table-map"></div>
+    </div>
+
+    <!-- Daily Summary -->
+    <div style="margin-top:16px;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden">
+        <!-- Header -->
+        <div style="background:#1a1008;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.9rem;font-weight:800;color:#e8b84b">📊 Tagesübersicht</span>
+            <div style="display:flex;align-items:center;gap:6px">
+                <button onclick="summaryNavDay(-1)" style="background:rgba(232,184,75,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700;color:#e8b84b">◀</button>
+                <input type="date" id="summary-date-picker"
+                    style="border:1px solid rgba(232,184,75,0.3);background:rgba(232,184,75,0.1);border-radius:8px;padding:4px 8px;font-size:0.8rem;font-weight:700;color:#e8b84b;cursor:pointer"
+                    onchange="setSummaryDate(this.value)">
+                <button onclick="summaryNavDay(1)" id="summary-nav-next" style="background:rgba(232,184,75,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700;color:#e8b84b">▶</button>
+                <button onclick="setSummaryToday()" style="background:#c8972a;color:#1a1008;border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.72rem;font-weight:800">Heute</button>
+            </div>
+        </div>
+        <!-- Period tabs -->
+        <div style="display:flex;border-bottom:1px solid #f0ece6;background:#fffbf5">
+            <button id="report-tab-day" onclick="setReportPeriod('day')"
+                style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid #c8972a;color:#1a1008">
+                📅 Tag
+            </button>
+            <button id="report-tab-week" onclick="setReportPeriod('week')"
+                style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid transparent;color:#888">
+                📆 Woche
+            </button>
+            <button id="report-tab-month" onclick="setReportPeriod('month')"
+                style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid transparent;color:#888">
+                🗓️ Monat
+            </button>
+        </div>
+        <!-- Stats -->
+        <div style="padding:14px 16px">
+            <span id="summary-day-label" style="font-size:0.72rem;color:#888;display:block;margin-bottom:10px;text-align:center"></span>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px">
+                <div class="summary-card" style="border-left:4px solid #27ae60">
+                    <div class="summary-num" id="sum-revenue" style="color:#27ae60;font-size:1.4rem">0,00 €</div>
+                    <div class="summary-label">💰 Umsatz</div>
+                </div>
+                <div class="summary-card" style="border-left:4px solid #c8972a">
+                    <div class="summary-num" id="sum-orders" style="color:#c8972a;font-size:1.4rem">0</div>
+                    <div class="summary-label">📋 Bestellungen</div>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+                <div class="summary-card" style="border-left:4px solid #8e44ad">
+                    <div class="summary-num" id="sum-avg" style="color:#8e44ad;font-size:1.1rem">0,00 €</div>
+                    <div class="summary-label">Ø Tisch</div>
+                </div>
+                <div class="summary-card" style="border-left:4px solid #2c6fad">
+                    <div class="summary-num" id="sum-bar" style="color:#2c6fad;font-size:1.1rem">0,00 €</div>
+                    <div class="summary-label">💵 Bar</div>
+                </div>
+                <div class="summary-card" style="border-left:4px solid #e74c3c">
+                    <div class="summary-num" id="sum-karte" style="color:#e74c3c;font-size:1.1rem">0,00 €</div>
+                    <div class="summary-label">💳 Karte</div>
+                </div>
+            </div>
+            <!-- Print button -->
+            <button onclick="printSalesReport()"
+                style="width:100%;background:#27ae60;color:#fff;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:0.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s"
+                onmouseover="this.style.background='#219a52'" onmouseout="this.style.background='#27ae60'">
+                🖨️ Bericht drucken
             </button>
         </div>
     </div>
-    <div id="table-map-section">
-        <div class="table-map-grid" id="table-map"></div>
+
+</div><!-- end view-tisch -->
+
+<!-- ══════════ VIEW: BESTELLUNGSLISTE ══════════ -->
+<div id="view-liste" style="display:none">
+
+    <!-- Stats bar -->
+    <div id="stats-bar" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"></div>
+
+    <!-- Filter Buttons -->
+    <div class="d-flex gap-2 mb-2 flex-wrap align-items-center">
+        <button class="filter-btn active" id="fb-all" onclick="setFilter('all',this)" style="background:#1a1008;color:#e8b84b;border-color:#1a1008">📋 Alle</button>
+        <button class="filter-btn" id="fb-pending" onclick="setFilter('pending',this)" style="background:#fff3cd;color:#856404;border-color:#f39c12">🟡 Ausstehend</button>
+        <button class="filter-btn" id="fb-paid" onclick="setFilter('paid',this)" style="background:#f0f0f0;color:#555;border-color:#95a5a6">⚫ Bezahlt</button>
+        <span id="total-count-inline" style="margin-left:auto;font-size:0.8rem;color:#999;font-weight:600"></span>
+    </div>
+    <!-- Date Filter -->
+    <div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
+        <span style="font-size:0.8rem;font-weight:700;color:#888">📅 Zeitraum:</span>
+        <button class="filter-btn active" id="df-today" onclick="setDateFilter('today',this)" style="background:#e8f4fd;color:#2c6fad;border-color:#2c6fad;font-size:0.82rem;padding:6px 14px">Heute</button>
+        <button class="filter-btn" id="df-yesterday" onclick="setDateFilter('yesterday',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Gestern</button>
+        <button class="filter-btn" id="df-week" onclick="setDateFilter('week',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Diese Woche</button>
+        <button class="filter-btn" id="df-all" onclick="setDateFilter('all',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Alle Tage</button>
+        <div style="display:flex;align-items:center;gap:4px;margin-left:4px">
+            <input type="date" id="df-custom-date" style="border:1.5px solid #ccc;border-radius:8px;padding:5px 8px;font-size:0.78rem;color:#333"
+                onchange="setDateFilter('custom',null,this.value)">
+        </div>
+    </div>
+    <div id="orders" class="row"></div>
+
+</div><!-- end view-liste -->
+
+<!-- ══════════ VIEW: AUSGABEN ══════════ -->
+<div id="view-ausgaben" style="display:none">
+
+    <!-- PIN Lock Screen -->
+    <div id="ausgaben-lock" style="text-align:center;padding:40px 20px">
+        <div style="font-size:3rem;margin-bottom:12px">🔐</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#1a1008;margin-bottom:6px">Inhaber-Bereich</div>
+        <div style="font-size:0.85rem;color:#888;margin-bottom:20px">PIN eingeben um fortzufahren</div>
+        <div style="display:flex;justify-content:center;gap:10px;margin-bottom:16px">
+            <input id="pin-input" type="password" maxlength="4" inputmode="numeric"
+                style="width:140px;text-align:center;font-size:1.8rem;letter-spacing:10px;border:2px solid #ddd;border-radius:10px;padding:10px;font-weight:900"
+                placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()">
+        </div>
+        <button onclick="checkPin()"
+            style="background:#1a1008;color:#e8b84b;border:none;border-radius:10px;padding:12px 32px;font-weight:800;font-size:1rem;cursor:pointer">
+            ✓ Bestätigen
+        </button>
+        <div id="pin-error" style="color:#e74c3c;font-size:0.85rem;margin-top:10px;display:none">❌ Falscher PIN</div>
+    </div>
+
+    <!-- Ausgaben Content (hidden until PIN correct) -->
+    <div id="ausgaben-content" style="display:none">
+
+        <!-- Toolbar -->
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+            <button onclick="openAddExpense()"
+                style="background:#c8972a;color:#1a1008;border:none;border-radius:10px;padding:10px 16px;font-weight:800;font-size:0.88rem;cursor:pointer">
+                ➕ Neue Ausgabe
+            </button>
+            <select id="expense-month-filter" onchange="loadExpenses()"
+                style="border:1.5px solid #ddd;border-radius:10px;padding:9px 12px;font-size:0.85rem;font-weight:700;color:#1a1008;flex:1">
+            </select>
+            <button onclick="printExpenseReport()"
+                style="background:#27ae60;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:800;font-size:0.85rem;cursor:pointer">
+                🖨️ Drucken
+            </button>
+            <button onclick="openChangePinModal()"
+                style="background:#f0ece6;color:#555;border:1.5px solid #ddd;border-radius:10px;padding:10px 12px;font-weight:700;font-size:0.82rem;cursor:pointer">
+                🔑 PIN ändern
+            </button>
+        </div>
+
+        <!-- Summary bar -->
+        <div id="expense-summary-bar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px"></div>
+
+        <!-- Expenses list -->
+        <div id="expense-list"></div>
+
+    </div>
+</div><!-- end view-ausgaben -->
+
+</div>
+
+
+<!-- ══════════ TISCH DETAIL MODAL ══════════ -->
+<div class="modal-overlay" id="tisch-modal">
+    <div class="modal-box" style="max-width:480px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+        <!-- Header -->
+        <div style="background:#1a1008;color:#e8b84b;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span style="font-weight:bold;font-size:1.1rem" id="tisch-modal-title">🪑 Tisch ?</span>
+            <button onclick="closeTischModal()" style="background:none;border:1.5px solid rgba(232,184,75,0.4);color:#e8b84b;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.85rem">✕</button>
+        </div>
+        <!-- Note chip -->
+        <div id="tisch-note-bar" style="display:none;background:#eaf2ff;border-bottom:1px solid #c5d9f5;padding:8px 16px;font-size:0.82rem;color:#1a4b8a;display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <span>📝</span>
+            <span id="tisch-note-text" style="flex:1"></span>
+            <button onclick="openNoteFromTisch()" style="background:none;border:1px solid #2c6fad;border-radius:6px;padding:2px 8px;font-size:0.75rem;color:#2c6fad;cursor:pointer">Bearbeiten</button>
+        </div>
+        <!-- Orders list -->
+        <div id="tisch-orders-list" style="overflow-y:auto;flex:1;padding:12px 16px"></div>
+        <!-- Footer actions -->
+        <div style="padding:12px 16px;border-top:1px solid #eee;background:#fffbf5;display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap">
+            <button onclick="openNoteFromTisch()" style="background:#eaf2ff;border:1.5px solid #2c6fad;color:#2c6fad;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:0.82rem;font-weight:700">📝 Notiz</button>
+            <button onclick="newOrderFromTisch()" style="background:#c8972a;border:none;color:#1a1008;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:0.82rem;font-weight:800;flex:1">➕ Neue Bestellung</button>
+        </div>
     </div>
 </div>
-
-<!-- Stats bar -->
-<div id="stats-bar" style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"></div>
-
-<!-- Filter Buttons -->
-<div class="d-flex gap-2 mb-2 flex-wrap align-items-center">
-    <button class="filter-btn active" id="fb-all" onclick="setFilter('all',this)" style="background:#1a1008;color:#e8b84b;border-color:#1a1008">📋 Alle</button>
-    <button class="filter-btn" id="fb-pending" onclick="setFilter('pending',this)" style="background:#fff3cd;color:#856404;border-color:#f39c12">🟡 Ausstehend</button>
-    <button class="filter-btn" id="fb-paid" onclick="setFilter('paid',this)" style="background:#f0f0f0;color:#555;border-color:#95a5a6">⚫ Bezahlt</button>
-    <span id="total-count-inline" style="margin-left:auto;font-size:0.8rem;color:#999;font-weight:600"></span>
-</div>
-<!-- Date Filter -->
-<div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
-    <span style="font-size:0.8rem;font-weight:700;color:#888">📅 Zeitraum:</span>
-    <button class="filter-btn active" id="df-today" onclick="setDateFilter('today',this)" style="background:#e8f4fd;color:#2c6fad;border-color:#2c6fad;font-size:0.82rem;padding:6px 14px">Heute</button>
-    <button class="filter-btn" id="df-yesterday" onclick="setDateFilter('yesterday',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Gestern</button>
-    <button class="filter-btn" id="df-week" onclick="setDateFilter('week',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Diese Woche</button>
-    <button class="filter-btn" id="df-all" onclick="setDateFilter('all',this)" style="background:#f5f5f5;color:#555;border-color:#ccc;font-size:0.82rem;padding:6px 14px">Alle Tage</button>
-    <div style="display:flex;align-items:center;gap:4px;margin-left:4px">
-        <input type="date" id="df-custom-date" style="border:1.5px solid #ccc;border-radius:8px;padding:5px 8px;font-size:0.78rem;color:#333"
-            onchange="setDateFilter('custom',null,this.value)">
-    </div>
-</div>
-
-<div id="orders" class="row"></div>
-</div>
-
 <!-- ══════════ NOTE MODAL ══════════ -->
 <div class="modal-overlay" id="note-modal">
     <div class="modal-box" style="max-width:380px">
@@ -757,6 +865,519 @@
 const API = "https://parsia-restaurant.onrender.com";
 
 
+
+
+
+// ══════════ SALES REPORT ══════════
+let reportPeriod = 'day'; // day | week | month
+
+function setReportPeriod(period) {
+    reportPeriod = period;
+    ['day','week','month'].forEach(p => {
+        const btn = document.getElementById('report-tab-' + p);
+        if (!btn) return;
+        btn.style.borderBottom = p === period ? '3px solid #c8972a' : '3px solid transparent';
+        btn.style.color = p === period ? '#1a1008' : '#888';
+    });
+    renderDailySummary();
+}
+
+function getReportDateRange() {
+    const base = selectedSummaryDate || new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+    if (reportPeriod === 'day') {
+        return { from: fmt(base), to: fmt(base), label: base.toLocaleDateString('de-DE', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) };
+    }
+    if (reportPeriod === 'week') {
+        const day = base.getDay() || 7;
+        const mon = new Date(base); mon.setDate(base.getDate() - day + 1);
+        const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+        return { from: fmt(mon), to: fmt(sun), label: `${mon.toLocaleDateString('de-DE',{day:'numeric',month:'long'})} – ${sun.toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'})}` };
+    }
+    if (reportPeriod === 'month') {
+        const from = new Date(base.getFullYear(), base.getMonth(), 1);
+        const to   = new Date(base.getFullYear(), base.getMonth()+1, 0);
+        return { from: fmt(from), to: fmt(to), label: base.toLocaleDateString('de-DE', {month:'long', year:'numeric'}) };
+    }
+}
+
+function getOrdersForPeriod() {
+    const range = getReportDateRange();
+    return allOrders.filter(o => {
+        if (!o.created_at) return false;
+        const d = o.created_at.slice(0,10);
+        return d >= range.from && d <= range.to;
+    });
+}
+
+function printSalesReport() {
+    const range   = getReportDateRange();
+    const orders  = getOrdersForPeriod();
+    const paid    = orders.filter(o => o.status === 'paid');
+    const pending = orders.filter(o => o.status === 'pending');
+
+    const total    = paid.reduce((s,o) => s + (o.total||0), 0);
+    const barRev   = paid.filter(o => o.paymentMethod==='bar').reduce((s,o) => s+(o.total||0), 0);
+    const karteRev = paid.filter(o => o.paymentMethod==='karte').reduce((s,o) => s+(o.total||0), 0);
+    const tables   = new Set(paid.map(o => o.table_number)).size;
+    const avg      = tables > 0 ? total / tables : 0;
+
+    const fmt  = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+    const now  = new Date().toLocaleString('de-DE');
+
+    const periodLabel = reportPeriod === 'day' ? 'Tagesbericht' : reportPeriod === 'week' ? 'Wochenbericht' : 'Monatsbericht';
+
+    // Order rows
+    const orderRows = paid.map(o => {
+        const items = (o.items||[]).map(i => `${i.qty}× ${i.name}`).join(', ');
+        const pm = o.paymentMethod === 'bar' ? '💵' : o.paymentMethod === 'karte' ? '💳' : '—';
+        const tip = o.trinkgeld > 0 ? ` <span style="color:#c8972a">(+${parseFloat(o.trinkgeld).toFixed(2)} € TG)</span>` : '';
+        return `<tr>
+            <td style="padding:5px 6px;border-bottom:1px solid #f0f0f0;color:#666;font-size:9pt">${o.created_at ? o.created_at.slice(11,16) : ''}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #f0f0f0;font-weight:700">T${o.table_number}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #f0f0f0;color:#555;font-size:9pt;max-width:200px">${items}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #f0f0f0;text-align:center">${pm}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:700;white-space:nowrap">${fmt(o.total||0)}${tip}</td>
+        </tr>`;
+    }).join('');
+
+    const pendingRows = pending.length > 0 ? `
+        <tr><td colspan="5" style="padding:10px 6px 4px;font-weight:800;color:#856404;font-size:9pt">⏳ Ausstehend (${pending.length})</td></tr>
+        ${pending.map(o => {
+            const items = (o.items||[]).map(i => `${i.qty}× ${i.name}`).join(', ');
+            return `<tr style="opacity:0.6">
+                <td style="padding:4px 6px;border-bottom:1px solid #f5f5f5;color:#888;font-size:9pt">${o.created_at ? o.created_at.slice(11,16) : ''}</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f5f5f5;font-weight:700">T${o.table_number}</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f5f5f5;color:#888;font-size:9pt">${items}</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f5f5f5;text-align:center">—</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f5f5f5;text-align:right;color:#888">${fmt(o.total||0)}</td>
+            </tr>`;
+        }).join('')}
+    ` : '';
+
+    const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${periodLabel} – Parsia</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Courier New', Courier, monospace; font-size: 10pt; padding: 12mm 14mm; color: #1a1008; }
+  h1 { font-size: 15pt; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px; }
+  h2 { font-size: 11pt; font-weight: 700; color: #555; margin-bottom: 10px; }
+  .header { text-align: center; border-bottom: 2px solid #1a1008; padding-bottom: 12px; margin-bottom: 16px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+  .summary-box { border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; }
+  .summary-box .val { font-size: 13pt; font-weight: 900; }
+  .summary-box .lbl { font-size: 8pt; color: #888; margin-top: 2px; }
+  .summary-total { background: #1a1008; color: #e8b84b; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .summary-total .val { font-size: 18pt; font-weight: 900; }
+  .summary-total .lbl { font-size: 9pt; opacity: 0.7; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f5f5f5; padding: 7px 6px; text-align: left; font-size: 9pt; font-weight: 800; border-bottom: 2px solid #ddd; }
+  th:last-child { text-align: right; }
+  th:nth-child(4) { text-align: center; }
+  .section-title { font-size: 10pt; font-weight: 800; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #eee; }
+  .footer { text-align: center; margin-top: 20px; font-size: 8pt; color: #aaa; border-top: 1px solid #eee; padding-top: 10px; }
+  @media print { @page { margin: 10mm 12mm; } body { padding: 0; } }
+</style>
+</head><body>
+
+<div class="header">
+  <div style="font-size:11pt;font-weight:700;letter-spacing:4px;margin-bottom:4px">✦ PARSIA RESTAURANT ✦</div>
+  <h1>${periodLabel}</h1>
+  <h2>${range.label}</h2>
+  <div style="font-size:8.5pt;color:#888">Erstellt am ${now}</div>
+</div>
+
+<div class="summary-total">
+  <div><div class="lbl">Gesamtumsatz</div><div class="val">${fmt(total)}</div></div>
+  <div style="text-align:right"><div class="lbl">${paid.length} bezahlte Bestellungen</div><div style="font-size:10pt;font-weight:700;margin-top:2px">${tables} Tische · Ø ${fmt(avg)}</div></div>
+</div>
+
+<div class="summary-grid">
+  <div class="summary-box" style="border-color:#2c6fad">
+    <div class="val" style="color:#2c6fad">${fmt(barRev)}</div>
+    <div class="lbl">💵 Barzahlung</div>
+  </div>
+  <div class="summary-box" style="border-color:#e74c3c">
+    <div class="val" style="color:#e74c3c">${fmt(karteRev)}</div>
+    <div class="lbl">💳 Kartenzahlung</div>
+  </div>
+  <div class="summary-box" style="border-color:#c8972a">
+    <div class="val" style="color:#c8972a">${orders.length}</div>
+    <div class="lbl">📋 Bestellungen gesamt</div>
+  </div>
+</div>
+
+<div class="section-title">✅ Bezahlte Bestellungen (${paid.length})</div>
+<table>
+  <tr>
+    <th style="width:8%">Zeit</th>
+    <th style="width:7%">Tisch</th>
+    <th>Artikel</th>
+    <th style="width:6%;text-align:center">Zahl.</th>
+    <th style="width:14%;text-align:right">Betrag</th>
+  </tr>
+  ${orderRows || '<tr><td colspan="5" style="padding:10px;color:#aaa;text-align:center">Keine bezahlten Bestellungen</td></tr>'}
+  ${pendingRows}
+  <tr style="font-weight:900;font-size:11pt;background:#f9f9f9">
+    <td colspan="4" style="padding:8px 6px;border-top:2px solid #1a1008">GESAMT</td>
+    <td style="padding:8px 6px;border-top:2px solid #1a1008;text-align:right;white-space:nowrap">${fmt(total)}</td>
+  </tr>
+</table>
+
+<div class="footer">Parsia Restaurant · Max-Braun-Str. 4, 66538 Neunkirchen · Tel: 06821 6364421</div>
+
+</body></html>`;
+
+    const win = window.open('', '_blank', 'width=800,height=900');
+    win.document.write(html);
+    win.document.close();
+    setTimeout(() => win.print(), 500);
+}
+
+
+// ══════════ AUSGABEN ══════════
+let ausgabenUnlocked = false;
+let expenseEditingId = null;
+const EXPENSE_CATS = ['Lebensmittel','Getränke','Reinigung','Personal','Miete & Nebenkosten','Sonstiges'];
+const CAT_COLORS = {
+    'Lebensmittel':'#27ae60','Getränke':'#2c6fad','Reinigung':'#8e44ad',
+    'Personal':'#e67e22','Miete & Nebenkosten':'#e74c3c','Sonstiges':'#95a5a6'
+};
+
+function checkPin() {
+    const pin = document.getElementById('pin-input').value;
+    fetch(API + '/settings/verify-pin', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({pin})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.valid) {
+            ausgabenUnlocked = true;
+            document.getElementById('ausgaben-lock').style.display    = 'none';
+            document.getElementById('ausgaben-content').style.display = 'block';
+            document.getElementById('pin-input').value = '';
+            document.getElementById('pin-error').style.display = 'none';
+            initExpenseMonthFilter();
+            loadExpenses();
+        } else {
+            document.getElementById('pin-error').style.display = 'block';
+            document.getElementById('pin-input').value = '';
+        }
+    });
+}
+
+function initExpenseMonthFilter() {
+    const sel = document.getElementById('expense-month-filter');
+    const now = new Date();
+    let html = '';
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        const lbl = d.toLocaleDateString('de-DE', {month:'long', year:'numeric'});
+        html += `<option value="${val}" ${i===0?'selected':''}>${lbl}</option>`;
+    }
+    sel.innerHTML = html;
+}
+
+function loadExpenses() {
+    const month = document.getElementById('expense-month-filter').value;
+    fetch(API + '/expenses?month=' + month)
+    .then(r => r.json())
+    .then(expenses => {
+        renderExpenseSummary(expenses, month);
+        renderExpenseList(expenses);
+    });
+}
+
+function renderExpenseSummary(expenses, month) {
+    const total = expenses.reduce((s,e) => s + e.amount, 0);
+    const fmt = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+
+    // Get revenue for same month from allOrders
+    const revenue = allOrders
+        .filter(o => o.status==='paid' && o.created_at && o.created_at.startsWith(month))
+        .reduce((s,o) => s + (o.total||0), 0);
+    const profit = revenue - total;
+
+    // Cat breakdown
+    const byCat = {};
+    expenses.forEach(e => { byCat[e.category] = (byCat[e.category]||0) + e.amount; });
+
+    const bar = document.getElementById('expense-summary-bar');
+    bar.innerHTML = `
+        <div class="summary-card" style="border-left:4px solid #e74c3c">
+            <div class="summary-num" style="color:#e74c3c;font-size:1.3rem">${fmt(total)}</div>
+            <div class="summary-label">💸 Ausgaben</div>
+        </div>
+        <div class="summary-card" style="border-left:4px solid #27ae60">
+            <div class="summary-num" style="color:#27ae60;font-size:1.3rem">${fmt(revenue)}</div>
+            <div class="summary-label">💰 Einnahmen</div>
+        </div>
+        <div class="summary-card" style="border-left:4px solid ${profit>=0?'#2c6fad':'#e74c3c'}">
+            <div class="summary-num" style="color:${profit>=0?'#2c6fad':'#e74c3c'};font-size:1.3rem">${fmt(profit)}</div>
+            <div class="summary-label">${profit>=0?'📈':'📉'} Gewinn</div>
+        </div>`;
+}
+
+function renderExpenseList(expenses) {
+    const list = document.getElementById('expense-list');
+    if (!expenses.length) {
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb">Keine Ausgaben in diesem Monat</div>';
+        return;
+    }
+    // Group by date
+    const byDate = {};
+    expenses.forEach(e => {
+        if (!byDate[e.date]) byDate[e.date] = [];
+        byDate[e.date].push(e);
+    });
+    const fmt = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+    list.innerHTML = Object.entries(byDate).map(([date, items]) => {
+        const dayTotal = items.reduce((s,e) => s+e.amount, 0);
+        const d = new Date(date + 'T00:00:00');
+        const dayLabel = d.toLocaleDateString('de-DE', {weekday:'short', day:'numeric', month:'short'});
+        return `
+        <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f0ece6;border-radius:8px;margin-bottom:6px">
+                <span style="font-weight:800;font-size:0.82rem;color:#1a1008">${dayLabel}</span>
+                <span style="font-weight:900;font-size:0.85rem;color:#e74c3c">${fmt(dayTotal)}</span>
+            </div>
+            ${items.map(e => `
+            <div style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:10px"
+                onclick="openEditExpense(${e.id},'${e.date}','${e.description.replace(/'/g,"\'")}',${e.amount},'${e.category}')">
+                <div style="flex:1">
+                    <div style="font-weight:700;font-size:0.9rem">${e.description}</div>
+                    <span style="background:${CAT_COLORS[e.category]||'#95a5a6'}22;color:${CAT_COLORS[e.category]||'#95a5a6'};border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:700">${e.category}</span>
+                </div>
+                <div style="font-weight:900;font-size:1rem;color:#1a1008;white-space:nowrap">${fmt(e.amount)}</div>
+                <span style="color:#ccc;font-size:0.8rem">✏️</span>
+            </div>`).join('')}
+        </div>`;
+    }).join('');
+}
+
+function openAddExpense() {
+    expenseEditingId = null;
+    document.getElementById('expense-modal-title').textContent = '➕ Neue Ausgabe';
+    document.getElementById('exp-date').value    = new Date().toISOString().slice(0,10);
+    document.getElementById('exp-desc').value    = '';
+    document.getElementById('exp-amount').value  = '';
+    document.getElementById('exp-category').value = 'Lebensmittel';
+    document.getElementById('exp-editing-id').value = '';
+    document.getElementById('exp-delete-btn').style.display = 'none';
+    document.getElementById('expense-modal').classList.add('open');
+    setTimeout(() => document.getElementById('exp-desc').focus(), 100);
+}
+
+function openEditExpense(id, date, desc, amount, category) {
+    expenseEditingId = id;
+    document.getElementById('expense-modal-title').textContent = '✏️ Ausgabe bearbeiten';
+    document.getElementById('exp-date').value     = date;
+    document.getElementById('exp-desc').value     = desc;
+    document.getElementById('exp-amount').value   = amount;
+    document.getElementById('exp-category').value = category;
+    document.getElementById('exp-editing-id').value = id;
+    document.getElementById('exp-delete-btn').style.display = 'inline-block';
+    document.getElementById('expense-modal').classList.add('open');
+}
+
+function closeExpenseModal() {
+    document.getElementById('expense-modal').classList.remove('open');
+    expenseEditingId = null;
+}
+
+function saveExpense() {
+    const data = {
+        date:        document.getElementById('exp-date').value,
+        description: document.getElementById('exp-desc').value.trim(),
+        amount:      parseFloat(document.getElementById('exp-amount').value),
+        category:    document.getElementById('exp-category').value,
+    };
+    if (!data.description || !data.amount || !data.date) {
+        alert('Bitte alle Felder ausfüllen!'); return;
+    }
+    const id = document.getElementById('exp-editing-id').value;
+    const url    = id ? API + '/expenses/' + id : API + '/expenses';
+    const method = id ? 'PUT' : 'POST';
+    fetch(url, {
+        method, headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    }).then(() => { closeExpenseModal(); loadExpenses(); });
+}
+
+function deleteExpense() {
+    const id = document.getElementById('exp-editing-id').value;
+    if (!id || !confirm('Ausgabe löschen?')) return;
+    fetch(API + '/expenses/' + id, {method:'DELETE'})
+    .then(() => { closeExpenseModal(); loadExpenses(); });
+}
+
+function openChangePinModal() {
+    document.getElementById('cp-old').value = '';
+    document.getElementById('cp-new').value = '';
+    document.getElementById('cp-confirm').value = '';
+    document.getElementById('cp-error').style.display = 'none';
+    document.getElementById('change-pin-modal').classList.add('open');
+}
+
+function savePinChange() {
+    const oldPin = document.getElementById('cp-old').value;
+    const newPin = document.getElementById('cp-new').value;
+    const confirm = document.getElementById('cp-confirm').value;
+    const errEl = document.getElementById('cp-error');
+
+    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+        errEl.textContent = 'PIN muss 4 Ziffern haben'; errEl.style.display = 'block'; return;
+    }
+    if (newPin !== confirm) {
+        errEl.textContent = 'PINs stimmen nicht überein'; errEl.style.display = 'block'; return;
+    }
+    // Verify old PIN first
+    fetch(API + '/settings/verify-pin', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({pin: oldPin})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.valid) {
+            errEl.textContent = 'Aktueller PIN falsch'; errEl.style.display = 'block'; return;
+        }
+        fetch(API + '/settings/owner_pin', {
+            method:'PUT', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({value: newPin})
+        }).then(() => {
+            document.getElementById('change-pin-modal').classList.remove('open');
+            showToast('PIN erfolgreich geändert ✅');
+        });
+    });
+}
+
+function printExpenseReport() {
+    const month = document.getElementById('expense-month-filter').value;
+    fetch(API + '/expenses?month=' + month)
+    .then(r => r.json())
+    .then(expenses => {
+        const total = expenses.reduce((s,e) => s + e.amount, 0);
+        const revenue = allOrders
+            .filter(o => o.status==='paid' && o.created_at && o.created_at.startsWith(month))
+            .reduce((s,o) => s + (o.total||0), 0);
+        const profit = revenue - total;
+        const fmt = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+        const d = new Date(month + '-01');
+        const monthLabel = d.toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+        const now = new Date().toLocaleString('de-DE');
+
+        // Category totals
+        const byCat = {};
+        expenses.forEach(e => { byCat[e.category] = (byCat[e.category]||0) + e.amount; });
+        const catRows = Object.entries(byCat).map(([cat,amt]) =>
+            `<tr><td style="padding:5px 8px">${cat}</td><td style="text-align:right;padding:5px 8px;font-weight:700">${fmt(amt)}</td></tr>`
+        ).join('');
+
+        const expRows = expenses.map(e =>
+            `<tr>
+                <td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#666;font-size:9pt">${e.date}</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f0f0f0">${e.description}</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;color:#888;font-size:9pt">${e.category}</td>
+                <td style="padding:4px 6px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:700">${fmt(e.amount)}</td>
+            </tr>`
+        ).join('');
+
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+        <title>Ausgabenbericht ${monthLabel}</title>
+        <style>
+          body { font-family:'Courier New',monospace;font-size:10pt;padding:12mm 14mm;color:#1a1008; }
+          h1 { font-size:14pt;font-weight:900;margin-bottom:2px; }
+          .header { text-align:center;border-bottom:2px solid #1a1008;padding-bottom:10px;margin-bottom:14px; }
+          .summary-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px; }
+          .box { border:1.5px solid #ddd;border-radius:8px;padding:10px 12px; }
+          .box .val { font-size:13pt;font-weight:900; }
+          .box .lbl { font-size:8pt;color:#888; }
+          table { width:100%;border-collapse:collapse; }
+          th { background:#f5f5f5;padding:6px 8px;text-align:left;font-size:9pt;border-bottom:2px solid #ddd; }
+          .section { font-weight:800;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid #eee;font-size:10pt; }
+          .footer { text-align:center;margin-top:16px;font-size:8pt;color:#aaa;border-top:1px solid #eee;padding-top:8px; }
+          @media print { @page { margin:8mm 10mm; } body { padding:0; } }
+        </style></head><body>
+        <div class="header">
+          <div style="font-size:10pt;font-weight:700;letter-spacing:3px;margin-bottom:4px">✦ PARSIA RESTAURANT ✦</div>
+          <h1>Ausgabenbericht</h1>
+          <div style="font-size:10pt;color:#555">${monthLabel}</div>
+          <div style="font-size:8pt;color:#888;margin-top:4px">Erstellt: ${now}</div>
+        </div>
+        <div class="summary-grid">
+          <div class="box" style="border-color:#e74c3c">
+            <div class="val" style="color:#e74c3c">${fmt(total)}</div>
+            <div class="lbl">💸 Ausgaben</div>
+          </div>
+          <div class="box" style="border-color:#27ae60">
+            <div class="val" style="color:#27ae60">${fmt(revenue)}</div>
+            <div class="lbl">💰 Einnahmen</div>
+          </div>
+          <div class="box" style="border-color:${profit>=0?'#2c6fad':'#e74c3c'}">
+            <div class="val" style="color:${profit>=0?'#2c6fad':'#e74c3c'}">${fmt(profit)}</div>
+            <div class="lbl">${profit>=0?'📈 Gewinn':'📉 Verlust'}</div>
+          </div>
+        </div>
+        <div class="section">📊 Nach Kategorie</div>
+        <table><tr><th>Kategorie</th><th style="text-align:right">Betrag</th></tr>${catRows}</table>
+        <div class="section">📋 Alle Ausgaben (${expenses.length})</div>
+        <table>
+          <tr><th style="width:14%">Datum</th><th>Beschreibung</th><th style="width:20%">Kategorie</th><th style="width:14%;text-align:right">Betrag</th></tr>
+          ${expRows}
+          <tr style="font-weight:900;font-size:11pt">
+            <td colspan="3" style="padding:7px 6px;border-top:2px solid #1a1008">GESAMT</td>
+            <td style="padding:7px 6px;border-top:2px solid #1a1008;text-align:right">${fmt(total)}</td>
+          </tr>
+        </table>
+        <div class="footer">Parsia Restaurant · Max-Braun-Str. 4, 66538 Neunkirchen</div>
+        </body></html>`;
+
+        const win = window.open('','_blank','width=800,height=900');
+        win.document.write(html);
+        win.document.close();
+        setTimeout(() => win.print(), 500);
+    });
+}
+
+// ══════════ VIEW SWITCHER ══════════
+let currentView = 'tisch';
+
+function switchView(view) {
+    currentView = view;
+    document.getElementById('view-tisch').style.display    = view === 'tisch'    ? 'block' : 'none';
+    document.getElementById('view-liste').style.display    = view === 'liste'    ? 'block' : 'none';
+    document.getElementById('view-ausgaben').style.display = view === 'ausgaben' ? 'block' : 'none';
+
+    ['tisch','liste','ausgaben'].forEach(v => {
+        const btn = document.getElementById('view-btn-' + v);
+        if (!btn) return;
+        if (v === view) {
+            btn.style.background = '#1a1008'; btn.style.color = '#e8b84b';
+            btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        } else {
+            btn.style.background = 'transparent'; btn.style.color = '#888';
+            btn.style.boxShadow = 'none';
+        }
+    });
+
+    // If switching to Ausgaben and already unlocked, load data
+    if (view === 'ausgaben' && ausgabenUnlocked) {
+        loadExpenses();
+    }
+    // Reset PIN lock if switching away
+    if (view !== 'ausgaben') {
+        ausgabenUnlocked = false;
+        document.getElementById('ausgaben-lock').style.display    = 'block';
+        document.getElementById('ausgaben-content').style.display = 'none';
+        document.getElementById('pin-input').value = '';
+        document.getElementById('pin-error').style.display = 'none';
+    }
+}
 
 let currentFilter = "all";
 let currentDateFilter = "today"; // today | yesterday | all
@@ -997,23 +1618,24 @@ function renderOrders() {
     const pendingCount = allOrders.filter(o => o.status === "pending").length;
     const paidCount    = allOrders.filter(o => o.status === "paid").length;
     const statsBar = document.getElementById("stats-bar");
-    if (statsBar) {
-        statsBar.innerHTML = `
-            <div style="background:#fff3cd;border:1.5px solid #f39c12;border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:10px;flex:1;min-width:130px">
-                <span style="font-size:1.6rem">🟡</span>
-                <div>
-                    <div style="font-size:1.5rem;font-weight:900;color:#856404;line-height:1">${pendingCount}</div>
-                    <div style="font-size:0.72rem;color:#856404;font-weight:700">Ausstehend</div>
-                </div>
+    const statsHtml = `
+        <div style="background:#fff3cd;border:1.5px solid #f39c12;border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:6px">
+            <span>🟡</span>
+            <div>
+                <div style="font-size:1.2rem;font-weight:900;color:#856404;line-height:1">${pendingCount}</div>
+                <div style="font-size:0.65rem;color:#856404;font-weight:700">Offen</div>
             </div>
-            <div style="background:#f0f0f0;border:1.5px solid #95a5a6;border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:10px;flex:1;min-width:130px">
-                <span style="font-size:1.6rem">✅</span>
-                <div>
-                    <div style="font-size:1.5rem;font-weight:900;color:#555;line-height:1">${paidCount}</div>
-                    <div style="font-size:0.72rem;color:#777;font-weight:700">Bezahlt</div>
-                </div>
-            </div>`;
-    }
+        </div>
+        <div style="background:#f0f0f0;border:1.5px solid #95a5a6;border-radius:10px;padding:6px 12px;display:flex;align-items:center;gap:6px">
+            <span>✅</span>
+            <div>
+                <div style="font-size:1.2rem;font-weight:900;color:#555;line-height:1">${paidCount}</div>
+                <div style="font-size:0.65rem;color:#777;font-weight:700">Bezahlt</div>
+            </div>
+        </div>`;
+    if (statsBar) statsBar.innerHTML = statsHtml.replace(/padding:6px 12px/g,'padding:10px 18px').replace(/font-size:1.2rem/g,'font-size:1.5rem').replace(/font-size:0.65rem/g,'font-size:0.72rem');
+    const statsInline = document.getElementById('stats-bar-inline');
+    if (statsInline) statsInline.innerHTML = statsHtml;
 
     if (!filtered.length) {
         document.getElementById("orders").innerHTML =
@@ -1147,15 +1769,15 @@ function renderTableMap() {
         const isPending = pendingTables.has(t);
         const hasNote = !!tableNotes[t];
         const cls = isPending ? 'tmap-pending' : 'tmap-free';
-        const icon = isPending ? '🪑' : '🪑';
         const statusText = isPending ? 'Belegt' : 'Frei';
         const statusColor = isPending ? '#e67e22' : '#27ae60';
         const amountHtml = isPending && tableAmounts[t]
             ? `<div class="tmap-amount">${tableAmounts[t].toFixed(2)} €</div>` : '';
+        const clickFn = isPending ? `openTischModal(${t})` : `openNoteModal(${t})`;
         html += `
-        <div class="tmap-cell ${cls}" onclick="openNoteModal(${t})" title="Notiz für Tisch ${t}">
+        <div class="tmap-cell ${cls}" onclick="${clickFn}" title="Tisch ${t}">
             ${hasNote ? '<div class="tmap-note-dot" title="Notiz vorhanden"></div>' : ''}
-            <div class="tmap-icon" style="color:${isPending?'#e67e22':'#27ae60'}">${icon}</div>
+            <div class="tmap-icon" style="color:${isPending?'#e67e22':'#27ae60'}">🪑</div>
             <div class="tmap-num">T${t}</div>
             <div class="tmap-status" style="color:${statusColor}">${statusText}</div>
             ${amountHtml}
@@ -1164,11 +1786,97 @@ function renderTableMap() {
     grid.innerHTML = html;
 }
 
+
+// ══════════ TISCH DETAIL MODAL ══════════
+let tischModalTable = null;
+
+function openTischModal(tableNum) {
+    tischModalTable = tableNum;
+    document.getElementById('tisch-modal-title').textContent = `🪑 Tisch ${tableNum}`;
+
+    // Note bar
+    const noteBar  = document.getElementById('tisch-note-bar');
+    const noteText = document.getElementById('tisch-note-text');
+    if (tableNotes[tableNum]) {
+        noteBar.style.display = 'flex';
+        noteText.textContent = tableNotes[tableNum];
+    } else {
+        noteBar.style.display = 'none';
+    }
+
+    // Orders
+    const orders = allOrders.filter(o => o.table_number == tableNum && o.status === 'pending');
+    const list = document.getElementById('tisch-orders-list');
+
+    if (!orders.length) {
+        list.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;font-size:0.95rem">Keine offenen Bestellungen</div>';
+    } else {
+        list.innerHTML = orders.map(o => {
+            const chips = (o.items || []).map(item =>
+                `<span style="background:#f5f2ee;border:1px solid #e0dbd3;border-radius:20px;padding:3px 9px;font-size:0.78rem;font-weight:600;display:inline-flex;align-items:center;gap:4px">
+                    <span style="background:#c8972a;color:#fff;border-radius:50%;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900">${item.qty}</span>
+                    ${item.name}
+                </span>`
+            ).join('');
+            const timer = getTimerInfo(o.created_at);
+            return `
+            <div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,0.05)">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <span style="font-size:0.75rem;color:#aaa">🕐 ${o.created_at ? o.created_at.slice(11,16)+' Uhr' : ''} · #${o.id}</span>
+                    ${timer ? `<span style="background:${timer.cls==='timer-fresh'?'#d4edda':timer.cls==='timer-medium'?'#fff3cd':'#f8d7da'};color:${timer.cls==='timer-fresh'?'#155724':timer.cls==='timer-medium'?'#856404':'#721c24'};border-radius:8px;padding:2px 8px;font-size:0.72rem;font-weight:700">⏱ ${timer.label}</span>` : ''}
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">${chips}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:1.1rem;font-weight:900;color:#1a1008">${o.total ? o.total.toFixed(2)+' €' : '—'}</span>
+                    <div style="display:flex;gap:6px">
+                        <button onclick="closeTischModal();openEditModal(${o.id})"
+                            style="background:#2c6fad;color:#fff;border:none;border-radius:7px;padding:6px 12px;cursor:pointer;font-size:0.78rem;font-weight:700">✏️ Edit</button>
+                        <button onclick="closeTischModal();openPaymentModal(${o.id})"
+                            style="background:#27ae60;color:#fff;border:none;border-radius:7px;padding:6px 12px;cursor:pointer;font-size:0.82rem;font-weight:800">💰 Bezahlen</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    document.getElementById('tisch-modal').classList.add('open');
+}
+
+function closeTischModal() {
+    document.getElementById('tisch-modal').classList.remove('open');
+    tischModalTable = null;
+}
+
+function openNoteFromTisch() {
+    const t = tischModalTable;
+    closeTischModal();
+    if (t !== null) {
+        setTimeout(() => openNoteModal(t), 50);
+    }
+}
+
+function newOrderFromTisch() {
+    closeTischModal();
+    // Open new order modal with table pre-selected
+    openNewOrderModal();
+    setTimeout(() => {
+        if (tischModalTable !== null) {
+            const cell = document.getElementById('no-cell-' + tischModalTable);
+            if (cell) { cell.click(); }
+        }
+    }, 200);
+}
+
 // ══════════ DAILY SUMMARY ══════════
 function renderDailySummary() {
     const selDate = selectedSummaryDate || new Date();
+    const range = getReportDateRange ? getReportDateRange() : null;
     const targetOrders = allOrders.filter(o => {
         if (!o.created_at) return false;
+        if (range) {
+            const d = o.created_at.slice(0,10);
+            return d >= range.from && d <= range.to;
+        }
         const d = new Date(o.created_at.replace(' ', 'T'));
         return d.getFullYear() === selDate.getFullYear() &&
                d.getMonth() === selDate.getMonth() &&
@@ -2129,5 +2837,68 @@ function installApp() {
   }
 }
 </script>
+
+<!-- ══════════ ADD/EDIT EXPENSE MODAL ══════════ -->
+<div class="modal-overlay" id="expense-modal">
+    <div class="modal-box" style="max-width:400px">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0" id="expense-modal-title">➕ Neue Ausgabe</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="closeExpenseModal()">✕</button>
+        </div>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Datum</label>
+            <input type="date" id="exp-date" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Beschreibung</label>
+            <input type="text" id="exp-desc" class="form-control" placeholder="z.B. Fleisch vom Markt">
+        </div>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Betrag (€)</label>
+            <input type="number" id="exp-amount" class="form-control" min="0" step="0.01" placeholder="0.00">
+        </div>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Kategorie</label>
+            <select id="exp-category" class="form-control">
+                <option>Lebensmittel</option>
+                <option>Getränke</option>
+                <option>Reinigung</option>
+                <option>Personal</option>
+                <option>Miete & Nebenkosten</option>
+                <option>Sonstiges</option>
+            </select>
+        </div>
+        <input type="hidden" id="exp-editing-id">
+        <div class="d-flex gap-2">
+            <button class="btn btn-success flex-fill fw-bold" onclick="saveExpense()">💾 Speichern</button>
+            <button class="btn btn-outline-danger" id="exp-delete-btn" onclick="deleteExpense()" style="display:none">🗑️</button>
+            <button class="btn btn-outline-secondary" onclick="closeExpenseModal()">Abbrechen</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ CHANGE PIN MODAL ══════════ -->
+<div class="modal-overlay" id="change-pin-modal">
+    <div class="modal-box" style="max-width:340px;text-align:center">
+        <h5 class="mb-3">🔑 PIN ändern</h5>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Aktueller PIN</label>
+            <input type="password" id="cp-old" maxlength="4" inputmode="numeric" class="form-control" style="text-align:center;letter-spacing:8px;font-size:1.4rem">
+        </div>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Neuer PIN</label>
+            <input type="password" id="cp-new" maxlength="4" inputmode="numeric" class="form-control" style="text-align:center;letter-spacing:8px;font-size:1.4rem">
+        </div>
+        <div class="mb-3">
+            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Neuer PIN wiederholen</label>
+            <input type="password" id="cp-confirm" maxlength="4" inputmode="numeric" class="form-control" style="text-align:center;letter-spacing:8px;font-size:1.4rem">
+        </div>
+        <div id="cp-error" style="color:#e74c3c;font-size:0.82rem;margin-bottom:10px;display:none"></div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-success flex-fill fw-bold" onclick="savePinChange()">✓ Speichern</button>
+            <button class="btn btn-outline-secondary" onclick="document.getElementById('change-pin-modal').classList.remove('open')">Abbrechen</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

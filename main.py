@@ -331,3 +331,87 @@ def parse_order(order):
         "archived":      order.archived or False,
         "archived_at":   order.archived_at,
     }
+
+# ──────────────────────────────────────────
+# EXPENSES API
+# ──────────────────────────────────────────
+
+@app.get("/expenses")
+def get_expenses(
+    db: Session = Depends(get_db),
+    date_from: str = Query(None),
+    date_to:   str = Query(None),
+    month:     str = Query(None, description="YYYY-MM"),
+):
+    q = db.query(database.Expense)
+    if month:
+        q = q.filter(database.Expense.date.like(f"{month}%"))
+    if date_from:
+        q = q.filter(database.Expense.date >= date_from)
+    if date_to:
+        q = q.filter(database.Expense.date <= date_to)
+    return q.order_by(database.Expense.date.desc()).all()
+
+@app.post("/expenses")
+def add_expense(data: dict, db: Session = Depends(get_db)):
+    exp = database.Expense(
+        date        = data["date"],
+        description = data["description"],
+        amount      = float(data["amount"]),
+        category    = data.get("category", "Sonstiges"),
+        created_by  = data.get("created_by", "Inhaber"),
+        created_at  = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    )
+    db.add(exp)
+    db.commit()
+    db.refresh(exp)
+    return exp
+
+@app.put("/expenses/{expense_id}")
+def update_expense(expense_id: int, data: dict, db: Session = Depends(get_db)):
+    exp = db.query(database.Expense).filter(database.Expense.id == expense_id).first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Not found")
+    for field in ["date", "description", "amount", "category", "created_by"]:
+        if field in data:
+            setattr(exp, field, data[field])
+    db.commit()
+    db.refresh(exp)
+    return exp
+
+@app.delete("/expenses/{expense_id}")
+def delete_expense(expense_id: int, db: Session = Depends(get_db)):
+    exp = db.query(database.Expense).filter(database.Expense.id == expense_id).first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Not found")
+    db.delete(exp)
+    db.commit()
+    return {"message": "Gelöscht ✅"}
+
+# ──────────────────────────────────────────
+# SETTINGS API (PIN)
+# ──────────────────────────────────────────
+
+@app.get("/settings/{key}")
+def get_setting(key: str, db: Session = Depends(get_db)):
+    s = db.query(database.Setting).filter(database.Setting.key == key).first()
+    if not s:
+        raise HTTPException(status_code=404, detail="Not found")
+    return {"key": s.key, "value": s.value}
+
+@app.put("/settings/{key}")
+def update_setting(key: str, data: dict, db: Session = Depends(get_db)):
+    s = db.query(database.Setting).filter(database.Setting.key == key).first()
+    if not s:
+        s = database.Setting(key=key, value=data["value"])
+        db.add(s)
+    else:
+        s.value = data["value"]
+    db.commit()
+    return {"key": key, "value": s.value}
+
+@app.post("/settings/verify-pin")
+def verify_pin(data: dict, db: Session = Depends(get_db)):
+    s = db.query(database.Setting).filter(database.Setting.key == "owner_pin").first()
+    stored = s.value if s else "0000"
+    return {"valid": data.get("pin") == stored}
