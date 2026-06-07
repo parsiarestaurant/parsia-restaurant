@@ -256,6 +256,10 @@ def update_order(order_id: int, data: dict, db: Session = Depends(get_db)):
         order.items = json.dumps(data["items"], ensure_ascii=False)
     if "total" in data:
         order.total = round(data["total"], 2)
+    if "archived" in data:
+        order.archived = data["archived"]
+        if not data["archived"]:
+            order.archived_at = None
     if "paymentMethod" in data or "trinkgeld" in data:
         try:
             items = json.loads(order.items)
