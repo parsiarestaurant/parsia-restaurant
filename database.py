@@ -4,7 +4,12 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 # ----------------------
 # DATABASE CONNECTION
 # ----------------------
-engine = create_engine("sqlite:///restaurant.db", connect_args={"check_same_thread": False})
+import os
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///restaurant.db")
+# Render PostgreSQL URL starts with postgres:// — fix for SQLAlchemy
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+engine = create_engine(DATABASE_URL)
 
 Base = declarative_base()
 
@@ -71,47 +76,19 @@ class Setting(Base):
 # ----------------------
 Base.metadata.create_all(bind=engine)
 
-# ── Migration: اگر ستون‌های جدید در دیتابیس قدیمی وجود ندارند، اضافه کن ──
-def run_migrations():
-    import sqlite3
-    conn = sqlite3.connect("restaurant.db")
-    cur = conn.cursor()
-    cur.execute("PRAGMA table_info(orders)")
-    existing_cols = {row[1] for row in cur.fetchall()}
+# ── Initialize default settings after table creation ──
+def init_defaults():
+    from sqlalchemy.orm import Session
+    db = Session(bind=engine)
+    try:
+        existing = db.query(Setting).filter(Setting.key == "owner_pin").first()
+        if not existing:
+            db.add(Setting(key="owner_pin", value="0000"))
+            db.commit()
+            print("✅ Default PIN initialized")
+    except Exception as e:
+        print(f"⚠️ init_defaults: {e}")
+    finally:
+        db.close()
 
-    if "archived" not in existing_cols:
-        cur.execute("ALTER TABLE orders ADD COLUMN archived BOOLEAN DEFAULT 0")
-        print("✅ Migration: 'archived' column added")
-
-    if "archived_at" not in existing_cols:
-        cur.execute("ALTER TABLE orders ADD COLUMN archived_at TEXT")
-        print("✅ Migration: 'archived_at' column added")
-
-    # Expenses table
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='expenses'")
-    if not cur.fetchone():
-        cur.execute("""CREATE TABLE expenses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT NOT NULL,
-            description TEXT NOT NULL,
-            amount REAL NOT NULL,
-            category TEXT DEFAULT 'Sonstiges',
-            created_by TEXT DEFAULT 'Inhaber',
-            created_at TEXT
-        )""")
-        print("✅ Migration: 'expenses' table created")
-
-    # Settings table
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'")
-    if not cur.fetchone():
-        cur.execute("""CREATE TABLE settings (
-            key TEXT PRIMARY KEY,
-            value TEXT NOT NULL
-        )""")
-        cur.execute("INSERT INTO settings (key, value) VALUES ('owner_pin', '0000')")
-        print("✅ Migration: 'settings' table created with default PIN")
-
-    conn.commit()
-    conn.close()
-
-run_migrations()
+init_defaults()
