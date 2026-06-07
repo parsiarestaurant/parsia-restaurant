@@ -2129,7 +2129,7 @@ function autoPrintReceipt(order) {
     win.document.write(`<html><head><title>Quittung Tisch ${order.table_number}</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { margin: 0; padding: 3mm 4mm; font-family: 'Courier New', Courier, monospace; font-size: 10pt; width: 72mm; text-align: center; }
+      body { margin: 0; padding: 3mm 6mm; font-family: 'Courier New', Courier, monospace; font-size: 10pt; width: 80mm; text-align: center; }
       .receipt-header { text-align: center; width: 100%; }
       .items-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
       .items-table th:nth-child(1), .items-table td:nth-child(1) { text-align: left; }
@@ -2140,7 +2140,7 @@ function autoPrintReceipt(order) {
       .totals-table td:nth-child(2) { text-align: right; white-space: nowrap; }
       .footer-center { text-align: center; width: 100%; }
       hr { border: none; border-top: 1px dashed #333; margin: 4px 0; width: 100%; }
-      @media print { body { margin: 0; padding: 3mm 4mm; width: 72mm; } @page { margin: 0; size: 80mm auto; } }
+      @media print { body { margin: 0; padding: 3mm 6mm; width: 80mm; } @page { margin: 0; size: 80mm auto; } }
     </style></head><body>
     ${receiptContent}
     </body></html>`);
@@ -2495,7 +2495,7 @@ function doPrintReceipt() {
             padding: 3mm 4mm;
             font-family: 'Courier New', Courier, monospace;
             font-size: 10pt;
-            width: 72mm;
+            width: 80mm;
             text-align: center;
           }
           /* Header — always centered */
@@ -2517,7 +2517,7 @@ function doPrintReceipt() {
           .footer-center { text-align: center; width: 100%; }
           hr { border: none; border-top: 1px dashed #333; margin: 4px 0; width: 100%; }
           @media print {
-            body { margin: 0; padding: 3mm 4mm; width: 72mm; font-size: 10pt; }
+            body { margin: 0; padding: 3mm 6mm; width: 80mm; font-size: 10pt; }
             @page { margin: 0; size: 80mm auto; }
           }
         </style>
