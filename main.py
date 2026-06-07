@@ -5,6 +5,11 @@ from sqlalchemy.orm import Session
 import database
 import json
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+TZ_DE = ZoneInfo("Europe/Berlin")
+def now_de(): return datetime.now(TZ_DE).strftime("%Y-%m-%d %H:%M:%S")
+def today_de(): return datetime.now(TZ_DE).strftime("%Y-%m-%d")
 
 app = FastAPI()
 
@@ -109,7 +114,7 @@ def create_order(order: dict, db: Session = Depends(get_db)):
         items        = items_json,
         status       = "pending",
         total        = round(total, 2),
-        created_at   = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        created_at   = now_de(),
         archived     = False,
     )
     db.add(new_order)
@@ -177,7 +182,7 @@ def get_orders_summary(
     شامل: مجموع درآمد، تعداد سفارش، تفکیک نقدی/کارت
     """
     if not date and not date_from:
-        date = datetime.now().strftime("%Y-%m-%d")
+        date = today_de()
 
     q = db.query(database.Order).filter(database.Order.status == "paid")
 
@@ -285,7 +290,7 @@ def archive_order(order_id: int, db: Session = Depends(get_db)):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     order.archived    = True
-    order.archived_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    order.archived_at = now_de()
     db.commit()
     return {"message": "Archiviert ✅", "order_id": order_id, "archived_at": order.archived_at}
 
@@ -360,7 +365,7 @@ def add_expense(data: dict, db: Session = Depends(get_db)):
         amount      = float(data["amount"]),
         category    = data.get("category", "Sonstiges"),
         created_by  = data.get("created_by", "Inhaber"),
-        created_at  = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        created_at  = now_de(),
     )
     db.add(exp)
     db.commit()
