@@ -50,14 +50,11 @@
         .pill-pending { background: #fff3cd; color: #856404; }
         .pill-paid    { background: #e9ecef; color: #6c757d; }
 
-        .order-timer {
+        .order-timer-hidden {
             font-size: 0.72rem; font-weight: 700;
             padding: 3px 9px; border-radius: 10px;
             display: inline-flex; align-items: center; gap: 3px; margin-top: 4px;
         }
-        .timer-fresh  { background: #d4edda; color: #155724; }
-        .timer-medium { background: #fff3cd; color: #856404; }
-        .timer-old    { background: #f8d7da; color: #721c24; }
 
         .order-items-area {
             padding: 4px 16px 10px;
@@ -461,70 +458,7 @@
         <div class="table-map-grid" id="table-map"></div>
     </div>
 
-    <!-- Daily Summary -->
-    <div style="margin-top:16px;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden">
-        <!-- Header -->
-        <div style="background:#1a1008;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.9rem;font-weight:800;color:#e8b84b">📊 Tagesübersicht</span>
-            <div style="display:flex;align-items:center;gap:6px">
-                <button onclick="summaryNavDay(-1)" style="background:rgba(232,184,75,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700;color:#e8b84b">◀</button>
-                <input type="date" id="summary-date-picker"
-                    style="border:1px solid rgba(232,184,75,0.3);background:rgba(232,184,75,0.1);border-radius:8px;padding:4px 8px;font-size:0.8rem;font-weight:700;color:#e8b84b;cursor:pointer"
-                    onchange="setSummaryDate(this.value)">
-                <button onclick="summaryNavDay(1)" id="summary-nav-next" style="background:rgba(232,184,75,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700;color:#e8b84b">▶</button>
-                <button onclick="setSummaryToday()" style="background:#c8972a;color:#1a1008;border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.72rem;font-weight:800">Heute</button>
-            </div>
-        </div>
-        <!-- Period tabs -->
-        <div style="display:flex;border-bottom:1px solid #f0ece6;background:#fffbf5">
-            <button id="report-tab-day" onclick="setReportPeriod('day')"
-                style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid #c8972a;color:#1a1008">
-                📅 Tag
-            </button>
-            <button id="report-tab-week" onclick="setReportPeriod('week')"
-                style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid transparent;color:#888">
-                📆 Woche
-            </button>
-            <button id="report-tab-month" onclick="setReportPeriod('month')"
-                style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid transparent;color:#888">
-                🗓️ Monat
-            </button>
-        </div>
-        <!-- Stats -->
-        <div style="padding:14px 16px">
-            <span id="summary-day-label" style="font-size:0.72rem;color:#888;display:block;margin-bottom:10px;text-align:center"></span>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px">
-                <div class="summary-card" style="border-left:4px solid #27ae60">
-                    <div class="summary-num" id="sum-revenue" style="color:#27ae60;font-size:1.4rem">0,00 €</div>
-                    <div class="summary-label">💰 Umsatz</div>
-                </div>
-                <div class="summary-card" style="border-left:4px solid #c8972a">
-                    <div class="summary-num" id="sum-orders" style="color:#c8972a;font-size:1.4rem">0</div>
-                    <div class="summary-label">📋 Bestellungen</div>
-                </div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-                <div class="summary-card" style="border-left:4px solid #8e44ad">
-                    <div class="summary-num" id="sum-avg" style="color:#8e44ad;font-size:1.1rem">0,00 €</div>
-                    <div class="summary-label">Ø Tisch</div>
-                </div>
-                <div class="summary-card" style="border-left:4px solid #2c6fad">
-                    <div class="summary-num" id="sum-bar" style="color:#2c6fad;font-size:1.1rem">0,00 €</div>
-                    <div class="summary-label">💵 Bar</div>
-                </div>
-                <div class="summary-card" style="border-left:4px solid #e74c3c">
-                    <div class="summary-num" id="sum-karte" style="color:#e74c3c;font-size:1.1rem">0,00 €</div>
-                    <div class="summary-label">💳 Karte</div>
-                </div>
-            </div>
-            <!-- Print button -->
-            <button onclick="printSalesReport()"
-                style="width:100%;background:#27ae60;color:#fff;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:0.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s"
-                onmouseover="this.style.background='#219a52'" onmouseout="this.style.background='#27ae60'">
-                🖨️ Bericht drucken
-            </button>
-        </div>
-    </div>
+
 
 </div><!-- end view-tisch -->
 
@@ -580,32 +514,120 @@
     <!-- Ausgaben Content (hidden until PIN correct) -->
     <div id="ausgaben-content" style="display:none">
 
-        <!-- Toolbar -->
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-            <button onclick="openAddExpense()"
-                style="background:#c8972a;color:#1a1008;border:none;border-radius:10px;padding:10px 16px;font-weight:800;font-size:0.88rem;cursor:pointer">
-                ➕ Neue Ausgabe
+
+        <!-- Tagesübersicht (owner only) -->
+        <div style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;margin-bottom:16px">
+            <div style="background:#1a1008;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:0.9rem;font-weight:800;color:#e8b84b">📊 Tagesübersicht</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <button onclick="summaryNavDay(-1)" style="background:rgba(232,184,75,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700;color:#e8b84b">◀</button>
+                    <input type="date" id="summary-date-picker"
+                        style="border:1px solid rgba(232,184,75,0.3);background:rgba(232,184,75,0.1);border-radius:8px;padding:4px 8px;font-size:0.8rem;font-weight:700;color:#e8b84b;cursor:pointer"
+                        onchange="setSummaryDate(this.value)">
+                    <button onclick="summaryNavDay(1)" id="summary-nav-next" style="background:rgba(232,184,75,0.15);border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-weight:700;color:#e8b84b">▶</button>
+                    <button onclick="setSummaryToday()" style="background:#c8972a;color:#1a1008;border:none;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:0.72rem;font-weight:800">Heute</button>
+                </div>
+            </div>
+            <div style="display:flex;border-bottom:1px solid #f0ece6;background:#fffbf5">
+                <button id="report-tab-day" onclick="setReportPeriod('day')"
+                    style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid #c8972a;color:#1a1008">
+                    📅 Tag
+                </button>
+                <button id="report-tab-week" onclick="setReportPeriod('week')"
+                    style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid transparent;color:#888">
+                    📆 Woche
+                </button>
+                <button id="report-tab-month" onclick="setReportPeriod('month')"
+                    style="flex:1;padding:9px;border:none;background:transparent;font-weight:800;font-size:0.8rem;cursor:pointer;border-bottom:3px solid transparent;color:#888">
+                    🗓️ Monat
+                </button>
+            </div>
+            <div style="padding:14px 16px">
+                <span id="summary-day-label" style="font-size:0.72rem;color:#888;display:block;margin-bottom:10px;text-align:center"></span>
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px">
+                    <div class="summary-card" style="border-left:4px solid #27ae60">
+                        <div class="summary-num" id="sum-revenue" style="color:#27ae60;font-size:1.4rem">0,00 €</div>
+                        <div class="summary-label">💰 Umsatz</div>
+                    </div>
+                    <div class="summary-card" style="border-left:4px solid #c8972a">
+                        <div class="summary-num" id="sum-orders" style="color:#c8972a;font-size:1.4rem">0</div>
+                        <div class="summary-label">📋 Bestellungen</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+                    <div class="summary-card" style="border-left:4px solid #8e44ad">
+                        <div class="summary-num" id="sum-avg" style="color:#8e44ad;font-size:1.1rem">0,00 €</div>
+                        <div class="summary-label">Ø Tisch</div>
+                    </div>
+                    <div class="summary-card" style="border-left:4px solid #2c6fad">
+                        <div class="summary-num" id="sum-bar" style="color:#2c6fad;font-size:1.1rem">0,00 €</div>
+                        <div class="summary-label">💵 Bar</div>
+                    </div>
+                    <div class="summary-card" style="border-left:4px solid #e74c3c">
+                        <div class="summary-num" id="sum-karte" style="color:#e74c3c;font-size:1.1rem">0,00 €</div>
+                        <div class="summary-label">💳 Karte</div>
+                    </div>
+                </div>
+                <button onclick="printSalesReport()"
+                    style="width:100%;background:#27ae60;color:#fff;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:0.92rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"
+                    onmouseover="this.style.background='#219a52'" onmouseout="this.style.background='#27ae60'">
+                    🖨️ Bericht drucken
+                </button>
+            </div>
+        </div>
+
+        <!-- Ausgaben Sub-tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:16px;background:#f0ece6;border-radius:12px;padding:5px">
+            <button id="aus-tab-ausgaben" onclick="switchAusgabenTab('ausgaben')"
+                style="flex:1;padding:9px;border:none;border-radius:8px;font-weight:800;font-size:0.85rem;cursor:pointer;background:#1a1008;color:#e8b84b">
+                💸 Ausgaben
             </button>
-            <select id="expense-month-filter" onchange="loadExpenses()"
-                style="border:1.5px solid #ddd;border-radius:10px;padding:9px 12px;font-size:0.85rem;font-weight:700;color:#1a1008;flex:1">
-            </select>
-            <button onclick="printExpenseReport()"
-                style="background:#27ae60;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:800;font-size:0.85rem;cursor:pointer">
-                🖨️ Drucken
-            </button>
-            <button onclick="openChangePinModal()"
-                style="background:#f0ece6;color:#555;border:1.5px solid #ddd;border-radius:10px;padding:10px 12px;font-weight:700;font-size:0.82rem;cursor:pointer">
-                🔑 PIN ändern
+            <button id="aus-tab-archiv" onclick="switchAusgabenTab('archiv')"
+                style="flex:1;padding:9px;border:none;border-radius:8px;font-weight:800;font-size:0.85rem;cursor:pointer;background:transparent;color:#888">
+                🗃️ Archiv
             </button>
         </div>
+
+        <!-- Ausgaben Panel -->
+        <div id="aus-panel-ausgaben">
+            <!-- Toolbar -->
+            <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+                <button onclick="openAddExpense()"
+                    style="background:#c8972a;color:#1a1008;border:none;border-radius:10px;padding:10px 16px;font-weight:800;font-size:0.88rem;cursor:pointer">
+                    ➕ Neue Ausgabe
+                </button>
+                <select id="expense-month-filter" onchange="loadExpenses()"
+                    style="border:1.5px solid #ddd;border-radius:10px;padding:9px 12px;font-size:0.85rem;font-weight:700;color:#1a1008;flex:1">
+                </select>
+                <button onclick="printExpenseReport()"
+                    style="background:#27ae60;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:800;font-size:0.85rem;cursor:pointer">
+                    🖨️ Drucken
+                </button>
+                <button onclick="openChangePinModal()"
+                    style="background:#f0ece6;color:#555;border:1.5px solid #ddd;border-radius:10px;padding:10px 12px;font-weight:700;font-size:0.82rem;cursor:pointer">
+                    🔑 PIN ändern
+                </button>
+            </div>
 
         <!-- Summary bar -->
         <div id="expense-summary-bar" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px"></div>
 
         <!-- Expenses list -->
         <div id="expense-list"></div>
+        </div><!-- end aus-panel-ausgaben -->
 
-    </div>
+        <!-- Archiv Panel -->
+        <div id="aus-panel-archiv" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <span style="font-weight:800;font-size:0.9rem;color:#1a1008">🗃️ Archivierte Bestellungen</span>
+                <button onclick="loadArchiv()" style="background:#f0ece6;border:1.5px solid #ddd;border-radius:8px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:#555">
+                    🔄 Aktualisieren
+                </button>
+            </div>
+            <div id="archiv-list"><div style="text-align:center;padding:30px;color:#bbb">Wird geladen...</div></div>
+        </div>
+
+    </div><!-- end ausgaben-content -->
 </div><!-- end view-ausgaben -->
 
 </div>
@@ -728,7 +750,7 @@
 
         <div class="d-flex gap-2">
             <button class="btn btn-success flex-fill fw-bold" onclick="saveEditedOrder()">💾 Speichern</button>
-            <button class="btn btn-outline-warning" onclick="deleteOrder()">📦 Archivieren</button>
+
         </div>
         <div style="margin-top:8px;font-size:0.75rem;color:#888;text-align:center">
             📋 Bestellungen werden dauerhaft für das Finanzamt gespeichert.
@@ -768,7 +790,7 @@
 
 <!-- ══════════ NEW ORDER MODAL ══════════ -->
 <div class="modal-overlay" id="new-order-modal" style="z-index:1200">
-    <div class="modal-box" style="max-width:680px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:96vh">
+    <div class="modal-box" style="max-width:680px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92dvh">
 
         <!-- Header -->
         <div style="background:#1a1008;color:#e8b84b;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
@@ -777,7 +799,7 @@
         </div>
 
         <!-- Step 1: Table Selection -->
-        <div id="no-step-1" class="no-step active" style="padding:20px;overflow-y:auto">
+        <div id="no-step-1" class="no-step active" style="padding:20px;overflow-y:auto;flex:1">
             <p class="text-muted mb-3" style="font-size:0.92rem">Welcher Tisch möchte bestellen?</p>
             <div class="table-grid" id="no-table-grid"></div>
             <div class="mt-4 d-flex gap-2">
@@ -788,7 +810,7 @@
         </div>
 
         <!-- Step 2: Menu Selection -->
-        <div id="no-step-2" class="no-step" style="display:flex;flex-direction:column;overflow:hidden;flex:1">
+        <div id="no-step-2" class="no-step" style="display:none;flex-direction:column;overflow:hidden;flex:1;min-height:0;height:0">
             <!-- Category tabs -->
             <div style="background:#2a1a06;padding:8px 12px;flex-shrink:0;position:relative">
                 <div class="no-cat-tabs" id="no-cat-tabs" onscroll="updateTabsScroll()"></div>
@@ -797,7 +819,7 @@
                 </div>
             </div>
             <!-- Items -->
-            <div id="no-menu-panel" style="padding:14px;overflow-y:auto;flex:1;min-height:0;background:#f5f2ee"></div>
+            <div id="no-menu-panel" style="padding:14px;overflow-y:auto;flex:1;min-height:0;background:#f5f2ee;-webkit-overflow-scrolling:touch"></div>
             <!-- Cart bar -->
             <div style="padding:12px 16px;background:#fff;border-top:1px solid #eee;flex-shrink:0">
                 <div class="no-cart-bar mb-2" onclick="noToggleCart()">
@@ -1037,6 +1059,104 @@ function printSalesReport() {
 }
 
 
+
+// ══════════ AUSGABEN SUB-TABS ══════════
+function switchAusgabenTab(tab) {
+    ['ausgaben','archiv'].forEach(t => {
+        const btn   = document.getElementById('aus-tab-' + t);
+        const panel = document.getElementById('aus-panel-' + t);
+        if (t === tab) {
+            btn.style.background = '#1a1008';
+            btn.style.color = '#e8b84b';
+            panel.style.display = 'block';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = '#888';
+            panel.style.display = 'none';
+        }
+    });
+    if (tab === 'archiv') loadArchiv();
+}
+
+// ══════════ ARCHIV ══════════
+function loadArchiv() {
+    const list = document.getElementById('archiv-list');
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb">Wird geladen...</div>';
+
+    fetch(API + '/orders?include_archived=true')
+    .then(r => r.json())
+    .then(orders => {
+        const archived = orders.filter(o => o.archived);
+        if (!archived.length) {
+            list.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb">Keine archivierten Bestellungen</div>';
+            return;
+        }
+        const fmt = v => v ? parseFloat(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €' : '—';
+        list.innerHTML = archived.map(o => {
+            const items = (o.items||[]).map(i => `${i.qty}× ${i.name}`).join(', ');
+            return `
+            <div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.05)">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                    <div>
+                        <span style="font-weight:800;font-size:0.95rem">Tisch ${o.table_number}</span>
+                        <span style="color:#aaa;font-size:0.78rem;margin-left:8px">${o.created_at ? o.created_at.slice(0,16) : ''}</span>
+                    </div>
+                    <span style="font-weight:900;font-size:1rem;color:#1a1008">${fmt(o.total)}</span>
+                </div>
+                <div style="font-size:0.82rem;color:#888;margin-bottom:10px">${items}</div>
+                <div style="font-size:0.72rem;color:#bbb;margin-bottom:10px">
+                    Archiviert: ${o.archived_at ? o.archived_at.slice(0,16) : '—'}
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button onclick="restoreOrder(${o.id})"
+                        style="flex:1;background:#2c6fad;color:#fff;border:none;border-radius:8px;padding:8px;font-weight:700;font-size:0.82rem;cursor:pointer">
+                        🔄 Wiederherstellen
+                    </button>
+                    <button onclick="deleteArchivedOrder(${o.id})"
+                        style="background:#e74c3c;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-weight:700;font-size:0.82rem;cursor:pointer">
+                        🗑️ Löschen
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    });
+}
+
+function archiveFromEdit() {
+    const id = editingOrder ? editingOrder.id : null;
+    if (!id) return;
+    if (!confirm('Bestellung archivieren? Sie wird aus dem Dashboard entfernt.')) return;
+    fetch(API + '/orders/' + id + '/archive', { method: 'PUT' })
+    .then(() => {
+        closeEditModal();
+        loadOrders();
+        showToast('🗃️ Archiviert');
+    });
+}
+
+function restoreOrder(id) {
+    if (!confirm('Bestellung wiederherstellen?')) return;
+    fetch(API + '/orders/' + id, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({archived: false, archived_at: null})
+    })
+    .then(() => {
+        showToast('✅ Wiederhergestellt!');
+        loadArchiv();
+        loadOrders();
+    });
+}
+
+function deleteArchivedOrder(id) {
+    if (!confirm('Bestellung dauerhaft löschen? Dies kann nicht rückgängig gemacht werden.')) return;
+    fetch(API + '/orders/' + id, { method: 'DELETE' })
+    .then(() => {
+        showToast('🗑️ Gelöscht');
+        loadArchiv();
+    });
+}
+
 // ══════════ AUSGABEN ══════════
 let ausgabenUnlocked = false;
 let expenseEditingId = null;
@@ -1063,6 +1183,8 @@ function checkPin() {
             document.getElementById('pin-error').style.display = 'none';
             initExpenseMonthFilter();
             loadExpenses();
+            initSummaryDatePicker();
+            renderDailySummary();
         } else {
             document.getElementById('pin-error').style.display = 'block';
             document.getElementById('pin-input').value = '';
@@ -1671,8 +1793,7 @@ function renderOrders() {
             ? `<span class="order-status-pill pill-pending">⏳ Ausstehend</span>`
             : `<span class="order-status-pill pill-paid">✅ Bezahlt</span>`;
 
-        const timerHtml = timer
-            ? `<div class="order-timer ${timer.cls}">⏱ ${timer.label}</div>` : '';
+        const timerHtml = '';
 
         const timeSmall = order.created_at
             ? `<div class="order-time-small">🕐 ${order.created_at.slice(11,16)} Uhr</div>` : '';
@@ -1823,7 +1944,7 @@ function openTischModal(tableNum) {
             <div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,0.05)">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
                     <span style="font-size:0.75rem;color:#aaa">🕐 ${o.created_at ? o.created_at.slice(11,16)+' Uhr' : ''} · #${o.id}</span>
-                    ${timer ? `<span style="background:${timer.cls==='timer-fresh'?'#d4edda':timer.cls==='timer-medium'?'#fff3cd':'#f8d7da'};color:${timer.cls==='timer-fresh'?'#155724':timer.cls==='timer-medium'?'#856404':'#721c24'};border-radius:8px;padding:2px 8px;font-size:0.72rem;font-weight:700">⏱ ${timer.label}</span>` : ''}
+
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">${chips}</div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
@@ -2031,6 +2152,9 @@ function autoPrintReceipt(order) {
 function openEditModal(id) {
     const order = allOrders.find(o => o.id === id);
     if (!order) return;
+    // Show archive button only if owner is logged in
+    const archivBtn = document.getElementById('archiv-btn-edit');
+    if (archivBtn) archivBtn.style.display = ausgabenUnlocked ? 'inline-block' : 'none';
     editingOrder = order;
     editItems = JSON.parse(JSON.stringify(order.items || []));
     document.getElementById('edit-table-label').textContent =
@@ -2116,6 +2240,8 @@ const menuData = {
         { id:508, img:"https://res.cloudinary.com/dmcgszod1/image/upload/sprite0.4L_gqcsqs.jpg",         name:"Sprite 0.4L",          price:4.00, type:'drink' },
         { id:509, img:"https://res.cloudinary.com/dmcgszod1/image/upload/fanta0.2L_apklkj.webp",         name:"Fanta 0.2L",           price:2.40, type:'drink' },
         { id:510, img:"https://res.cloudinary.com/dmcgszod1/image/upload/fanta0.4L_bgqdzg.jpg",          name:"Fanta 0.4L",           price:4.00, type:'drink' },
+        { id:517, img:"https://res.cloudinary.com/dmcgszod1/image/upload/spezi_0.2L_zqmbyv.jpg",          name:"Spezi 0.2L",           price:2.40, type:'drink' },
+        { id:518, img:"https://res.cloudinary.com/dmcgszod1/image/upload/spezi_0.4L_uxt2mj.webp",         name:"Spezi 0.4L",           price:4.00, type:'drink' },
         { id:511, img:"https://res.cloudinary.com/dmcgszod1/image/upload/apfelschorde0.2L_rixkej.jpg",   name:"Apfelschorle 0.2L",    price:2.40, type:'drink' },
         { id:512, img:"https://res.cloudinary.com/dmcgszod1/image/upload/apfelschorde0.4L_hzjky6.jpg",   name:"Apfelschorle 0.4L",    price:4.00, type:'drink' },
         { id:513, img:"https://res.cloudinary.com/dmcgszod1/image/upload/wasserstill0.2L_z8aicn.jpg",    name:"Wasser Still 0.2L",    price:2.50, type:'drink' },
@@ -2135,7 +2261,8 @@ const menuData = {
         { id:704, img:"https://res.cloudinary.com/dmcgszod1/image/upload/weizen_alkoholfrei_tmxvj8.jpg",     name:"Weizen Alkoholfrei",      price:5.00, type:'drink' },
         { id:705, img:"https://res.cloudinary.com/dmcgszod1/image/upload/Weizen_mit_alkohol_qrrwah.jpg",     name:"Weizen mit Alkohol",      price:5.00, type:'drink' },
         { id:706, img:"https://res.cloudinary.com/dmcgszod1/image/upload/Wein_sgnerr.webp",                  name:"Wein / Sekt",             price:0.00, type:'drink' },
-        { id:707, img:"https://res.cloudinary.com/dmcgszod1/image/upload/Aragh_Sagi_xb6yo9.jpg",             name:"Aragh Sagi 0.2L",         price:5.00, type:'drink' },
+        { id:707, img:"https://res.cloudinary.com/dmcgszod1/image/upload/Aragh_Sagi_xb6yo9.jpg",             name:"Aragh Sagi 0.2L",         price:5.00,  type:'drink' },
+        { id:708, img:"https://res.cloudinary.com/dmcgszod1/image/upload/Aragh_Sagi_0.4L_a2shmj.jpg",      name:"Aragh Sagi 0.4L",         price:10.00, type:'drink' },
     ]},
 };
 
@@ -2472,64 +2599,85 @@ function printKitchenTicket(id) {
             sectionsHtml += `<div class="cat-section"><div class="cat-label">┌─ ${label}</div><div class="cat-items">${lines}</div><div class="cat-bottom"></div></div>`;
         });
 
-        const win = window.open("", "_blank", "width=400,height=600");
+        // Rebuild sectionsHtml with new large-print format
+        let largeSectionsHtml = '';
+        allCats.forEach(({ key, label }) => {
+            if (!groups[key] || !groups[key].length) return;
+            const lines = groups[key].map(item => `
+                <div class="item-block">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-qty">[ ${item.qty} ]</div>
+                </div>`
+            ).join('');
+            largeSectionsHtml += `
+                <div class="cat-section">
+                    <div class="cat-label">&gt;&gt;&gt; ${label.toUpperCase()} &lt;&lt;&lt;</div>
+                    ${lines}
+                    <div class="cat-divider">================================</div>
+                </div>`;
+        });
+
+        const timeStr = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+        const dateStr = new Date().toLocaleDateString('de-DE');
+
+        const win = window.open("", "_blank", "width=400,height=700");
         win.document.write(`<html><head><title>Küche Bon</title>
         <style>
           * { margin:0; padding:0; box-sizing:border-box; }
-          body { font-family:'Courier New',monospace; padding:10px; font-size:16px; }
-          h2 { text-align:center; font-size:1.8rem; margin-bottom:4px; }
-          .meta { text-align:center; font-size:1.1rem; margin-bottom:3px; }
-          .cat-section { margin-top:14px; font-family:'Courier New',monospace; }
-          .cat-items { padding:4px 10px; border-left:1px solid #000; border-right:1px solid #000; }
+          body { font-family:'Courier New',monospace; padding:8px 12px; background:#fff; }
+          .header-line { text-align:center; font-size:1rem; font-weight:900; letter-spacing:2px; }
+          .divider { text-align:center; font-size:1rem; margin:6px 0; letter-spacing:1px; }
+          .tisch { text-align:center; font-size:2.2rem; font-weight:900; margin:8px 0 2px; }
+          .zeit  { text-align:center; font-size:1.1rem; color:#333; margin-bottom:4px; }
+          .cat-section { margin-top:16px; }
           .cat-label {
             font-size:1.1rem;
             font-weight:900;
-            letter-spacing:1px;
-            white-space:nowrap;
-            border-top:1px solid #000;
-            border-left:1px solid #000;
-            border-right:1px solid #000;
-            padding:4px 10px 2px;
-            text-transform:uppercase;
+            letter-spacing:2px;
+            text-align:center;
+            margin-bottom:10px;
           }
-          .cat-bottom {
-            border-bottom:1px solid #000;
-            border-left:1px solid #000;
-            border-right:1px solid #000;
-            height:6px;
+          .item-block {
+            margin-bottom:16px;
+            padding-bottom:14px;
+            border-bottom:1px dashed #aaa;
           }
-          .item-row {
-            display:flex;
-            justify-content:space-between;
-            align-items:baseline;
-            padding:5px 0;
-            border-bottom:1px dotted #bbb;
-          }
-          .item-row:last-child { border-bottom:none; }
-          .item-qty {
-            font-size:1.5rem;
-            font-weight:900;
-            white-space:nowrap;
-            margin-left:12px;
-          }
+          .item-block:last-child { border-bottom:none; }
           .item-name {
-            font-size:1.3rem;
-            font-weight:bold;
+            font-size:1.6rem;
+            font-weight:900;
+            line-height:1.3;
             word-break:break-word;
+          }
+          .item-qty {
+            font-size:2.8rem;
+            font-weight:900;
+            text-align:right;
+            letter-spacing:2px;
+            margin-top:4px;
+          }
+          .cat-divider {
+            text-align:center;
+            font-size:0.9rem;
+            margin-top:14px;
+            letter-spacing:1px;
+            color:#555;
           }
           @media print {
             @page { margin:0; size:80mm auto; }
-            body { padding:4px; font-size:15px; }
+            body { padding:6px 10px; }
           }
         </style></head><body>
-        <h2>🍳 KÜCHE BON</h2>
-        <p class="meta"><b>Tisch: ${order.table_number}</b></p>
-        <p class="meta">${now}</p>
-        <hr style="border-style:dashed;margin:8px 0">
-        ${sectionsHtml}
+        <div class="divider">================================</div>
+        <div class="header-line">KUCHE BON</div>
+        <div class="divider">================================</div>
+        <div class="tisch">TISCH ${order.table_number}</div>
+        <div class="zeit">${dateStr} &nbsp; ${timeStr} Uhr</div>
+        <div class="divider">================================</div>
+        ${largeSectionsHtml}
         </body></html>`);
         win.document.close();
-        win.print();
+        setTimeout(() => { win.print(); win.close(); }, 400);
     });
 }
 
@@ -2827,7 +2975,10 @@ function noShowStep(activeId) {
     ['no-step-1','no-step-2','no-step-3'].forEach(id => {
         const el = document.getElementById(id);
         if (id === activeId) {
-            el.style.display = '';
+            // step-2 needs flex display to work correctly
+            el.style.display = (id === 'no-step-2') ? 'flex' : '';
+            el.style.height = (id === 'no-step-2') ? '0' : '';
+            el.style.flex   = (id === 'no-step-2') ? '1' : '';
             el.classList.add('active');
         } else {
             el.style.display = 'none';
