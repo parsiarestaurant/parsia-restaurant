@@ -750,7 +750,7 @@
 
         <div class="d-flex gap-2">
             <button class="btn btn-success flex-fill fw-bold" onclick="saveEditedOrder()">💾 Speichern</button>
-            <button id="archiv-btn-edit" class="btn btn-outline-warning" onclick="archiveFromEdit()" style="display:none">🗃️ Archivieren</button>
+            <button class="btn btn-outline-warning" onclick="archiveFromEdit()">🗃️ Archivieren</button>
         </div>
         <div style="margin-top:8px;font-size:0.75rem;color:#888;text-align:center">
             📋 Bestellungen werden dauerhaft für das Finanzamt gespeichert.
@@ -2152,9 +2152,7 @@ function autoPrintReceipt(order) {
 function openEditModal(id) {
     const order = allOrders.find(o => o.id === id);
     if (!order) return;
-    // Show archive button only if owner is logged in
-    const archivBtn = document.getElementById('archiv-btn-edit');
-    if (archivBtn) archivBtn.style.display = ausgabenUnlocked ? 'inline-block' : 'none';
+
     editingOrder = order;
     editItems = JSON.parse(JSON.stringify(order.items || []));
     document.getElementById('edit-table-label').textContent =
