@@ -381,7 +381,7 @@ def update_expense(expense_id: int, data: dict, db: Session = Depends(get_db)):
     exp = db.query(database.Expense).filter(database.Expense.id == expense_id).first()
     if not exp:
         raise HTTPException(status_code=404, detail="Not found")
-    for field in ["date", "description", "amount", "category", "created_by", "receipt_number", "receipt_image"]:
+    for field in ["date", "description", "amount", "category", "created_by", "receipt_number"]:
         if field in data:
             setattr(exp, field, data[field])
     db.commit()

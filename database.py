@@ -62,7 +62,6 @@ class Expense(Base):
     created_by      = Column(String, default="Inhaber")
     created_at      = Column(String)
     receipt_number  = Column(String, nullable=True)   # شماره رسید
-    receipt_image   = Column(String, nullable=True)   # URL عکس رسید در Cloudinary
 
 # ----------------------
 # SETTINGS TABLE MODEL
