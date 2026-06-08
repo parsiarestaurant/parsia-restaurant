@@ -825,8 +825,8 @@
         .empty-cart {
             text-align: center;
             color: var(--text-soft);
-            padding: 50px 20px;
-            font-size: 1.2rem;
+            padding: 20px 20px;
+            font-size: 1.1rem;
             font-family: 'Cormorant Garamond', serif;
         }
 
@@ -1777,6 +1777,7 @@ function showSection(id, tab) {
     if (el) el.classList.add('active');
     if (tab) tab.classList.add('active');
     document.getElementById('drink-subtabs').classList.remove('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showDrinksSection(tab) {
@@ -1785,6 +1786,7 @@ function showDrinksSection(tab) {
     document.getElementById('drinks-section').classList.add('active');
     tab.classList.add('active');
     document.getElementById('drink-subtabs').classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function toggleAccordion(key) {
