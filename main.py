@@ -424,3 +424,23 @@ def verify_pin(data: dict, db: Session = Depends(get_db)):
     s = db.query(database.Setting).filter(database.Setting.key == "owner_pin").first()
     stored = s.value if s else "0000"
     return {"valid": data.get("pin") == stored}
+
+@app.get("/admin/run-migration")
+def run_migration():
+    """یک‌بار اجرا کنید تا ستون‌های جدید اضافه شوند"""
+    from sqlalchemy import text
+    results = []
+    with engine.connect() as conn:
+        migrations = [
+            "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS receipt_number VARCHAR",
+            "ALTER TABLE orders ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE orders ADD COLUMN IF NOT EXISTS archived_at VARCHAR",
+        ]
+        for sql in migrations:
+            try:
+                conn.execute(text(sql))
+                conn.commit()
+                results.append(f"✅ {sql[:50]}")
+            except Exception as e:
+                results.append(f"⚠️ {str(e)[:80]}")
+    return {"results": results}
