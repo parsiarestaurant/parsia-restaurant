@@ -8,7 +8,7 @@ import os
 base_url = "https://parsia-restaurant.onrender.com/frontend/menu.html?table="
 tables = 16
 output_folder = "qrcodes"
-logo_path = "logo.jpg"
+logo_path = "frontend/images/logo/logo.jpg"
 
 os.makedirs(output_folder, exist_ok=True)
 
