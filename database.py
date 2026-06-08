@@ -77,6 +77,23 @@ class Setting(Base):
 # ----------------------
 Base.metadata.create_all(bind=engine)
 
+# ── Add missing columns (safe to run multiple times) ──
+def run_migrations():
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        safe_migrations = [
+            "ALTER TABLE expenses ADD COLUMN IF NOT EXISTS receipt_number VARCHAR",
+        ]
+        for sql in safe_migrations:
+            try:
+                conn.execute(text(sql))
+                conn.commit()
+                print(f"✅ Migration OK: {sql[:60]}")
+            except Exception as e:
+                print(f"ℹ️ Migration skip: {e}")
+
+run_migrations()
+
 # ── Initialize default settings after table creation ──
 def init_defaults():
     from sqlalchemy.orm import Session
