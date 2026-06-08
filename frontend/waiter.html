@@ -1061,40 +1061,6 @@ function printSalesReport() {
 
 
 
-// ══════════ RECEIPT IMAGE UPLOAD ══════════
-const CL_CLOUD  = "dmcgszod1";
-const CL_PRESET = "parsia_receipts";
-
-function previewReceiptImage(input) {
-    if (!input.files || !input.files[0]) return;
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('exp-receipt-img').src = e.target.result;
-        document.getElementById('exp-receipt-preview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-}
-
-function clearReceiptImage() {
-    document.getElementById('exp-receipt-file').value = '';
-    document.getElementById('exp-receipt-url').value = '';
-    document.getElementById('exp-receipt-preview').style.display = 'none';
-    document.getElementById('exp-receipt-img').src = '';
-}
-
-async function uploadReceiptToCloudinary(file) {
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', CL_PRESET);
-    fd.append('folder', 'receipts');
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`, {
-        method: 'POST', body: fd
-    });
-    const data = await res.json();
-    return data.secure_url;
-}
-
 // ══════════ AUSGABEN SUB-TABS ══════════
 function switchAusgabenTab(tab) {
     ['ausgaben','archiv'].forEach(t => {
@@ -1312,7 +1278,6 @@ function renderExpenseList(expenses) {
                         <span style="background:${CAT_COLORS[e.category]||'#95a5a6'}22;color:${CAT_COLORS[e.category]||'#95a5a6'};border-radius:20px;padding:2px 8px;font-size:0.72rem;font-weight:700">${e.category}</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px">
-                        ${e.receipt_image ? `<img src="${e.receipt_image}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid #eee" onclick="event.stopPropagation();window.open('${e.receipt_image}','_blank')">` : ''}
                         <div style="font-weight:900;font-size:1rem;color:#1a1008;white-space:nowrap">${fmt(e.amount)}</div>
                         <span style="color:#ccc;font-size:0.8rem">✏️</span>
                     </div>
@@ -1332,12 +1297,11 @@ function openAddExpense() {
     document.getElementById('exp-editing-id').value = '';
     document.getElementById('exp-delete-btn').style.display = 'none';
     document.getElementById('exp-receipt-number').value = '';
-    clearReceiptImage();
     document.getElementById('expense-modal').classList.add('open');
     setTimeout(() => document.getElementById('exp-desc').focus(), 100);
 }
 
-function openEditExpense(id, date, desc, amount, category, receiptNum, receiptImg) {
+function openEditExpense(id, date, desc, amount, category, receiptNum) {
     expenseEditingId = id;
     document.getElementById('expense-modal-title').textContent = '✏️ Ausgabe bearbeiten';
     document.getElementById('exp-date').value     = date;
@@ -1346,13 +1310,6 @@ function openEditExpense(id, date, desc, amount, category, receiptNum, receiptIm
     document.getElementById('exp-category').value = category;
     document.getElementById('exp-editing-id').value = id;
     document.getElementById('exp-receipt-number').value = receiptNum || '';
-    document.getElementById('exp-receipt-url').value    = receiptImg || '';
-    if (receiptImg) {
-        document.getElementById('exp-receipt-img').src = receiptImg;
-        document.getElementById('exp-receipt-preview').style.display = 'block';
-    } else {
-        clearReceiptImage();
-    }
     document.getElementById('exp-delete-btn').style.display = 'inline-block';
     document.getElementById('expense-modal').classList.add('open');
 }
@@ -1362,31 +1319,17 @@ function closeExpenseModal() {
     expenseEditingId = null;
 }
 
-async function saveExpense() {
+function saveExpense() {
     const data = {
         date:           document.getElementById('exp-date').value,
         description:    document.getElementById('exp-desc').value.trim(),
         amount:         parseFloat(document.getElementById('exp-amount').value),
         category:       document.getElementById('exp-category').value,
         receipt_number: document.getElementById('exp-receipt-number').value.trim() || null,
-        receipt_image:  document.getElementById('exp-receipt-url').value || null,
     };
     if (!data.description || !data.amount || !data.date) {
         alert('Bitte alle Felder ausfüllen!'); return;
     }
-
-    // Upload image if selected
-    const fileInput = document.getElementById('exp-receipt-file');
-    if (fileInput.files && fileInput.files[0]) {
-        try {
-            showToast('⏳ Bild wird hochgeladen...');
-            data.receipt_image = await uploadReceiptToCloudinary(fileInput.files[0]);
-        } catch(e) {
-            alert('Fehler beim Hochladen des Belegs: ' + e.message);
-            return;
-        }
-    }
-
     const id = document.getElementById('exp-editing-id').value;
     const url    = id ? API + '/expenses/' + id : API + '/expenses';
     const method = id ? 'PUT' : 'POST';
@@ -3050,6 +2993,15 @@ function noShowStep(activeId) {
     });
 }
 
+function showToast(msg, duration=2200) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.style.opacity = '0', duration);
+}
+
 setInterval(loadOrders, 5000);
 loadOrders();
 initSummaryDatePicker();
@@ -3119,16 +3071,7 @@ function installApp() {
             <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Belegnummer <span style="font-weight:400;color:#aaa">(optional)</span></label>
             <input type="text" id="exp-receipt-number" class="form-control" placeholder="z.B. RE-2026-001">
         </div>
-        <div class="mb-3">
-            <label style="font-size:0.82rem;font-weight:700;color:#555;margin-bottom:4px;display:block">Beleg / Foto <span style="font-weight:400;color:#aaa">(optional)</span></label>
-            <input type="file" id="exp-receipt-file" accept="image/*" class="form-control"
-                onchange="previewReceiptImage(this)">
-            <div id="exp-receipt-preview" style="margin-top:8px;display:none">
-                <img id="exp-receipt-img" src="" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid #ddd;object-fit:contain">
-                <button onclick="clearReceiptImage()" style="display:block;margin-top:4px;background:none;border:none;color:#e74c3c;font-size:0.78rem;cursor:pointer">✕ Entfernen</button>
-            </div>
-            <input type="hidden" id="exp-receipt-url">
-        </div>
+
         <input type="hidden" id="exp-editing-id">
         <div class="d-flex gap-2">
             <button class="btn btn-success flex-fill fw-bold" onclick="saveExpense()">💾 Speichern</button>
@@ -3161,5 +3104,6 @@ function installApp() {
         </div>
     </div>
 </div>
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1008;color:#e8b84b;padding:10px 22px;border-radius:20px;font-weight:700;font-size:0.88rem;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap"></div>
 </body>
 </html>
